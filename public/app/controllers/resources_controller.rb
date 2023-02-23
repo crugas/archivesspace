@@ -381,7 +381,7 @@ class ResourcesController < ApplicationController
     @base_search= @base_search.sub("q=#{qry}", '')
     page = Integer(params.fetch(:page, "1"))
 
-    @results = archivesspace.search(@query, page, @criteria)
+    @results = archivesspace.search(@query, page, @criteria.merge({'sort' => 'ao_tree_position_u_ssort asc'}))
 
     if @results['total_hits'] > 0
       process_search_results(@base_search)

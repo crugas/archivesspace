@@ -1,4 +1,5 @@
 # Schema inherits from the abstract_archival_object schema, and must only include extensions/overrides unique to archival object records.
+# Schema inherits from the abstract_archival_object schema, and must only include extensions/overrides unique to archival object records.
 
 {
   :schema => {
@@ -142,6 +143,8 @@
         "readonly" => "true",
         "items" => {"type" => "JSONModel(:rights_restriction) object"},
       },
+
+      "tree_position" => {"type" => "string", "readonly" => "true"},
     },
   },
 }

@@ -411,6 +411,7 @@ module TreeNodes
       jsons = super
 
       positions = calculate_logical_ao_positions(objs)
+      tree_positions = calculate_tree_positions(objs)
 
       jsons.zip(objs).each do |json, obj|
         if obj.root_record_id
@@ -435,6 +436,8 @@ module TreeNodes
         if node_model.publishable?
           json['has_unpublished_ancestor'] = calculate_has_unpublished_ancestor(obj)
         end
+
+        json['tree_position'] = tree_positions.fetch(obj.id)
       end
 
       jsons
@@ -488,6 +491,36 @@ module TreeNodes
       result
     end
 
+
+    def calculate_tree_positions(objs)
+      ancestors = {}
+      positions = {}
+
+      to_process = objs
+      while(true)
+        next_batch_ids = Set.new
+        to_process.each do |obj|
+          positions[obj.id] ||= obj.position
+
+          if obj.parent_id
+            next_batch_ids << obj.parent_id
+            ancestors[obj.id] ||= []
+            ancestors[obj.id] << obj.parent_id
+            ancestors.clone.each do |_, ids|
+              if ids.include?(obj.id)
+                ids << obj.parent_id
+              end
+            end
+          end
+        end
+
+        break if next_batch_ids.empty?
+
+        to_process = self.node_model.filter(:id => next_batch_ids.to_a)
+      end
+
+      objs.map{|obj| [obj.id, ([obj.id] + ancestors.fetch(obj.id, [])).reverse.map{|node_id| positions.fetch(node_id).to_s(16).rjust(16, '0')}.join]}.to_h
+    end
 
     def calculate_has_unpublished_ancestor(obj, check_root_record = true)
       if check_root_record && obj.root_record_id

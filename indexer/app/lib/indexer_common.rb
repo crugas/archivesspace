@@ -408,6 +408,7 @@ class IndexerCommon
         doc['ref_id'] = record['record']['ref_id']
         doc['slug'] = record['record']['slug']
         doc['is_slug_auto'] = record['record']['is_slug_auto']
+        doc['ao_tree_position_u_ssort'] = record['record']['tree_position']
       end
     }
 
@@ -534,6 +535,7 @@ class IndexerCommon
           doc['processing_priority'] = cm['processing_priority']
           doc['processors'] = cm['processors']
         end
+        doc['ao_tree_position_u_ssort'] = '0'.rjust(16, '0')
       end
 
       if doc['primary_type'] == 'digital_object'

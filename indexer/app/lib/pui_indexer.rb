@@ -80,16 +80,21 @@ class PUIIndexer < PeriodicIndexer
         # fields too - the json sent to indexer_common only has directly inherited
         # fields because only they should be indexed.
         # so we remerge without the :direct_only flag, and we remove the ancestors
-        doc['json'] = ASUtils.to_json(RecordInheritance.merge(record['record'],
-                                                              :remove_ancestors => true))
+        doc['json'] = ASUtils.to_json(RecordInheritance.merge(record['record']))
 
         # special handling for title because it is populated from display_string
         # in indexer_common and display_string is not changed in the merge process
         doc['title'] = record['record']['title'] if record['record']['title']
 
+        if doc['primary_type'] == 'archival_object'
+          # Index the archival object position in the tree
+        end
+
+
         # special handling for fullrecord because we don't want the ancestors indexed.
         # we're now done with the ancestors, so we can just delete them from the record
         record['record'].delete('ancestors')
+
         doc['fullrecord'] = IndexerCommon.build_fullrecord(record)
         doc['fullrecord_published'] = IndexerCommon.build_fullrecord(record, published_only=true)
       end
