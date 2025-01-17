@@ -43,7 +43,7 @@ en:
     cite_item_description: Cite Item Description
     digitized: View Digital Material
     request: Request
-    print: Print
+    print: Download PDF
     print-generating: Generating
     collection_overview: Collection Overview
     hierarch: Collection Organization
@@ -96,6 +96,18 @@ en:
   searched-field: "searching %{field}"
 
   search_results:
+    highlighting:
+      found_in: Found in
+      four_part_id: Identifier
+      dates: Dates
+      subjects_text: Subjects
+      published_agents: Agents
+      creators_text: Creators
+      role_enum_s: Roles
+      linked_agent_roles: Linked Agent Roles
+      notes_published: Notes
+      finding_aid_title: Finding Aid Title
+      finding_aid_filing_title: Finding Aid Filing Title
     page_title: "Found %{count} Results"
     results_head: "Showing %{type}: %{start} - %{end} of %{total}"
     result: Result
@@ -118,8 +130,8 @@ en:
     filter_by: Filter By
     filtered_by: Filtered By
     remove_filter: Remove this filter
-    more_facets: more
-    fewer_facets: less
+    more_facets: More
+    fewer_facets: Less
     op:
       AND: and
       OR: or
@@ -202,6 +214,7 @@ en:
     backend_down_message: ArchivesSpace is currently experiencing technical difficulties. We
       apologise for the inconvenience. Please try again later.
     unexpected_error: Your request could not be completed due to an unexpected error
+    invalid_search_params: "Invalid search parameter '%{value}' for field '%{field}'"
 
   boolean:
     "true": "Yes"
@@ -215,6 +228,7 @@ en:
   navigation:
     hierarchical: hierarchical navigation
     top_level: top-level navigation
+    mobile_menu: Navigation menu for smaller devices
 
   internal_links:
     main: Main Content
@@ -288,6 +302,7 @@ en:
         accessions: Related Unprocessed Material
         deaccessions: Deaccessioned Material
         forms_part_of: Part Relationship
+        has_part: Part Relationship
         sibling_of: Sibling Relationship
 
   archival_object:
@@ -308,14 +323,21 @@ en:
     identifier_separator: ":"
     _public:
       identifier: Identifier
+      identifier_pdf: ID
+      identifier_ark: "ID [ark]"
+      ark_link_name: "Archival Resource Key"
       extent: Extent
+      extent_full: Full Extent
+      extent_partial: Partial Extent
       dates: Dates
       lang: Language of Materials
+      lang_pdf: Language of the Material
       script: Script
       digital_object: Digital Object
       physdesc: Physical Description
       storage: Container Information
       additional: Additional Description
+      uri: "ID [aspace_uri]"
       finding_aid:
         head: Finding Aid & Administrative Information
         title: Title
@@ -336,6 +358,15 @@ en:
       related_accessions:
         accessions: Accession Records
         deaccessions: Deaccession Records
+    load_records:
+      alert: This collection contains a large number of records
+      showing: Showing
+      percent_convention: "%"
+      load: Load records
+      load_all: Load all records
+      scroll: On scroll
+      all: All at once
+      loading: Loading
 
   top_container:
     _singular: Container
@@ -350,6 +381,11 @@ en:
       link: Link to digital object
       badge_label: Digital %{level}
       go: Go to file
+      additional: Additional File Versions
+      url_encoded_data: URL-encoded data
+      browse_number_digital_objects_in_collection:
+        one: Browse %{num} digital object in collection
+        other: Browse %{num} digital objects in collection
 
   subject:
     _singular: Subject
@@ -455,6 +491,10 @@ en:
     finding_aid_written_in: Finding aid written in
     your_finding_aid_pdf: Your finding aid PDF for "%{title}"
     your_finding_aid_is_attached: The finding aid you requested is attached.
+    accessrestrict: Conditions Governing Access
+    userestrict: Conditions Governing Use
+    accruals: Accruals
+    acqinfo: Immediate Source of Acquisition
 
   readmore:
     see_more: See more
@@ -551,3 +591,21 @@ en:
     fr: French
     de: German
     ja: Japanese
+
+  pdf_error:
+    title: There was an error generating this PDF.
+    description: "We're sorry, there was an error generating this PDF finding aid. Here is some diagnostic information to help determine what went wrong."
+    headings:
+      location: Error Location
+      message: Error Message
+      type: Error Type
+      additional_info: Additional Information
+    location:
+      location_header: "The error occurred while generating the header."
+      location_title_page: "The error occurred while generating the title page."
+      location_toc: "The error occurred while generating the table of contents."
+      location_resource: "The error occurred while generating sections relating to the Resource record, which includes Summary Information, Controlled Access Headings, and the Notes sections."
+      location_archival_object: "The error occurred while generating the Collection Inventory."
+      location_footer: "The error occurred while generating the footer."
+    additional_info:
+      invalid_markup: "This error can result from invalid markup present in a note or subrecord."

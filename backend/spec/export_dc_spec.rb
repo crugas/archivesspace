@@ -114,7 +114,7 @@ describe "Exported Dublin Core metadata" do
 
 
   it "points to the right schemas" do
-    schema_locations = "http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd".split(" ").sort.join(" ")
+    schema_locations = "http://purl.org/dc/elements/1.1/ https://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd http://purl.org/dc/terms/ https://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd".split(" ").sort.join(" ")
     expect(@dc.xpath("xmlns:dc", @dc.namespaces).attr("xsi:schemaLocation").value.split(" ").sort.join(" ")).to eq(schema_locations)
   end
 

@@ -109,9 +109,43 @@ describe 'OAI handler' do
         expect {
           check_oai_request_against_fixture("getrecord_#{prefix}",
                                             :verb => 'GetRecord',
-                                            :identifier => 'oai:archivesspace/' + @test_resource_record,
+                                            :identifier => 'oai:archivesspace:' + @test_resource_record,
                                             :metadataPrefix => prefix)
         }.not_to raise_error
+      end
+    end
+
+    context 'when include_uris is provided from AppConfig[:oai_ead_options] and is set to true' do
+      before do
+        AppConfig[:oai_ead_options] = { include_uris: true }
+      end
+
+      RESOURCE_BASED_FORMATS.each do |prefix|
+        it "responds to a GetRecord request for type #{prefix}, mapping appropriately" do
+          expect {
+            check_oai_request_against_fixture("getrecord_#{prefix}",
+                                              :verb => 'GetRecord',
+                                              :identifier => 'oai:archivesspace:' + @test_resource_record,
+                                              :metadataPrefix => prefix)
+          }.not_to raise_error
+        end
+      end
+    end
+
+    context 'when include_uris is provided from AppConfig[:oai_ead_options] and is set to false' do
+      before do
+        AppConfig[:oai_ead_options] = { include_uris: false }
+      end
+
+      RESOURCE_BASED_FORMATS.each do |prefix|
+        it "responds to a GetRecord request for type #{prefix}, mapping appropriately" do
+          expect {
+            check_oai_request_against_fixture("getrecord_#{prefix}_without_uris",
+                                              :verb => 'GetRecord',
+                                              :identifier => 'oai:archivesspace:' + @test_resource_record,
+                                              :metadataPrefix => prefix)
+          }.not_to raise_error
+        end
       end
     end
 
@@ -121,12 +155,12 @@ describe 'OAI handler' do
     #    expect {
     #      check_oai_request_against_fixture("getrecord_#{prefix}",
     #                                        :verb => 'GetRecord',
-    #                                        :identifier => 'oai:archivesspace/' + @test_archival_object_record,
+    #                                        :identifier => 'oai:archivesspace:' + @test_archival_object_record,
     #                                        :metadataPrefix => prefix)
 
     #     check_oai_request_against_fixture("getrecord_resource_#{prefix}",
     #                                        :verb => 'GetRecord',
-    #                                        :identifier => 'oai:archivesspace/' + @test_resource_record,
+    #                                        :identifier => 'oai:archivesspace:' + @test_resource_record,
     #                                        :metadataPrefix => prefix)
     #    }.not_to raise_error
     #  end
@@ -362,7 +396,7 @@ describe 'OAI handler' do
     describe 'DC output' do
       it "should map Conditions Governing Access and Conditions Governing Use to <dc:rights>" do
 
-        uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dc"
+        uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dc"
 
         response = get uri
         expect(response.body).to match(/<dc:rights.*>conditions governing access note<\/dc:rights>/)
@@ -373,7 +407,7 @@ describe 'OAI handler' do
       end
 
       it "should map Extents to dc:format, not dc:extent" do
-        uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dc"
+        uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dc"
 
         response = get uri
 
@@ -390,7 +424,7 @@ describe 'OAI handler' do
           AppConfig[:arks_enabled] = true
         end
         it "should output ARK name in identifier tag" do
-          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dc"
+          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dc"
           response = get uri
           resource_id = JSONModel(:resource).id_for(@test_resource_record)
           ark_url = ArkName.first(:resource_id => resource_id.to_i).value
@@ -402,7 +436,7 @@ describe 'OAI handler' do
           AppConfig[:arks_enabled] = false
         end
         it "should not output ARK name in identifier tag if ARK output is disabled" do
-          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dcterms"
+          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dcterms"
           response = get uri
           resource_id = @test_resource_record.split("/")[4]
           ark_url = ArkName.first(:resource_id => resource_id.to_i).value
@@ -416,7 +450,7 @@ describe 'OAI handler' do
           AppConfig[:arks_enabled] = true
         end
         it "should output ARK name in identifier tag" do
-          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dcterms"
+          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dcterms"
           response = get uri
           resource_id = @test_resource_record.split("/")[4]
           ark_url = ArkName.first(:resource_id => resource_id.to_i).value
@@ -428,7 +462,7 @@ describe 'OAI handler' do
           AppConfig[:arks_enabled] = false
         end
         it "should not output ARK name in identifier tag if ARK output is disabled" do
-          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dcterms"
+          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dcterms"
           response = get uri
           resource_id = @test_resource_record.split("/")[4]
           ark_url = ArkName.first(:resource_id => resource_id.to_i).value
@@ -442,7 +476,7 @@ describe 'OAI handler' do
           AppConfig[:arks_enabled] = true
         end
         it "should output ARK name in identifier tag" do
-          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_mods"
+          uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_mods"
           response = get uri
           resource_id = @test_resource_record.split("/")[4]
           ark_url = ArkName.first(:resource_id => resource_id.to_i).value
@@ -454,37 +488,37 @@ describe 'OAI handler' do
 
   describe 'publish flags' do
     it "should respect publish flags for dc exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_dc"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_dc"
       response = get uri
       expect(response.body).not_to match(/note with unpublished parent node/)
     end
 
     it "should respect publish flags for ead exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_ead"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_ead"
       response = get uri
       expect(response.body).not_to match(/note with unpublished parent node/)
     end
 
     it "should respect publish flags on creator agents for ead exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_ead"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_ead"
       response = get uri
       expect(response.body).not_to match(/UNPUBLISHED Creator Agent/)
     end
 
     it "should respect publish flags on source agents for ead exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_ead"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_ead"
       response = get uri
       expect(response.body).not_to match(/UNPUBLISHED Corporate Agent/)
     end
 
     it "should respect publish flags for marc exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_marc"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_marc"
       response = get uri
       expect(response.body).not_to match(/note with unpublished parent node/)
     end
 
     it "should respect publish flags for mods exports" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@test_resource_record}&metadataPrefix=oai_mods"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@test_resource_record}&metadataPrefix=oai_mods"
       response = get uri
       expect(response.body).not_to match(/note with unpublished parent node/)
     end
@@ -516,7 +550,7 @@ describe 'OAI handler' do
     end
 
     it "does not publish resources in a repository with OAI disabled" do
-      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace/#{@resource['uri']}&metadataPrefix=oai_marc"
+      uri = "/oai?verb=GetRecord&identifier=oai:archivesspace:#{@resource['uri']}&metadataPrefix=oai_marc"
 
       response = get uri
       expect(response.body).to match(/<error code="idDoesNotExist">/)

@@ -11,7 +11,7 @@ class Search
     query = if params[:q]
               Solr::Query.create_keyword_search(params[:q])
             elsif params[:aq] && params[:aq]['query']
-              Solr::Query.create_advanced_search(params[:aq])
+              Solr::Query.create_advanced_search(params[:aq], protect_unpublished: show_published_only)
             else
               Solr::Query.create_match_all_query
             end
@@ -31,7 +31,7 @@ class Search
       set_writer_type( params[:dt] || "json" )
 
     query.remove_csv_header if ( params[:dt] == "csv" and params[:no_csv_header] )
-    query.limit_fields_to(params[:fields]) if params[:fields] && AppConfig[:limit_csv_fields]
+    query.limit_fields_to(params[:fields]) if params[:fields] && (AppConfig[:limit_csv_fields] || params[:dt] != "csv")
 
     results = Solr.search(query)
 

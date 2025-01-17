@@ -14,7 +14,9 @@ class ArchivesSpaceClient
 
   DEFAULT_SEARCH_OPTS = {
     'publish' => true,
-    'page_size' => AppConfig[:pui_search_results_page_size] }
+    'page_size' => AppConfig[:pui_search_results_page_size],
+    'hl' => true
+  }
 
   def self.init
     @instance = self.new
@@ -147,8 +149,7 @@ class ArchivesSpaceClient
       Rails.logger.debug("POST Search url: #{url} ")
     end
     response = do_http_request(request)
-    if response.code != '200'
-      Rails.logger.debug("Code: #{response.code}")
+    if response.code.to_s != '200'
       raise RequestFailedException.new("#{response.code}: #{response.body}")
     end
     results = ASUtils.json_parse(response.body)

@@ -121,63 +121,76 @@ class IndexerCommon
   end
 
 
-  def self.extract_string_values(doc)
-    queue = [doc]
-    strings = []
+  def self.extract_string_values(doc, *opts)
+    return doc, doc if doc.is_a?(String)
 
-    while !queue.empty?
-      doc = queue.pop
+    if doc.is_a?(Array)
+      published_queue = doc.flatten
+    else
+      published_queue = [doc]
+    end
 
-      doc.each do |key, val|
-        if IndexerCommonConfig.fullrecord_excludes.include?(key) || key =~ /_enum_s$/
-          next # ignored
-        elsif val.is_a?(String)
-          strings.push(val)
-        elsif val.is_a?(Hash)
-          queue.push(val)
-        elsif val.is_a?(Array)
-          val.each do |v|
-            if v.is_a?(String)
-              strings.push(v)
-            elsif v.is_a?(Hash)
-              queue.push(v)
+    extract_unpublished = !opts.include?(:published_only)
+
+    unpublished_queue = []
+    published_strings = []
+    unpublished_strings = []
+    published_done = false
+
+    [
+      [published_queue, published_strings],
+      [unpublished_queue, unpublished_strings]
+    ].each do |queue, strings|
+
+      while !queue.empty?
+        doc = queue.pop
+
+        if (!published_done && doc.has_key?("publish") && !doc["publish"])
+          if extract_unpublished
+            unpublished_queue.push(doc)
+          end
+          next
+        end
+
+        doc.each do |key, val|
+          if IndexerCommonConfig.fullrecord_excludes.include?(key) || key =~ /_enum_s$/
+            next # ignored
+          elsif val.is_a?(String)
+            strings.push(val)
+          elsif val.is_a?(Hash)
+            queue.push(val)
+          elsif val.is_a?(Array)
+            val.flatten.each do |v|
+              if v.is_a?(String)
+                strings.push(v)
+              elsif v.is_a?(Hash)
+                queue.push(v)
+              end
             end
           end
         end
       end
-    end
 
-    strings.join(' ').strip
-  end
-
-
-  def self.build_fullrecord(record)
-    fullrecord = IndexerCommon.extract_string_values(record)
-    %w(finding_aid_subtitle finding_aid_author).each do |field|
-      if record['record'].has_key?(field)
-        fullrecord << " #{record['record'][field]}"
+      if extract_unpublished
+        published_done = true
+      else
+        break
       end
+
     end
 
-    if record['record'].has_key?('names')
-      fullrecord << " " + record['record']['names'].map {|name|
-        IndexerCommon.extract_string_values(name)
-      }.join(" ")
+    if extract_unpublished
+      return published_strings, unpublished_strings
+    else
+      return published_strings
     end
-    fullrecord.strip
   end
 
-  # There's a problem with how translation paths get loaded when selenium tests are run
-  # Call this instead of I18n.t so that it won't cause an error when selenium tests are run
-  @@selenium = Dir.getwd.end_with? 'selenium'
-  def t(*args)
-    if @@selenium
-      args[0]
-    else
-      args << {} unless args.last.is_a?(Hash)
-      args[1][:default] ||= args[0].split('.').last
-      I18n.t(*args)
-    end
+
+  def build_fullrecord(doc, record)
+    # 'fullrecord' only contains unpublished text at this stage, but 'fullrecord_published'
+    # will be merged into it by Solr using copyField
+    doc['fullrecord_published'], doc['fullrecord'] = IndexerCommon.extract_string_values(record['record'])
   end
 
   def add_agents(doc, record)
@@ -209,7 +222,7 @@ class IndexerCommon
         elsif seen[link['ref']] == 'subject' && link['role'] != 'creator'
           # do nothing
         else
-          relator_label = link['relator'] ? t("enumerations.linked_agent_archival_record_relators.#{link['relator']}") : ''
+          relator_label = link['relator'] ? I18n.t("enumerations.linked_agent_archival_record_relators.#{link['relator']}") : ''
 
           doc["#{link['ref'].gsub(/\//, '_')}_relator_sort"] = "#{link['role']} #{relator_label}"
           seen[link['ref']] = link['role']
@@ -250,11 +263,9 @@ class IndexerCommon
 
   def add_notes(doc, record)
     if record['record']['notes']
-      if record['record']['notes'].respond_to?(:map)
-        doc['notes'] = record['record']['notes'].map {|note| IndexerCommon.extract_string_values(note) }.join(" ");
-      else
-        doc['notes'] = record['record']['notes']
-      end
+      # 'notes' only contains unpublished notes at this stage, but 'notes_published'
+      # will be merged into it by Solr using copyField
+      doc['notes_published'], doc['notes'] = IndexerCommon.extract_string_values(record['record']['notes'])
     end
   end
 
@@ -416,7 +427,7 @@ class IndexerCommon
       if doc['primary_type'] == 'accession'
         date = record['record']['accession_date']
         if date == '9999-12-31'
-          unknown = t('accession.accession_date_unknown')
+          unknown = I18n.t('accession.accession_date_unknown')
           doc['accession_date'] = unknown
           doc['fullrecord'] ||= ''
           doc['fullrecord'] << unknown + ' '
@@ -555,6 +566,31 @@ class IndexerCommon
         doc['title'] = record['record']['event_type'] # adding this for emedded searches
         doc['outcome'] = record['record']['outcome']
         doc['linked_record_uris'] = record['record']['linked_records'].map { |c| c['ref'] }
+
+        # ANW-1635: index linked record titles/display names so they are available in CSV output
+        doc['linked_record_titles'] = record['record']['linked_records'].map do |rec|
+          if    rec['_resolved']['jsonmodel_type'] == "agent_person"
+            rec['_resolved']['display_name']['sort_name']
+          elsif rec['_resolved']['jsonmodel_type'] == "agent_family"
+            rec['_resolved']['display_name']['sort_name']
+          elsif rec['_resolved']['jsonmodel_type'] == "agent_corporate_entity"
+            rec['_resolved']['display_name']['sort_name']
+          elsif rec['_resolved']['jsonmodel_type'] == "agent_software"
+            rec['_resolved']['display_name']['sort_name']
+          elsif rec['_resolved']['jsonmodel_type'] == "accession"
+            rec['_resolved']['title']
+          elsif rec['_resolved']['jsonmodel_type'] == "resource"
+            rec['_resolved']['title']
+          elsif rec['_resolved']['jsonmodel_type'] == "digital_object"
+            rec['_resolved']['title']
+          elsif rec['_resolved']['jsonmodel_type'] == "digital_object_component"
+            rec['_resolved']['title']
+          elsif rec['_resolved']['jsonmodel_type'] == "archival_object"
+            rec['_resolved']['display_string']
+          else
+            "not_found"
+          end
+        end
       end
     }
 
@@ -661,8 +697,8 @@ class IndexerCommon
     add_document_prepare_hook {|doc, record|
       if doc['primary_type'] == 'job'
         report_type = record['record']['job']['report_type']
-        doc['title'] = (report_type ? t("reports.#{report_type}.title", :default => report_type) :
-          t("job.types.#{record['record']['job_type']}"))
+        doc['title'] = (report_type ? I18n.t("reports.#{report_type}.title", :default => report_type) :
+          I18n.t("job.types.#{record['record']['job_type']}"))
         doc['types'] << record['record']['job_type']
         doc['types'] << report_type
         doc['job_type'] = record['record']['job_type']
@@ -842,10 +878,11 @@ class IndexerCommon
 
 
     add_document_prepare_hook { |doc, record|
-      doc['fullrecord'] ||= ''
-      doc['fullrecord'] << IndexerCommon.build_fullrecord(record)
+      if !self.instance_of?(PUIIndexer)
+        # The PUI indexer makes its own call to build_fullrecord, so only call it here for realtime and periodic
+        build_fullrecord(doc, record)
+      end
     }
-
 
     add_document_prepare_hook {|doc, record|
       if doc['primary_type'] == 'location_profile'

@@ -1,4 +1,5 @@
 require 'aspace-rails/asset_path_rewriter'
+require 'aspace-rails/compressor'
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -21,8 +22,8 @@ Rails.application.configure do
   config.public_file_server.enabled = true
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(harmony: true)
-  # config.assets.css_compressor = :sass
+  config.assets.js_compressor = ASpaceCompressor.new(:js)
+  config.assets.css_compressor = ASpaceCompressor.new(:css)
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = true
@@ -45,7 +46,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = AppConfig[:force_ssl]
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
@@ -89,23 +90,31 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   # DISABLED BY MST # config.active_record.dump_schema_after_migration = false
 
-  if AppConfig[:public_proxy_prefix] != "/"
+  # The default file handler doesn't know about asset prefixes and returns a 404.  Make it strip the prefix before looking for the path on disk.
+  if AppConfig[:public_proxy_prefix] && AppConfig[:public_proxy_prefix].length > 1
     require 'action_dispatch/middleware/static'
-
-    # The default file handler doesn't know about asset prefixes and returns a 404.  Make it strip the prefix before looking for the path on disk.
     module ActionDispatch
       class FileHandler
-        alias :match_orig :match?
-        def match?(path)
+        private
+
+        def find_file(path_info, accept_encoding:)
           prefix = AppConfig[:public_proxy_prefix]
-          modified_path = path.gsub(/^#{Regexp.quote(prefix)}/, "/")
-          match_orig(modified_path)
+          each_candidate_filepath(path_info) do |filepath, content_type|
+            filepath = filepath.gsub(/^#{Regexp.quote(prefix)}/, "/")
+            if response = try_files(filepath, content_type, accept_encoding: accept_encoding)
+              return response
+            end
+          end
         end
       end
     end
-  end
 
-  if AppConfig[:public_proxy_prefix] && AppConfig[:public_proxy_prefix].length > 1
     AssetPathRewriter.new.rewrite(AppConfig[:public_proxy_prefix], File.dirname(__FILE__))
   end
+
+  # Infinite Tree and Records config
+  config.infinite_tree_waypoint_size = 200
+  config.infinite_records_waypoint_size = 20
+  config.infinite_records_main_max_concurrent_waypoint_fetches = 20
+  config.infinite_records_worker_max_concurrent_waypoint_fetches = 100
 end

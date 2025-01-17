@@ -43,7 +43,7 @@ fr:
     cite_item: Cité article
     cite_item_description: Cité Élément Description
     request: Requête
-    print: Impression
+    print: Télécharger PDF
     print-generating: Génération
     collection_overview: Survol des collections
     hierarch: Organisation des collections
@@ -55,6 +55,9 @@ fr:
     search_remove_row: Supprimer une ligne dessous
     staff_link: Réservé au personnel
 
+    next: Suivant
+    previous: Précédent
+    digitized: Voir le matériel numérique
   page_actions: Page Actions
 
   request:
@@ -95,6 +98,18 @@ fr:
 
   pagination: {}
   search_results:
+    highlighting:
+      found_in: Trouvé dans
+      four_part_id: Identifiant
+      dates: Rendez-vous
+      subjects_text: Sujettes
+      published_agents: Agentes
+      creators_text: Créatrices
+      role_enum_s: Les rôles
+      linked_agent_roles: Rôles d'agent liés
+      notes_published: Remarques
+      finding_aid_title: Titre de l'instrument de recherche
+      finding_aid_filing_title: Titre de classement de l'aide
     page_title: "%{count} résultats trouvés"
     results_head: "%{type} affichés : %{start} - %{end} de %{total}"
     result: Résultats
@@ -114,8 +129,8 @@ fr:
     filter_by: Filtrer par
     filtered_by: Filtré par
     remove_filter: Ôter ce filtre
-    more_facets: plus
-    fewer_facets: moins
+    more_facets: Plus
+    fewer_facets: Moins
     op:
       AND: et
       OR: ou
@@ -162,6 +177,8 @@ fr:
       instance_type_enum_s: Type d'instance
       langcode: Langue
 
+      digital_object_type_enum_s: Type
+      extent_type_enum_s: Importance matérielle
   search_sorting:
     sort_by: "Trier par :"
     sort: Trier
@@ -190,13 +207,14 @@ fr:
 
   errors:
     error_404: "%{type} Enregistrement non trouvé"
-    error_404_message: "La notice %{type} à laquelle vous avez tenté d'accéder n'existe plus ou peut avoir\
-      \ été enlevée."
+    error_404_message: "La notice %{type} à laquelle vous avez tenté d'accéder n'existe plus ou peut avoir
+      été enlevée."
     backend_down: Impossible de se connecter à la base de données
     backend_down_message: ArchivesSpace rencontre actuellement des difficultés techniques. Nous nous excusons
       pour le dérangement. Veuillez réessayer plus tard.
     unexpected_error: Votre recherche n'a pu être effectuée en raison d'une erreur inattendue
 
+    invalid_search_params: Paramètre de recherche '%{value}' non valide pour '%{field}'
   boolean:
     "true": "Oui"
     "false": "Non"
@@ -205,6 +223,11 @@ fr:
     search_placeholder: Saisissez les termes de votre recherche
     error_no_term: Aucun terme saisi.
     toggle_navigation: Basculer la navigation
+
+  navigation:
+    hierarchical: Navigation hiérarchique
+    top_level: Navigation de haut niveau
+    mobile_menu: Menu de navigation pour les petits appareils
 
   internal_links:
     main: Contenu principal
@@ -274,6 +297,7 @@ fr:
         forms_part_of: Relation entre les pièces
         sibling_of: Relation fraternelle
 
+        has_part: Relation entre les pièces
   archival_object:
     _public:
       section: {}
@@ -305,6 +329,8 @@ fr:
     _public:
       identifier: Identifiant
       extent: Volume
+      extent_full: Volume complet
+      extent_partial: Volume partiel
       dates: Dates
       lang: Langue des matériaux
       script: Scénario
@@ -334,11 +360,26 @@ fr:
       related_accessions:
         accessions: Notices entrées
         deaccessions: Notices aliénations
+      identifier_ark: ID [ark]
+      uri: ID [aspace_uri]
+      identifier_pdf: ID
+      lang_pdf: Langue du matériel
+      ark_link_name: Clé de Ressource d'Archives
+    load_records:
+      alert: "Cette collection contient un grand nombre d'enregistrements"
+      showing: "Affichage"
+      percent_convention: " %"
+      load: "Charger les enregistrements"
+      load_all: "Charger tous les enregistrements"
+      scroll: "Au défilement"
+      all: "Tous en une fois"
+      loading: Chargement
 
   top_container:
     _singular: Conditionnement
     _plural: Conditionnements
 
+    restricted: Limité
   related_resource: {}
   digital_object:
     _singular: Document numérique
@@ -350,6 +391,12 @@ fr:
       go: Aller au dossier
       section: {}
       messages: {}
+      additional: Versions de fichiers supplémentaires
+      url_encoded_data: Données codées par URL
+      browse_number_digital_objects_in_collection:
+        one: Chercher %{num} objet numérique dans la collection
+        many: Chercher %{num} objets numériques dans la collection
+        other: ''
   digital_object_component:
     _public:
       section: {}
@@ -442,6 +489,10 @@ fr:
     finding_aid_written_in: Instrument de recherche écrit en
     your_finding_aid_pdf: Votre instrument de recherche PDF pour "%{title}"
     your_finding_aid_is_attached: L'instrument de recherche demandé est en pièce jointe.
+    userestrict: Conditions d'utilisation
+    accruals: Accroissements
+    acqinfo: Informations sur les modalités d'entrée
+    accessrestrict: Conditions d'accès
   readmore:
     see_more: Voir plus
     see_less: Voir moins
@@ -566,3 +617,25 @@ fr:
     fr: Français
     de: Allemand
     ja: Japonais
+  pdf_error:
+    headings:
+      message: Message d'erreur
+      type: Type d'erreur
+      location: Emplacement de l'erreur
+      additional_info: Info supplémentaire
+    title: Une erreur s'est produite lors de la génération de ce PDF.
+    description: Nous sommes désolés, une erreur s'est produite lors de la génération de cette aide à
+      la recherche au format PDF. Voici quelques informations de diagnostic pour vous aider à déterminer
+      ce qui s'est passé.
+    location:
+      location_title_page: L'erreur s'est produite lors de la génération de la page de titre.
+      location_footer: L'erreur s'est produite lors de la génération du pied de page.
+      location_header: L'erreur s'est produite lors de la génération de l'en-tête.
+      location_toc: L'erreur s'est produite lors de la génération de la table des matières.
+      location_resource: L'erreur s'est produite lors de la génération des sections relatives à l'enregistrement
+        de ressource, qui incluent les informations récapitulatives, les en-têtes d'accès contrôlé et
+        les sections Notes.
+      location_archival_object: L'erreur s'est produite lors de la génération de l'inventaire de la collection.
+    additional_info:
+      invalid_markup: Cette erreur peut résulter d’un balisage non valide présent dans une note ou un
+        sous-enregistrement.

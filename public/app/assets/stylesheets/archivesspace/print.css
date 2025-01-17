@@ -198,22 +198,21 @@
     border-color: white !important;
   }
 
-  /* Expand 'See more' sections, hide expander */
-  .readmore .more {
-    visibility: visible !important;
-    display: inline !important;
+  /* Expand 'See more' sections */
+  .readmore__content {
+    max-height: fit-content !important;
+    overflow: auto !important;
   }
-  .readmore span.elipses,
-  .readmore a.expander {
-    display: none;
+
+  .readmore__content::after,
+  .readmore__more-label,
+  .readmore__less-label {
+    display: none !important;
   }
 
   /* Show all infinite records, tighten whitespace */
-  .infinite-record-wrapper {
+  .infinite-records-container {
     height: auto !important;
-  }
-  .infinite-record-wrapper div.infinite-record-record:first-of-type h3 {
-    margin-top: 0 !important;
   }
 
   /* Applied by print.js */

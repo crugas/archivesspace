@@ -2,76 +2,78 @@
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2'
+gem 'rails', '6.1.6'
 
 # For handling HTML enities when processing exports as XML
-gem 'htmlentities', '~> 4.3', '>= 4.3.4'
-gem 'i18n', '0.9.1'
-gem 'loofah', '>= 2.2.3'
-gem 'rubyzip', '>= 1.3.0'
+gem 'htmlentities'
+gem 'i18n'
 
-gem 'nokogiri', '>= 1.10.8'
+gem 'nokogiri'
 
-gem 'sprockets-rails', '2.3.3'
+# Gems used only for assets and not required in production environments by default.
+# Assets group was deprecated with Rails 4, but we still need it as we need to avoid using gems that include
+# native extensions in production
+group :assets do
+  gem 'sprockets-rails'
+  gem 'sassc-rails'
+  gem 'sass-rails'
+  # Use CoffeeScript for .coffee assets and views
+  gem 'coffee-rails'
+  # See https://github.com/rails/execjs#readme for more supported runtimes
+  gem 'execjs'
+end
 
 gem 'atomic', '= 1.0.1'
 
-# use bootstrap's sass - lockdown to pre-sassc version
-# because https://github.com/rails/rails/issues/38492
-gem 'bootstrap-sass', '= 3.3.7'
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0', '>= 5.0.6'
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier'
-# Use font-awesome icons
-gem 'font-awesome-sass', '4.7.0'
-
-# Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '4.2.2'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-gem 'therubyrhino'
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 
 gem 'excon', '>= 0.76.0'
-gem 'json', '2.3.0'
+gem 'json'
 gem 'json-schema', '1.0.10'
-gem 'multipart-post', '1.2.0'
+gem 'multipart-post', '~> 2.4.0'
 gem 'net-http-persistent', '>= 4.0.1'
 
 # support clipboard
 gem 'clipboard-rails'
 
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
+gem 'rubyzip', '< 1.4'
 
-# Enable support for `rails server`
-gem 'listen', group: :development
+# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'turbolinks'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-group :development, :test do
-  gem 'pry', '~> 0.12.2'
+group :development do
+  gem 'web-console'
+  gem 'pry'
   gem 'pry-nav'
   gem 'pry-rails'
-  gem 'pry-debugger-jruby', '>= 1.2.2'
-  gem 'mizuno-aspace'
+  gem 'pry-debugger-jruby'
+  gem 'listen'
+end
+
+group :development, :test do
+  gem 'puma'
 end
 
 group :test do
+  gem 'childprocess'
   gem 'axe-core-rspec'
-  gem 'capybara', '3.15.1'
-  gem 'dumb_delegator', '~> 0.8'
-  gem 'factory_bot_rails', '~> 4.11', '>= 4.11.1'
+  gem 'capybara'
+  gem 'capybara-screenshot'
+  gem 'dumb_delegator'
+  gem 'factory_bot', '= 6.2.1'
+  gem 'factory_bot_rails'
   gem 'fog-aws', '2.0.0', require: false
   gem 'launchy'
   gem 'rails-controller-testing'
-  gem 'rspec', '~> 3.6.0'
+  gem 'rspec'
   gem 'rspec-rails'
   gem 'rspec-retry'
-  gem 'selenium-webdriver', '~> 3.142', '>= 3.142.3'
-  gem 'simplecov', '0.7.1'
+  gem 'selenium-webdriver'
+  gem 'simplecov'
 end
 
 # Allow plugins to provide their own Gemfiles too.

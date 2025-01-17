@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'rails_helper'
 
 describe 'File Version Link', js: true do
+  # aka 'generic icon'
   def check_uri_css(uri, css)
     visit(uri)
     expect(page).to have_css(css)
@@ -86,8 +87,26 @@ describe 'File Version Link', js: true do
         }
       ]
     )
+    @do_unpublished = create(
+      :digital_object,
+      publish: false,
+      file_versions: [
+        {
+          publish: true,
+          file_uri: 'http://example.com',
+        }
+      ]
+    )
     @resource = create(:resource, publish: true,
                        instances: [build(:instance_digital, digital_object: { ref: @do1.uri }), build(:instance_digital, digital_object: { ref: @do2.uri }), build(:instance_digital, digital_object: { ref: @do3.uri })])
+    @resource_w_unpub_do = create(:resource, publish: true,
+                                  instances: [build(:instance_digital, digital_object: { ref: @do_unpublished.uri })])
+    @aobj = create(:archival_object, publish: true,
+                       resource: { 'ref' => @resource.uri },
+                       instances: [build(:instance_digital, digital_object: { ref: @do1.uri }), build(:instance_digital, digital_object: { ref: @do2.uri })])
+    @aobj_w_unpub_do = create(:archival_object, publish: true,
+                              resource: { 'ref' => @resource_w_unpub_do.uri },
+                              instances: [build(:instance_digital, digital_object: { ref: @do_unpublished.uri })])
 
     @do_movie = create(:digital_object, publish: true, digital_object_type: 'moving_image', file_versions: [{publish: true, file_uri: file_base + '0.avi', file_format_name: 'avi'}])
     @do_sound1 = create(:digital_object, publish: true, digital_object_type: 'sound_recording', file_versions: [{publish: true, file_uri: file_base + '0.aiff', file_format_name: 'aiff'}])
@@ -112,6 +131,25 @@ describe 'File Version Link', js: true do
     expect(page).to have_css('.available-digital-objects .external-digital-object__link[href="https://example.com/fv1.jpg"]')
     expect(page).to have_css('.available-digital-objects .external-digital-object__link[href="https://example.com/fv1.gif"]')
     expect(page).to have_css('.available-digital-objects .external-digital-object__link[href="https://example.com/fv1.mp3"]')
+  end
+
+  it "shows links to all linked digital objects' most recently published file versions on an archival object's page" do
+    visit(@aobj.uri)
+    expect(page.all('.available-digital-objects > .objectimage').length).to eq 2
+    expect(page).to have_css('.available-digital-objects .external-digital-object__link[href="https://example.com/fv1.jpg"]')
+    expect(page).to have_css('.available-digital-objects .external-digital-object__link[href="https://example.com/fv1.gif"]')
+  end
+
+  it "is not shown on a resource page when a linked digital object is unpublished "\
+     "with published file versions" do
+    visit(@resource_w_unpub_do.uri)
+    expect(page).not_to have_css('.available-digital-objects .external-digital-object__link')
+  end
+
+  it "is not shown on an archival object page when a linked digital object is unpublished "\
+      "with published file versions" do
+    visit(@aobj_w_unpub_do.uri)
+    expect(page).not_to have_css('.available-digital-objects .external-digital-object__link')
   end
 
   it "shows the correct icon for digital_object_type moving_image" do
@@ -141,5 +179,4 @@ describe 'File Version Link', js: true do
   it "shows the correct icon for digital_object_type default" do
     check_uri_css(@do_default.uri, type_map[:default])
   end
-
 end

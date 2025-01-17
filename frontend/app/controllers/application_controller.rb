@@ -4,6 +4,7 @@ require 'search'
 require 'zlib'
 
 class ApplicationController < ActionController::Base
+  include ActionView::Helpers::TranslationHelper
   protect_from_forgery with: :exception
 
   helper :all
@@ -21,15 +22,17 @@ class ApplicationController < ActionController::Base
   end
 
   # Note: This should be first!
-  before_action :store_user_session
+  before_action :store_user_session, unless: -> { params[:login] && !session[:user] }
 
-  before_action :refresh_permissions
+  before_action :refresh_permissions, unless: -> { params[:login] && !session[:user] }
 
-  before_action :refresh_preferences
+  before_action :refresh_preferences, unless: -> { params[:login] && !session[:user] }
 
-  before_action :load_repository_list
+  before_action :load_repository_list, unless: -> { params[:login] && !session[:user] }
 
   before_action :unauthorised_access
+
+  before_action :init_ancestor_titles
 
   around_action :set_locale
 
@@ -152,40 +155,40 @@ class ApplicationController < ActionController::Base
   end
 
 
-  def handle_merge(victims, target_uri, merge_type, extra_params = {})
+  def handle_merge(merge_candidates, merge_destination_uri, merge_type, extra_params = {})
     request = JSONModel(:merge_request).new
-    request.target = {'ref' => target_uri}
-    request.victims = Array.wrap(victims).map { |victim| { 'ref' => victim } }
+    request.merge_destination = {'ref' => merge_destination_uri}
+    request.merge_candidates = Array.wrap(merge_candidates).map { |merge_candidate| { 'ref' => merge_candidate } }
     if params[:id]
       id = params[:id]
     else
-      id = target_uri.split('/')[-1]
+      id = merge_destination_uri.split('/')[-1]
     end
     begin
       request.save(:record_type => merge_type)
 
-      flash[:success] = I18n.t("#{merge_type}._frontend.messages.merged")
+      flash[:success] = t("#{merge_type}._frontend.messages.merged")
 
       if merge_type == 'top_container'
         redirect_to(:controller => :top_containers, :action => :index)
       else
-        resolver = Resolver.new(target_uri)
+        resolver = Resolver.new(merge_destination_uri)
         redirect_to(resolver.view_uri)
       end
     rescue ValidationException => e
       flash[:error] = e.errors.to_s
       redirect_to({:action => :show, :id => id}.merge(extra_params))
     rescue ConflictException => e
-      flash[:error] = I18n.t("errors.merge_conflict", :message => e.conflicts)
+      flash[:error] = t("errors.merge_conflict", :message => e.conflicts)
       redirect_to({:action => :show, :id => id}.merge(extra_params))
     rescue RecordNotFound => e
-      flash[:error] = I18n.t("errors.error_404")
+      flash[:error] = t("errors.error_404")
       redirect_to({:action => :show, :id => id}.merge(extra_params))
     end
   end
 
 
-  def handle_accept_children(target_jsonmodel)
+  def handle_accept_children(merge_destination_jsonmodel)
     unless params[:children]
       # Nothing to do
       return render :json => {
@@ -193,7 +196,7 @@ class ApplicationController < ActionController::Base
                     }
     end
 
-    response = JSONModel::HTTP.post_form(target_jsonmodel.uri_for(params[:id]) + "/accept_children",
+    response = JSONModel::HTTP.post_form(merge_destination_jsonmodel.uri_for(params[:id]) + "/accept_children",
                                          "children[]" => params[:children],
                                          "position" => params[:index].to_i)
 
@@ -251,7 +254,11 @@ class ApplicationController < ActionController::Base
   end
 
   def user_is_global_admin?
-    session['user'] and session['user'] == "admin"
+    if AppConfig[:allow_other_admins_access_to_system_info]
+      session['user'] and user_can? 'administer_system'
+    else
+      session['user'] and session['user'] == "admin"
+    end
   end
 
 
@@ -304,14 +311,18 @@ class ApplicationController < ActionController::Base
   end
 
   def set_user_repository_cookie(repository_uri)
-    cookies[user_repository_cookie_key] = repository_uri
+    cookies[user_repository_cookie_key] = {
+      value: repository_uri,
+      httponly: true,
+      same_site: :lax
+    }
   end
 
   # sometimes we get exceptions that look like this: "translation missing: validation_errors.protected_read-only_list_#/dates_of_existence/0/date_type_structured._invalid_value__add_or_update_either_a_single_or_ranged_date_subrecord_to_set_.__must_be_one_of__single__range
   # replace the untranslatable text with a generic message
   # untranslatable messages have a reference to an array index, like record/0/subrecord. We'll look for anything that has an error that matches to /d+/ and replace it with something generic that we can translate.
   def clean_exceptions(ex)
-    generic_error = I18n.t("validation_errors.generic_validation_error")
+    generic_error = t("validation_errors.generic_validation_error")
     regex = /\/\d+\//
 
     ex.each do |key, exception|
@@ -509,6 +520,11 @@ class ApplicationController < ActionController::Base
   end
 
 
+  def init_ancestor_titles
+    @ancestor_titles = {}
+  end
+
+
   protected
 
   def cleanup_params_for_schema(params_hash, schema)
@@ -668,16 +684,16 @@ class ApplicationController < ActionController::Base
 
   def handle_transfer(model)
     old_uri = model.uri_for(params[:id])
-    response = JSONModel::HTTP.post_form(model.uri_for(params[:id]) + "/transfer",
-                                         "target_repo" => params[:ref])
+
+    response = JSONModel::HTTP.post_form(model.uri_for(params[:id]) + "/transfer", "target_repo" => params[:ref])
 
     if response.code == '200'
-      flash[:success] = I18n.t("actions.transfer_successful")
+      flash[:success] = t("actions.transfer_successful")
     elsif response.code == '409'
     # Transfer failed for a known reason
       raise ArchivesSpace::TransferConflictException.new(ASUtils.json_parse(response.body).fetch('error'))
     else
-      flash[:error] = I18n.t("actions.transfer_failed") + ": " + response.body
+      flash[:error] = t("actions.transfer_failed") + ": " + response.body
     end
 
     redirect_to(:action => :index, :deleted_uri => old_uri)

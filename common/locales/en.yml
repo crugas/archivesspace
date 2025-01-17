@@ -158,7 +158,7 @@ en:
   location: &location_attributes
     title: Location
     temporary_question: Temporary?
-    temporary: Temporary
+    temporary: Temporary Type
     temporary_tooltip: |
         <p>Used to indicate if this Location is a specific type of temporary location (e.g. an exhibition area).</p>
     building: Building
@@ -1895,45 +1895,41 @@ en:
       basic_data_entry: "Basic Data Entry users of the %{repo_code} repository"
       repository_viewers: "Viewers of the %{repo_code} repository"
     permission_types:
-      manage_repository: manage this repository (change groups and other settings)
-      update_location_record: create/modify/delete location records in this repository
-      update_subject_record: create/update subject records
-      update_agent_record: create/update agent records
-      view_agent_contact_record: view contact details for agent records
-      show_full_agents: work with agents in full mode
-      update_vocabulary_record: create/update vocabulary records
-      update_accession_record: create/update accessions in this repository
-      update_resource_record: create/update resources in this repository
-      update_digital_object_record: create/update digital objects in this repository
-      update_event_record: create/update event records in this repository
-      view_repository: view the records in this repository
-      view_suppressed: view suppressed records in this repository
-      suppress_archival_record: suppress the major record types in this repository
-      delete_archival_record: delete the major record types in this repository
-      delete_event_record: delete event records in this repository
-      update_classification_record: create/update classifications and classification terms
-      delete_classification_record: delete classifications and classification terms
-      merge_agents_and_subjects: merge agent/subject records
-      merge_archival_record: merge the major record types in this repository
-      manage_rde_templates: manage RDE templates
-      transfer_repository: transfer the entire contents of a repository
-      transfer_archival_record: transfer major record types between repositories
-      manage_subject_record: create/update/delete subject records
-      manage_agent_record: create/update/delete agent records
-      manage_vocabulary_record: create/update/delete vocabulary records
-      import_records: initiate import jobs
-      cancel_importer_job: cancel an import job
-      update_container_record: create/update top container records
-      manage_container_record: delete/bulk update top container records
-      manage_container_profile_record: create/update/delete container profile records
-      manage_location_profile_record: create/update/delete location profile records
-      create_job: create and run a background job
-      cancel_job: cancel a background job
-      update_assessment_record: create/update assessment records
-      delete_assessment_record: delete assessment records
-      manage_assessment_attributes: create/update/delete repository assessment attributes definitions
-      manage_enumeration_record: create/update/delete controlled value records
-      manage_custom_report_templates: manage custom report templates
+      manage_repository: assign <b>users</b> to groups (in this repository)<br/>set <b>group</b> permissions (in this repository)<br/>set <b>repository preferences</b> (in this repository)<br/>configure <b>required fields and default values</b> (in this repository)<br/>create and run <b>batch find and replace jobs</b> (in this repository)<br/>create/update/delete <b>locations</b> (system-wide)
+      view_agent_contact_record: edit/view contact details section of <b>agents</b> (in this repository)
+      show_full_agents: edit additional sections of <b>agents</b> enabled by full mode (in this repository)
+      update_accession_record: create/update <b>accessions</b> (in this repository)
+      update_resource_record: create/update <b>resources</b> (in this repository)
+      update_digital_object_record: create/update <b>digital objects</b> (in this repository)
+      update_event_record: create/update <b>events</b> (in this repository)
+      view_repository: view <b>all records</b> (in this repository)<br/>view <b>agents</b> (system-wide)<br/>view <b>subjects</b> (system-wide)
+      view_suppressed: view <b>suppressed records</b> (in this repository)
+      suppress_archival_record: suppress <b>accessions, archival objects and resources</b> (in this repository)
+      delete_archival_record: delete <b>accessions, archival objects, digital objects and resources</b> (in this repository)
+      delete_event_record: delete <b>events</b> (in this repository)
+      update_classification_record: create/update <b>classifications</b> (in this repository)
+      delete_classification_record: delete <b>classifications</b> (in this repository)
+      merge_agents_and_subjects: merge <b>agents</b> (system-wide)<br/>merge <b>subjects</b> (system-wide)
+      merge_archival_record: merge <b>digital objects</b> (in this repository)</br>merge <b>resources</b> (in this repository)
+      manage_rde_templates: create/delete <b>rapid data entry templates</b> (in this repository)
+      transfer_repository: transfer <b>the entire contents of this repository</b> to another repository (must also have the same permission in the destination repository)
+      transfer_archival_record: transfer individual <b>accessions, digital objects and resources</b> to another repository (must also have permission to create/update records of the type being transferred in both repositories)
+      manage_subject_record: create/update/delete <b>subjects</b> (system-wide)
+      manage_agent_record: create/update/delete <b>agents</b> (system-wide)
+      manage_vocabulary_record: create/update/delete <b>vocabularies</b> (system-wide)
+      import_records: create/run <b>import jobs</b> (in this repository)
+      cancel_importer_job: cancel <b>import jobs</b> (in this repository)
+      update_container_record: create/update <b>top containers</b> (in this repository)
+      manage_container_record: delete/bulk-update <b>top containers</b> (in this repository)
+      manage_container_profile_record: create/update/delete <b>container profiles</b> (system-wide)
+      manage_location_profile_record: create/update/delete <b>location profiles</b> (system-wide)
+      create_job: create/run <b>background jobs</b> (in this repository)
+      cancel_job: cancel <b>background jobs</b> (in this repository)
+      update_assessment_record: create/update <b>assessments</b> (in this repository)
+      delete_assessment_record: delete <b>assessments</b> (in this repository)
+      manage_assessment_attributes: create/update/delete <b>repository assessment attributes definitions</b> (in this repository)
+      manage_enumeration_record: create/update/delete <b>controlled values</b> (system-wide)
+      manage_custom_report_templates: create/update/delete <b>custom report templates</b> (in this repository)
     _singular: Group
     _plural: Groups
 
@@ -2046,6 +2042,10 @@ en:
     finding_aid_status: Finding Aid Status
     finding_aid_status_tooltip: |
         <p>Indicates the status of the finding aid.</p>
+
+    is_finding_aid_status_published: Finding Aid Status Published?
+    is_finding_aid_status_published_tooltip: |
+        <p>Determines whether Finding Aid Status is exposed publically.</p>
     finding_aid_note: Finding Aid Note
     finding_aid_note_tooltip: |
         <p>For recording any additional information about the finding aid (not the described Resource) not covered by the other finding aid data elements.</p>
@@ -2249,6 +2249,7 @@ en:
     admin: Administrator
     _singular: User
     _plural: Users
+    reset_password: Reset Password
 
   collection_management: &collection_management_attributes
     cataloged_note: Cataloged Note
@@ -2386,7 +2387,7 @@ en:
     publish_tooltip: Whether to publish new records by default.
     default_values: Pre-populate Records?
     default_values_tooltip: Whether to pre-populate new Accession and Resource records with default values.
-    digital_object_spawn_description: Spawn description for Digital Object instances from linked Resource/Accession?
+    digital_object_spawn: Spawn description for Digital Object instances from linked record
     browse_column: Column %{num}
     browse_column_tooltip: The field to show in column %{num}.
     sort_column: Default Sort Column
@@ -2406,6 +2407,7 @@ en:
     event_browse_section: Event Browse Columns
     collection_management_browse_section: Collection Management Browse Columns
     top_container_browse_section: Top Container Browse Columns
+    top_container_mgmt_browse_section: Top Container Management Browse Columns
     classification_browse_section: Classification Browse Columns
     assessment_browse_section: Assessment Browse Columns
     repositories_browse_section: Repository Browse Columns
@@ -2502,7 +2504,7 @@ en:
     sponsor_set_desc_required: Sponsor set description is required for creating an OAI sponsor set
     sponsor_set_name_required: Sponsor set name is required for creating an OAI sponsor set
     invalid_characters: Contains invalid characters
-    conflicting_record: "<a href='/resolve/readonly?uri=%{record_uri}' target='_blank'>View conflicting record</a>"
+    conflicting_record: View conflicting record
     or_date_expression_is_required: Dates must specify at least one date expression
     must_specify_either_a_single_or_ranged_date: Dates must be specified as either Single or Ranged
     must_be_in_yyyy[yyy][yy][y]__yyyy[yyy][yy][y]-mm__or_yyyy-mm-dd_format: Standardized dates must be in a standardized format
@@ -2529,17 +2531,19 @@ en:
       generate_arks_job: Generate ARKs in Bulk
       find_and_replace_job: Batch Find and Replace (Beta)
       trim_whitespace_job: Trim Whitespace
+      resource_duplicate_job: Resource Duplicate
       unknown_job_type: Unknown job type
       bulk_import_job: Load via Spreadsheet
       top_container_linker_job: Top Container Linker
       ns2_remover_job: ns2 Namespace Remover
+      bulk_archival_object_updater_job: Bulk Archival Object Updater
     status: Status
     status_completed: Completed
     status_queued: Queued
     status_running: Running
     status_failed: Failed
     status_canceled: Canceled
-    queue_position: "Nr. %{position}"
+    queue_position: "No. %{position}"
     time_submitted: Time Submitted
     time_started: Time Started
     time_finished: Time Completed
@@ -2560,6 +2564,7 @@ en:
     _singular: Import Job
     import_events: Import Maintenance Events?
     import_subjects: Import and Link related Subjects?
+    import_repository: Link imported locations to current repository?
     filenames: Files
     import_type: Import Type
     import_type_ead_xml: EAD
@@ -2615,6 +2620,16 @@ en:
 
   trim_whitespace_job:
     description: Removes leading and trailing whitespace from titles for resources, accessions, digital objects, archival objects, and digital object components.
+
+  resource_duplicate_job:
+    going_to_duplicate_job: Going to duplicate resource with id %{resource_id}.
+    success_message: Successfully duplicated resource %{resource_source_id} to resource %{resource_duplicated_id}.
+    resource_failure_message: Failed to duplicate resource from resource with id %{resource_id}; Validation error %{message}.
+    archival_object_failure_message: Failed to duplicate archival object with id %{archival_object_id} from resource with id %{resource_id}; Validation error %{message}.
+    source_archival_object: Source archival object %{source_archival_object_inspect}.
+    success_reload_message: All done. Please click refresh to get a link to the new resource.
+    job_failed: Job Failed.
+    could_not_find_resource: Could not find provided resource with id %{resource_id}.
 
   ns2_remover_job:
       description: >
@@ -2918,7 +2933,7 @@ en:
       date_label: "Date label [%{what}] invalid for %{date_str}. The date will not be processed."
       certainty: "Invalid 'date certainty' ignored for %{date_str}: (%{what})"
       below_bad_ao: Cannot process because it is a child of the bad archival object
-      enum: "NOT FOUND: '%{label}' not found in list %{which}"
+      enum: "INVALID: %{which}: '%{label}'. Must be one of: %{valid_values}"
       error: "ERROR: Error(s) detected: %{term}"
       invalid_date: "Invalid date definition (%{what}) for %{date_str}. The date will not be processed."
       invalid_date_label: "Invalid date label definition in first date (%{what})"

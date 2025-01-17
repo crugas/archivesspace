@@ -9,10 +9,12 @@ a {
   line-height: inherit;
   cursor: pointer;
 }
+
 a:hover,
 a:focus {
   color: $dark_against_shade;
 }
+
 a img {
   border: 0;
 }
@@ -32,12 +34,12 @@ a img {
   .logo {
     float: right;
     height: 75px;
-    text-align: right;
+    padding: 0.5rem;
   }
 }
 
 #content {
-  margin: 0 rem-calc(30);
+  padding: rem-calc(40);
 }
 
 .panel-footer {
@@ -69,23 +71,6 @@ a img {
   font-style: italic;
 }
 
-/* handling of more/less */
-.readmore .more {
-  visibility: hidden;
-  display: none;
-}
-.readmore.expanded .more {
-  visibility: visible;
-  display: block;
-}
-.readmore.expanded .elipses {
-  visibility: hidden;
-  width: 0;
-}
-.readmore .expander .fa {
-  font-size: 0.8em;
-}
-
 /* for the "tabbing" effect */
 .tabbing.navbar-default {
   background-color: $white;
@@ -94,17 +79,23 @@ a img {
 
 .more-facets {
   .btn {
-    padding-left: 20px;
-    color: $accent-color;
+    border: 1px solid $primary-color;
+    color: $primary-color;
+
+    &:hover {
+      border-color: $secondary-color;
+      background-color: $lightshade;
+      color: $secondary-color;
+    }
   }
-  .below-the-fold {
+  .more-facets__facets,
+  .more-facets__less {
     display: none;
   }
 }
 
 .tabbing.nav-pills > li > a {
   margin-bottom: 0;
-  margin-left: -10px;
   margin-right: 0;
   background-color: $secondary-color;
   color: $white;
@@ -136,10 +127,12 @@ a img {
   border-top-left-radius: 0;
 }
 
-.tabbing.nav-pills > li > a.disabled-nav-pill:hover {
-  color: #333;
+.tabbing.nav-pills > li.nav-item.disabled > a.nav-link:hover,
+.tabbing.nav-pills > li.nav-item.disabled > a.nav-link:focus {
+  color: #777;
+  text-decoration: none;
   background-color: transparent;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 /* this enables customization of the nav bar. h/t to zessx (http://stackoverflow.com/users/1238019/zessx)
@@ -161,7 +154,7 @@ a img {
   }
   .navbar-nav {
     > li {
-      > a {
+      > a.nav-link {
         color: $nvColDefault;
         font-size: 1rem !important;
         &:hover,
@@ -172,18 +165,18 @@ a img {
       }
     }
     > .active {
-      > a,
-      > a:hover,
-      > a:focus {
+      > a.nav-link,
+      > a.nav-link:hover,
+      > a.nav-link:focus {
         color: $nvColHighlight;
         background-color: $nvBgHighlight;
         text-decoration: underline;
       }
     }
     > .open {
-      > a,
-      > a:hover,
-      > a:focus {
+      > a.nav-link,
+      > a.nav-link:hover,
+      > a.nav-link:focus {
         color: $nvColHighlight;
         background-color: $nvBgHighlight;
         text-decoration: underline;
@@ -203,14 +196,6 @@ a img {
   .navbar-collapse,
   .navbar-form {
     border-color: $nvColDefault;
-  }
-  .navbar-link {
-    color: $nvColDefault;
-    font-size: 1rem !important;
-    &:hover {
-      color: $nvColHighlight;
-      text-decoration: underline;
-    }
   }
 }
 @media (max-width: 767px) {
@@ -264,21 +249,12 @@ a img {
   }
 }
 
-#main-content.accessions,
-#main-content.objects {
-  padding: 0 1em;
-}
-
 #sidebar {
   border: 1px solid $border;
   padding: rem-calc(10);
 }
 
 #whats-in-container {
-  margin-top: rem-calc(20);
-  padding-bottom: rem-calc(20);
-  padding-left: rem-calc(20);
-  margin-bottom: rem-calc(10);
   border: 1px solid $border;
   > h3 {
     margin-top: 0;
@@ -391,7 +367,8 @@ a img {
 .recordrow {
   padding: rem-calc(10);
   border: 1px solid $border;
-  margin-bottom: rem-calc(10);
+  border-radius: var(--bootstrap-rounded-border-radius);
+  margin-bottom: 1rem;
 
   &.featured {
     background-color: $row-background;
@@ -437,9 +414,9 @@ h1,
 
 /* we want to shrink the font size of h1 in smaller sizes */
 
-@media (max-width: $screen-xs-max) {
-  h1,
-  .h1 {
+h1,
+.h1 {
+  @include media-breakpoint-down(sm) {
     font-size: rem-calc(22);
   }
 }
@@ -489,6 +466,10 @@ h5,
   }
 }
 
+.navbar-toggler {
+  border: 0;
+}
+
 .spacer {
   padding-top: 3em;
 }
@@ -513,6 +494,8 @@ h5,
 }
 #submit_search {
   width: 100%;
+  font-size: 16px;
+  background-color: #006f9b;
 }
 .searchstatement {
   background-color: $row-background;
@@ -567,15 +550,6 @@ ul.no-bullets {
   }
 }
 
-.recordnumber {
-  /* background-color: #ccc; */
-  padding: 0 5px;
-  font-weight: bold;
-
-  /* position: absolute; */
-
-  /* right: 20px; */
-}
 .definition {
   font-size: 0.7em;
   float: right;
@@ -776,26 +750,38 @@ i.giant {
 /* record details */
 .available-digital-objects {
   float: right;
-  max-width: 50%;
+  max-width: 40%;
 }
 
 .objectimage {
+  max-width: 100%;
   display: block;
   margin: 0 0 1em 1em;
 }
-.objectimage img {
+.objectimage img,
+.additional-file-version img {
   margin: 0 auto;
   display: block;
+  min-width: 200px;
   max-width: 100%;
-  border-top-right-radius: var(--bootstrap-rounded-corner-radius);
-  border-top-left-radius: var(--bootstrap-rounded-corner-radius);
 }
-.objectimage figcaption {
+.objectimage figcaption,
+.additional-file-version figcaption {
   padding: 0.5rem;
 }
 .objectimage button[type='submit'] {
   width: 100%;
   white-space: normal;
+}
+
+@media (min-width: 500px) {
+  .additional-file-version {
+    display: block;
+    max-width: 500px;
+  }
+}
+.additional-file-version + .additional-file-version {
+  margin-top: 1rem !important;
 }
 
 .record-type-badge.digital_object.external-digital-object__link {
@@ -812,7 +798,7 @@ i.giant {
   margin-bottom: 20px;
   padding: var(--bootstrap-horizontal-white-space-unit);
   border: 1px solid $lightblue;
-  border-radius: var(--bootstrap-rounded-corner-radius);
+  border-radius: var(--bootstrap-rounded-border-radius);
   background-color: #fff;
   text-align: center;
 }
@@ -827,7 +813,7 @@ i.giant {
   margin-bottom: 0;
   padding: 6px 12px;
   border: 1px solid $lightblue;
-  border-radius: var(--bootstrap-rounded-corner-radius);
+  border-radius: var(--bootstrap-rounded-border-radius);
   font-size: 14px;
   font-family: var(--bootstrap-sans);
   font-weight: normal;
@@ -852,7 +838,7 @@ span.title {
 
 span.required {
   font-variant: small-caps;
-  color: $alert-warning-text;
+  color: darken($warning, 60%);
 }
 .keywordscontext {
   .content {
@@ -877,6 +863,7 @@ span.head {
 }
 
 .breadcrumb > li + li::before {
+  padding-left: 0.625rem;
   color: $darkest;
   content: '\007C\00a0';
 }
@@ -908,40 +895,6 @@ span.head {
   padding-left: 20px;
 }
 
-#sidebar form {
-  max-width: 85%;
-  margin: 0 auto;
-}
-
-#sidebar .year_from {
-  padding: 0;
-  padding-right: 0.2rem;
-}
-
-#sidebar .year_to {
-  padding: 0;
-  padding-left: 0.2rem;
-}
-
-.filter_more form {
-  max-width: 90%;
-  margin: 0 auto;
-}
-
-.filter_more .year_from {
-  padding: 0;
-  padding-right: 0.2rem;
-}
-
-.filter_more .year_to {
-  padding: 0;
-  padding-left: 0.2rem;
-}
-
-.sorter {
-  margin-top: 20px;
-}
-
 .panel-heading {
   word-break: break-word;
   white-space: normal;
@@ -965,7 +918,19 @@ span.head {
 @media (min-width: 992px) {
   #sidebar.resizable-sidebar {
     position: relative;
-    padding-left: 12px;
+    padding-left: 18px; // padding-right (10) + handle width (8)
+
+    &.resizable-sidebar-left {
+      padding-left: 0.625rem;
+      padding-right: 18px;
+
+      .resizable-sidebar-handle {
+        left: unset;
+        right: 0;
+        border-right: none;
+        border-left: 1px solid #ccc;
+      }
+    }
 
     .resizable-sidebar-handle {
       background-color: #eee;
@@ -1045,4 +1010,61 @@ span.head {
 
 #language_select {
   text-align: right;
+}
+
+// Bootstrap 4+ uses flex for its col classes. This overrides the flex behaviors in the public app wherever there is a resizable sidebar to enable custom JS
+.row.has-resizable-content {
+  flex-wrap: nowrap;
+  .col-sm-3.resizable-sidebar {
+    flex: unset;
+    max-width: unset;
+  }
+  .resizable-sidebar {
+    width: 25%;
+  }
+  .resizable-content-pane {
+    width: 100%;
+    @media (min-width: 992px) {
+      flex: 1;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  #sidebar.resizable-sidebar {
+    &.resizable-sidebar-left {
+      .resizable-sidebar-handle {
+        left: unset;
+        right: 0;
+      }
+    }
+    .resizable-sidebar-handle {
+      background-color: #eee;
+      position: absolute;
+      height: 100%;
+      width: 8px;
+      top: 0;
+      left: 0;
+      cursor: ew-resize;
+      background-image: asset-url('sidebar_drag_handle.png');
+      background-repeat: no-repeat;
+      background-position: 1px center;
+      border-right: 1px solid #ccc;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    .resizable-sidebar-handle::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .resizable-sidebar-handle::-moz-range-thumb {
+      -moz-appearance: none;
+      appearance: none;
+      background: none;
+      border: none;
+    }
+  }
 }

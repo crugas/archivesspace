@@ -1,12 +1,12 @@
 $(function () {
-  function handleRepresentativeChange($subform, isRepresentative) {
+  function handleRepresentativeChange($subform, isRepresentative, field_name) {
     if (isRepresentative) {
       $subform.addClass('is-representative');
     } else {
       $subform.removeClass('is-representative');
     }
 
-    $(':input[name$="[is_representative]"]', $subform).val(
+    $(':input[name$="[' + field_name + ']"]', $subform).val(
       isRepresentative ? 1 : 0
     );
 
@@ -20,59 +20,73 @@ $(function () {
       if (
         object_name === 'file_version' ||
         object_name === 'instance' ||
-        object_name == 'agent_contact'
+        object_name === 'agent_contact' ||
+        object_name === 'linked_agent'
       ) {
-        var $subform = $(subform);
-        var $section = $subform.closest('section.subrecord-form');
-        var isRepresentative =
-          $(':input[name$="[is_representative]"]', $subform).val() === '1';
-        var local_publish_button = $subform.find('.js-file-version-publish');
-        var local_make_rep_button = $subform.find('.is-representative-toggle');
-
-        var eventName =
-          'newrepresentative' + object_name.replace(/_/, '') + '.aspace';
-
-        if (local_publish_button.prop('checked') == false) {
-          local_make_rep_button.prop('disabled', true);
+        // ANW-504: for linked agents, the field that stores the switch denoting a representative number is 'is_primary'
+        var rep_field_name;
+        if (object_name === 'linked_agent') {
+          rep_field_name = 'is_primary';
         } else {
-          local_make_rep_button.prop('disabled', false);
+          rep_field_name = 'is_representative';
         }
 
-        $subform.find('.js-file-version-publish').click(function (e) {
-          if (
-            $subform.hasClass('is-representative') &&
-            $(this).prop('checked', true)
-          ) {
-            handleRepresentativeChange($subform, false);
-            $(this).prop('checked', false);
-          }
+        const $subform = $(subform);
+        const $section = $subform.closest('section.subrecord-form');
+        const isRepresentative =
+          $(':input[name$="[' + rep_field_name + ']"]', $subform).val() === '1';
+        const $labelBtn = $subform.find('.is-representative-label');
+        const $repBtn = $subform.find('.is-representative-toggle');
+        const eventName =
+          'newrepresentative' + object_name.replace(/_/, '') + '.aspace';
 
-          if ($(this).prop('checked') == false) {
-            local_make_rep_button.prop('disabled', true);
+        if (object_name === 'file_version') {
+          const $pubBox = $subform.find('.js-file-version-publish');
+
+          if ($pubBox.prop('checked') == false) {
+            $repBtn.prop('disabled', true);
           } else {
-            local_make_rep_button.prop('disabled', false);
+            $repBtn.prop('disabled', false);
           }
-        });
 
-        $subform.find('.is-representative-toggle').click(function (e) {
-          local_publish_button.prop('checked', true);
-        });
+          $pubBox.click(function () {
+            if (
+              $subform.hasClass('is-representative') &&
+              $(this).prop('checked', true)
+            ) {
+              handleRepresentativeChange($subform, false, rep_field_name);
+              $(this).prop('checked', false);
+            }
+
+            if ($(this).prop('checked') == false) {
+              $repBtn.prop('disabled', true);
+            } else {
+              $repBtn.prop('disabled', false);
+            }
+          });
+        }
 
         if (isRepresentative) {
           $subform.addClass('is-representative');
         }
 
-        $('.is-representative-toggle', $subform).click(function (e) {
+        $repBtn.click(function (e) {
           e.preventDefault();
           $(this).parent().off('click');
-
           $section.triggerHandler(eventName, [$subform]);
+        });
+
+        $labelBtn.click(function (e) {
+          e.preventDefault();
+          $(this).parent().off('click');
+          handleRepresentativeChange($subform, false, rep_field_name);
         });
 
         $section.on(eventName, function (e, representative_subform) {
           handleRepresentativeChange(
             $subform,
-            representative_subform == $subform
+            representative_subform == $subform,
+            rep_field_name
           );
           $('.tooltip').tooltip('hide');
         });

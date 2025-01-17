@@ -6,16 +6,19 @@
 
   <% define_template "digital_object", jsonmodel_definition(:digital_object) do |form| %>
     <section id="basic_information">
-      <h3>
-        <%= I18n.t("digital_object._frontend.section.basic_information") %>
+      <div class="d-flex align-items-center border-bottom bg-asFormHeadingBg">
+        <h3 class="flex-grow-1 mb-0 border-0">
+          <%= t("digital_object._frontend.section.basic_information") %>
+        </h3>
         <%= link_to_help :topic => "digital_object_basic_information" %>
-      </h3>
-
+      </div>
       <%= render_plugin_partials("top_of_basic_information_digital_object",
                                  :form => form,
                                  :record => @digital_object) %>
 
-      <%= form.label_and_textarea "title" %>
+      <%= form.label_and_textarea "title", :field_opts => {
+        :class => "form-control#{AppConfig[:allow_mixed_content_title_fields] ? ' mixed-content' : ''}"
+      } %>
 
       <%= render_aspace_partial :partial => "shared/slug", :locals => {:form => form, :record_type => @digital_object} if AppConfig[:use_human_readable_urls] %>
 
@@ -43,7 +46,7 @@
   <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "linked_agents", :template => "digital_object_linked_agent"} %>
   <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "subjects", :template => "subrecord_subject"} %>
 
-  <%= render_aspace_partial :partial => "notes/form", :locals => { :section_id => "digital_object_notes", :form => form, :all_note_types => note_types_for(form['jsonmodel_type'])} %>
+  <%= render_aspace_partial :partial => "notes/form", :locals => { :section_id => "digital_object_notes_", :form => form, :all_note_types => note_types_for(form['jsonmodel_type'])} %>
 
   <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "external_documents"} %>
   <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "rights_statements"} %>

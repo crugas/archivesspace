@@ -1,6 +1,6 @@
 class SessionController < ApplicationController
 
-  set_access_control  :public => [:login, :logout, :check_session, :has_session, :login_inline],
+  set_access_control  :public => [:login, :token_login, :logout, :check_session, :has_session, :login_inline],
                       "become_user" => [:select_user, :become_user]
 
 
@@ -18,7 +18,7 @@ class SessionController < ApplicationController
 
 
   def login_inline
-    render_aspace_partial :partial => "shared/modal", :locals => {:title => I18n.t("session.inline_login_title"), :partial => "shared/login", :id => "inlineLoginModal", :klass => "inline-login-modal"}
+    render_aspace_partial :partial => "shared/modal", :locals => {:title => t("session.inline_login_title"), :partial => "shared/login", :id => "inlineLoginModal", :klass => "inline-login-modal"}
   end
 
 
@@ -28,10 +28,10 @@ class SessionController < ApplicationController
 
   def become_user
     if User.become_user(self, params[:username])
-      flash[:success] = I18n.t("become-user.success")
+      flash[:success] = t("become-user.success")
       redirect_to :controller => :welcome, :action => :index
     else
-      flash[:error] = I18n.t("become-user.failed")
+      flash[:error] = t("become-user.failed")
       redirect_to :controller => :session, :action => :select_user
     end
   end
@@ -60,6 +60,23 @@ class SessionController < ApplicationController
   def has_session
     render :json => {:has_session => !session[:user].nil?}
   end
+
+
+  def token_login
+    backend_session = User.token_login(params[:username], params[:token])
+    if backend_session
+      # this can't prevent a determined user from using a token-acquired
+      # session to do things they could do with a regular login token, but it should
+      # suffice to make a typical user reset password and log back in.
+      backend_session['user']['permissions'] = {}
+      User.establish_session(self, backend_session, params[:username])
+    else
+      flash[:error] = I18n.t('login.password_update_error')
+    end
+
+    redirect_to :controller => :users, :action => :password_form
+  end
+
 
   private
 

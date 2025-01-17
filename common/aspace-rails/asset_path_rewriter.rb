@@ -1,4 +1,4 @@
-#
+
 # This is another funny but not "ha ha" funny thing.  In production mode, the
 # Rails asset pipeline takes our LESS files, grinds away, and spits out static
 # CSS, compressed, compiled, etc..  This is a problem for us because it assumes
@@ -62,32 +62,30 @@ class AssetPathRewriter
 
       return unless success
 
-      rewrite_files = []
-      rewrite_files += Dir.glob(File.join(base_dir, "assets", "*.css"))
-      rewrite_files += Dir.glob(File.join(base_dir, "assets", "themes", "**", "*.css"))
-      rewrite_files += Dir.glob(File.join(base_dir, "assets", "archivesspace", "**", "*.css"))
-
-      rewrite_files.each do |file|
-        rewrite_for_prefix(file, prefix)
-      end
+      rewrite_files = Dir.glob(File.join(base_dir, "assets", "**", "*.css"))
+      rewrite_files.each { |file| rewrite_for_prefix(file, prefix) }
     end
   end
 
   private
 
   def rewrite_for_prefix(path, prefix)
-    css = File.read(path)
-    css.gsub!(%r{url\(/assets/}, "url(#{prefix}assets/")
-    css.gsub!(%r{url\("/assets/}, "url(\"#{prefix}assets/")
-    css.gsub!(%r{url\('/assets/}, "url('#{prefix}assets/")
-    File.open(path, "w") do |fh|
-      fh.write(css)
-    end
-
-    if File.exist?(path + '.gz')
-      Zlib::GzipWriter.open(path + '.gz') do |gz|
-        gz.write css
+    begin
+      css = File.read(path)
+      css.gsub!(%r{url\(/assets/}, "url(#{prefix}assets/")
+      css.gsub!(%r{url\("/assets/}, "url(\"#{prefix}assets/")
+      css.gsub!(%r{url\('/assets/}, "url('#{prefix}assets/")
+      File.open(path, "w") do |fh|
+        fh.write(css)
       end
+
+      if File.exist?(path + '.gz')
+        Zlib::GzipWriter.open(path + '.gz') do |gz|
+          gz.write css
+        end
+      end
+    rescue Exception => e
+      throw Exception.new "failed to rewrite #{path} for #{prefix} - #{e.message}"
     end
   end
 end

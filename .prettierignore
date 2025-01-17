@@ -2,7 +2,8 @@
 *.yml
 *.yaml
 *.json
-frontend/app/assets/javascripts/twitter/
+frontend/app/assets/stylesheets/vendor/
+frontend/app/assets/stylesheets/jquery.*
 frontend/vendor/
 public/app/assets/javascripts/bootstrap-accessibility/
-public/vendor/assets/javascripts/
+public/vendor/assets/

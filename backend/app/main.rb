@@ -1,6 +1,8 @@
 require 'bundler/setup'
 Bundler.require
 
+require 'rack/utils'
+
 Rack::Utils.key_space_limit = 655360 # x10 Rack default
 Rack::Utils.param_depth_limit = 200 # x2 Rack default
 
@@ -17,10 +19,12 @@ end
 require_relative 'lib/bootstrap'
 ASpaceEnvironment.init
 
-
-require 'archivesspace_thread_dump'
-ArchivesSpaceThreadDump.init(File.join(ASUtils.find_base_directory, "thread_dump_backend.txt"))
-
+# JRuby 9.3.0.0 introduced more nuanced thread teardowns.
+# See: https://github.com/jruby/jruby/pull/6176
+# Under the assumption that the thread dump facility is not widely
+# relied-upon, we hereby comment it out...
+# require 'archivesspace_thread_dump'
+# ArchivesSpaceThreadDump.init(File.join(ASUtils.find_base_directory, "thread_dump_backend.txt"))
 
 require_relative 'lib/uri_resolver'
 require_relative 'lib/rest'
@@ -32,10 +36,8 @@ require_relative 'lib/request_context'
 require_relative 'lib/component_transfer'
 require_relative 'lib/progress_ticker'
 require_relative 'lib/csv_template_generator'
-
 require_relative 'lib/ark/ark_minter'
-
-require 'solr_snapshotter'
+require_relative 'lib/user_mailer'
 
 require 'barcode_check'
 require 'benchmark'
@@ -208,14 +210,6 @@ class ArchivesSpaceService < Sinatra::Base
             Log.info("Backup of embedded demo database completed!")
           end
         end
-
-        if AppConfig[:solr_backup_schedule] && AppConfig[:solr_backup_number_to_keep] > 0
-          settings.scheduler.cron(AppConfig[:solr_backup_schedule],
-                                  :tags => 'solr_backup') do
-            Log.info("Creating snapshot of Solr index and indexer state")
-            SolrSnapshotter.snapshot
-          end
-        end
       end
 
       ANONYMOUS_USER = AnonymousUser.new
@@ -353,7 +347,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   get '/' do
-    sys_info = DB.sysinfo.merge({ "archivesSpaceVersion" => ASConstants.VERSION})
+    sys_info = DB.sysinfo
 
     request.accept.each do |type|
       case type

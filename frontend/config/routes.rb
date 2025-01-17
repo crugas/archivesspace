@@ -30,6 +30,9 @@ ArchivesSpace::Application.routes.draw do
     match 'users/manage_access' => 'users#manage_access', :via => [:get]
     match 'users/edit_self' => 'users#edit_self', :via => [:get]
     match 'users/update_self' => 'users#update_self', :via => [:post]
+    match 'users/edit_password' => 'users#password_form', :via => [:get]
+    match 'users/recover_password' => 'users#recover_password', :via => [:post]
+    match 'users/update_password' => 'users#update_password', :via => [:post]
     match 'users/:id/edit_groups' => 'users#edit_groups', :via => [:get]
     match 'users/:id/edit' => 'users#edit', :via => [:get]
     match 'users/:id/update_groups' => 'users#update_groups', :via => [:post]
@@ -40,6 +43,7 @@ ArchivesSpace::Application.routes.draw do
     match 'users/:id/delete' => 'users#delete', :via => [:post]
     match('/users/:id/activate' => 'users#activate', :via => [:get], :as => :user_activate)
     match('/users/:id/deactivate' => 'users#deactivate', :via => [:get], :as => :user_deactivate)
+    match 'users/:username/:token' => 'session#token_login', :via => [:get], constraints: { username: /[^\/]+/ }
 
     resources :users
 
@@ -112,9 +116,11 @@ ArchivesSpace::Application.routes.draw do
     resources :resources
     match 'resources/:id/container_labels' => 'exports#container_labels', :via => [:get]
     match 'resources/:id/container_tempate' => 'exports#container_template', :via => [:get]
+    match 'resources/:id/digital_object_template' => 'exports#digital_object_template', :via => [:get]
     match 'resources/:id/download_marc' => 'exports#download_marc', :via => [:get]
     match 'resources/:id/download_ead' => 'exports#download_ead', :via => [:get]
     match 'resources/:id/print_to_pdf' => 'exports#print_to_pdf', :via => [:get]
+    match 'resources/:id/resource_duplicate' => 'exports#resource_duplicate', :via => [:post]
     match 'resources/:id' => 'resources#update', :via => [:post]
     match 'resources/:id/delete' => 'resources#delete', :via => [:post]
     match 'resources/:id/rde' => 'resources#rde', :via => [:get]
@@ -252,6 +258,9 @@ ArchivesSpace::Application.routes.draw do
     match 'preferences/:id' => 'preferences#update', :via => [:post]
     match 'preferences/:id/reset' => 'preferences#reset', :via => [:post]
 
+    match('bulk_archival_object_updater/download' => 'bulk_archival_object_updater#download_form', :via => [:get])
+    match('bulk_archival_object_updater/download' => 'bulk_archival_object_updater#download', :via => [:post])
+
     resources :rde_templates
     match 'rde_templates/batch_delete' => 'rde_templates#batch_delete', :via => [:post]
 
@@ -332,7 +341,6 @@ ArchivesSpace::Application.routes.draw do
 
     match "system_info" => "system_info#show", :via => [ :get ]
     match "system_info/log" => "system_info#stream_log", :via => [:get]
-    match "system_info/config" => "system_info#reload_config", :via => [:post]
 
     root :to => 'welcome#index'
   end

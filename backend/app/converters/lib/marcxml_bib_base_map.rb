@@ -99,7 +99,8 @@ module MarcXMLBibBaseMap
           :role => agent['_role'] || 'subject',
           :terms => agent['_terms'] || [],
           :relator => agent['_relator'],
-          :ref => agent.uri
+          :ref => agent.uri,
+          :is_primary => agent['_is_primary']
         }
       },
       :map => {
@@ -309,8 +310,51 @@ module MarcXMLBibBaseMap
   end
 
 
-  # agents from 100 and 700 field are creators or sources
-  def creators_and_sources
+  # agents from 100 field are creators
+  # this is the same map as #sources below, with the exception of adding the is_primary flag by default
+  # TODO: remove source stuff from #creator and creator stuff from #source, not confident in changing this at this time
+  def creators
+    {
+      :map => {
+        "subfield[@code='d']" => :dates,
+        "subfield[@code='e']" => -> agent, node {
+          agent['_role'] = case
+                           when ['Auctioneer (auc)',
+                                 'Bookseller (bsl)',
+                                 'Collector (col)',
+                                 'Depositor (dpt)',
+                                 'Donor (dnr)',
+                                 'Former owner (fmo)',
+                                 'Funder (fnd)',
+                                 'Owner (own)'].include?(node.inner_text)
+
+                             'source'
+                           else
+                             'creator'
+                           end
+        },
+        "self::datafield" => {
+          :map => {
+            "@ind1" => sets_name_order_from_ind1,
+            "subfield[@code='v']" => adds_prefixed_qualifier('Form subdivision'),
+            "subfield[@code='x']" => adds_prefixed_qualifier('General subdivision'),
+            "subfield[@code='y']" => adds_prefixed_qualifier('Chronological subdivision'),
+            "subfield[@code='z']" => adds_prefixed_qualifier('Geographic subdivision'),
+          },
+          :defaults => {
+            :source => 'ingest',
+          }
+        }
+      },
+      :defaults => {
+        '_role' => 'creator',
+        '_is_primary' => true,
+      }
+    }
+  end
+
+  # agents from 700 field are sources
+  def sources
     {
       :map => {
         "subfield[@code='d']" => :dates,
@@ -348,6 +392,7 @@ module MarcXMLBibBaseMap
       }
     }
   end
+
 
   # agents derived from 600 fields
   def agent_as_subject
@@ -596,9 +641,8 @@ module MarcXMLBibBaseMap
   # can be produced. A chain of sketcky substitutions at
   # the end attempts to keep the punctuation normal.
   def subfield_template(template, node, map=nil)
-    result = template.clone
+    result = template.dup
     section = /\{([^@${]*)([@$])(ind[0-9]|\S{1})([^}]*)\}/
-
     while result.match(section)
       if $2 == '@'
         val = node.attr("#{$3}")
@@ -845,7 +889,7 @@ module MarcXMLBibBaseMap
                                                 Version-$s; Form subdivision-$k; Miscellaneous-$g)
                                                 |), is_fallback_resource_title),
 
-        "datafield[@tag='242']" => multipart_note('odd',  'Translation of Title', "{$a: }{$b }{[$h] }{$n, }{$p, }{$y}){ / $c}"),
+        "datafield[@tag='242']" => multipart_note('odd', 'Translation of Title', "{$a: }{$b }{[$h] }{$n, }{$p, }{$y}){ / $c}"),
 
         # TITLE
         "datafield[@tag='245']" => -> resource, node {
@@ -960,7 +1004,7 @@ module MarcXMLBibBaseMap
                 elsif ext =~ /^([0-9\.,]+)/
                   extent.number = $1
                 else
-                  raise "The extent field (300) could not be parsed."
+                  raise "The extent field (300, #{ext}) could not be parsed."
                 end
 
               # $a and $f present, a must be numeric, f must be an extent value that's present in the extent_extent_type enumeration
@@ -970,7 +1014,7 @@ module MarcXMLBibBaseMap
                 if a_content.inner_text =~ /^[+-]?([0-9]+\.?[0-9]*|\.[0-9]+)$/
                   extent.number = a_content.inner_text
                 else
-                  raise "No numeric value found in field 300, subfield a"
+                  raise "No numeric value found in field 300, subfield a (#{a_content.inner_text})"
                 end
 
                 # remove punctuation and replace underscores with spaces to better match extent_type translation values
@@ -980,7 +1024,7 @@ module MarcXMLBibBaseMap
                 if extent_values.include?(f_content_cleaned)
                   extent.extent_type = f_content.inner_text
                 else
-                  raise "Extent type in field 300, subfield f is not found in the extent type controlled vocabulary."
+                  raise "Extent type in field 300, subfield f (#{f_content.inner_text}) is not found in the extent type controlled vocabulary."
                 end
               end
 
@@ -1242,10 +1286,10 @@ module MarcXMLBibBaseMap
 
         "datafield[@tag='583']" => multipart_note('processinfo', 'Processing Note', %q|
                                             {Action: $a}{--Action Identification: $b}{--Time/Date of Action: $c}{--Action interval: $d}
-                                            {--Action interval: $d}{--Contingency for Action: $e}{--Authorization: $f}{--Jurisdiction: $h}
+                                            {--Contingency for Action: $e}{--Authorization: $f}{--Jurisdiction: $h}
                                             {--Method of action: $i}{--Site of Action: $j}{--Action agent: $k}{--Status: $l}{--Extent: $n}
                                             {--Type of unit: $o}{--URI: $u}{--Non-public note: $x}{--Public note: $z}{--Materials specified: $3}
-                                            {--Institution: $5}.|),
+                                            {--Institution: $5}|.split(/\n+/).map {|l| l.strip }.reject {|l| l.empty? }.join),
 
         "datafield[@tag='584']" => multipart_note('accruals', 'Accruals', %q|
                                             {Accumulation: $a}{--Frequency of use: $b}{--Materials specified: $3}{--Institution: $5}.|),
@@ -1253,19 +1297,23 @@ module MarcXMLBibBaseMap
         "datafield[starts-with(@tag, '59')]" => multipart_note('odd', 'Local Note'),
 
         # LINKED AGENTS (PERSON)
-        "datafield[@tag='100' or @tag='700'][@ind1='0' or @ind1='1']" => mix(person_template, creators_and_sources),
+        "datafield[@tag='100'][@ind1='0' or @ind1='1']" => mix(person_template, creators),
+        "datafield[@tag='700'][@ind1='0' or @ind1='1']" => mix(person_template, sources),
 
         "datafield[@tag='600'][@ind1='0' or @ind1='1']" => mix(person_template, agent_as_subject),
 
         # LINKED AGENTS (FAMILY)
-        "datafield[@tag='100' or @tag='700'][@ind1='3']" => mix(family_template, creators_and_sources),
+        "datafield[@tag='100'][@ind1='3']" => mix(family_template, creators),
+        "datafield[@tag='700'][@ind1='3']" => mix(family_template, sources),
 
         "datafield[@tag='600'][@ind1='3']" => mix(family_template, agent_as_subject),
 
         # LINKED AGENTS (CORPORATE)
-        "datafield[@tag='110' or @tag='710']" => mix(corp_template, creators_and_sources),
+        "datafield[@tag='110']" => mix(corp_template, creators),
+        "datafield[@tag='710']" => mix(corp_template, sources),
 
-        "datafield[@tag='111' or @tag='711']" => mix(corp_template, creators_and_sources, corp_variation),
+        "datafield[@tag='111']" => mix(corp_template, creators, corp_variation),
+        "datafield[@tag='711']" => mix(corp_template, sources, corp_variation),
 
         "datafield[@tag='610']" => mix(corp_template, agent_as_subject),
 

@@ -20,7 +20,7 @@ class AgentsController < ApplicationController
         search_params = params_for_backend_search.merge({ 'facet[]' => SearchResultData.AGENT_FACETS })
         search_params['type[]'] = 'agent'
         uri = "/repositories/#{session[:repo_id]}/search"
-        csv_response(uri, Search.build_filters(search_params), "#{I18n.t('agent._plural').downcase}.")
+        csv_response(uri, Search.build_filters(search_params), "#{t('agent._plural').downcase}.")
       end
     end
   end
@@ -71,14 +71,14 @@ class AgentsController < ApplicationController
                   return render action: :new
                 },
                 on_valid: lambda  { |id|
-                  flash[:success] = I18n.t('agent._frontend.messages.created')
+                  flash[:success] = t('agent._frontend.messages.created')
 
                   if @agent['is_slug_auto'] == false &&
                      @agent['slug'].nil? &&
                      params['agent'] &&
                      params['agent']['is_slug_auto'] == '1'
 
-                    flash[:warning] = I18n.t('slug.autogen_disabled')
+                    flash[:warning] = t('slug.autogen_disabled')
                   end
 
                   return render json: @agent.to_hash if inline?
@@ -103,13 +103,13 @@ class AgentsController < ApplicationController
                   return render action: :edit
                 },
                 on_valid: lambda  { |id|
-                  flash[:success] = I18n.t('agent._frontend.messages.updated')
+                  flash[:success] = t('agent._frontend.messages.updated')
                   if @agent['is_slug_auto'] == false &&
                      @agent['slug'].nil? &&
                      params['agent'] &&
                      params['agent']['is_slug_auto'] == '1'
 
-                    flash[:warning] = I18n.t('slug.autogen_disabled')
+                    flash[:warning] = t('slug.autogen_disabled')
                   end
 
                   redirect_to controller: :agents, action: :edit, id: id, agent_type: @agent_type
@@ -120,7 +120,7 @@ class AgentsController < ApplicationController
     agent = JSONModel(@agent_type).find(params[:id])
 
     if agent.key?('is_repo_agent')
-      flash[:error] = I18n.t('errors.cannot_delete_repository_agent')
+      flash[:error] = t('errors.cannot_delete_repository_agent')
       redirect_to(controller: :agents, action: :show, id: params[:id])
       return
     end
@@ -128,12 +128,12 @@ class AgentsController < ApplicationController
     begin
       agent.delete
     rescue ConflictException => e
-      flash[:error] = I18n.t('agent._frontend.messages.delete_conflict', error: I18n.t("errors.#{e.conflicts}", default: e.message))
+      flash[:error] = t('agent._frontend.messages.delete_conflict', error: t("errors.#{e.conflicts}", default: e.message))
       redirect_to(controller: :agents, action: :show, id: params[:id])
       return
     end
 
-    flash[:success] = I18n.t('agent._frontend.messages.deleted', JSONModelI18nWrapper.new(agent: agent))
+    flash[:success] = t('agent._frontend.messages.deleted', JSONModelI18nWrapper.new(agent: agent))
     redirect_to(controller: :agents, action: :index, deleted_uri: agent.uri)
   end
 
@@ -143,7 +143,7 @@ class AgentsController < ApplicationController
     response = JSONModel::HTTP.post_form("#{agent.uri}/publish")
 
     if response.code == '200'
-      flash[:success] = I18n.t('agent._frontend.messages.published', JSONModelI18nWrapper.new(agent: agent).enable_parse_mixed_content!(url_for(:root)))
+      flash[:success] = t('agent._frontend.messages.published', JSONModelI18nWrapper.new(agent: agent).enable_parse_mixed_content!(url_for(:root)))
     else
       flash[:error] = ASUtils.json_parse(response.body)['error'].to_s
     end
@@ -171,7 +171,7 @@ class AgentsController < ApplicationController
                               )
                             }).save
 
-    flash[:success] = I18n.t('default_values.messages.defaults_updated')
+    flash[:success] = t('default_values.messages.defaults_updated')
     redirect_to controller: :agents, action: :defaults
   rescue Exception => e
     flash[:error] = e.message
@@ -207,7 +207,7 @@ class AgentsController < ApplicationController
                                'lock_version' => processed_params['lock_version'],
                                'record_type' => @agent_type.to_s,
                                'subrecord_requirements' => subrecord_requirements}).save
-    flash[:success] = I18n.t('required_fields.messages.required_fields_updated')
+    flash[:success] = t('required_fields.messages.required_fields_updated')
     redirect_to controller: :agents, action: :required
   rescue Exception => e
     flash[:error] = e.message
@@ -216,49 +216,49 @@ class AgentsController < ApplicationController
 
   def merge
     merge_list = params[:record_uris]
-    target = merge_list[0]
+    merge_destination = merge_list[0]
     merge_list.shift
-    victims = merge_list
-    target_type = JSONModel.parse_reference(target)[:type]
-    handle_merge(victims,
-                 target,
+    merge_candidates = merge_list
+    merge_destination_type = JSONModel.parse_reference(merge_destination)[:type]
+    handle_merge(merge_candidates,
+                 merge_destination,
                  'agent',
-                 { agent_type: target_type })
+                 { agent_type: merge_destination_type })
   end
 
   def merge_selector
     @agent = JSONModel(@agent_type).find(params[:id], find_opts)
 
     if params[:refs].is_a?(Array)
-      flash[:error] = I18n.t('errors.merge_too_many_victims')
+      flash[:error] = t('errors.merge_too_many_merge_candidates')
       redirect_to({ action: :show, id: params[:id] })
       return
     end
 
-    victim_details = JSONModel.parse_reference(params[:refs])
-    @victim_type = victim_details[:type].to_sym
-    if @victim_type != @agent_type
-      flash[:error] = I18n.t('errors.merge_different_types')
+    merge_candidate_details = JSONModel.parse_reference(params[:refs])
+    @merge_candidate_type = merge_candidate_details[:type].to_sym
+    if @merge_candidate_type != @agent_type
+      flash[:error] = t('errors.merge_different_types')
       redirect_to({ action: :show, id: params[:id] })
       return
     end
 
-    @victim = JSONModel(@victim_type).find(victim_details[:id], find_opts)
-    if @agent.key?('is_user') || @victim.key?('is_user')
-      flash[:error] = I18n.t('errors.merge_denied_for_system_user')
+    @merge_candidate = JSONModel(@merge_candidate_type).find(merge_candidate_details[:id], find_opts)
+    if @agent.key?('is_user') || @merge_candidate.key?('is_user')
+      flash[:error] = t('errors.merge_denied_for_system_user')
       redirect_to({ action: :show, id: params[:id] })
       return
     end
 
-    relationship_uris = @victim['related_agents'] ? @victim['related_agents'].map {|ra| ra['ref']} : []
+    relationship_uris = @merge_candidate['related_agents'] ? @merge_candidate['related_agents'].map {|ra| ra['ref']} : []
     if relationship_uris.include?(@agent['uri'])
-      flash[:error] = I18n.t('errors.merge_denied_relationship')
+      flash[:error] = t('errors.merge_denied_relationship')
       redirect_to({ action: :show, id: params[:id] })
       return
     end
 
-    if !user_can?('view_agent_contact_record') && (@agent.agent_contacts.any? || @victim.agent_contacts.any?)
-      flash[:error] = I18n.t('errors.merge_restricted_contact_details')
+    if !user_can?('view_agent_contact_record') && (@agent.agent_contacts.any? || @merge_candidate.agent_contacts.any?)
+      flash[:error] = t('errors.merge_restricted_contact_details')
       redirect_to({ action: :show, id: params[:id] })
       return
     end
@@ -267,9 +267,11 @@ class AgentsController < ApplicationController
   end
 
   def merge_detail
+    merge_destination_uri = JSONModel(@agent_type).uri_for(params[:id])
+    merge_candidate_uri = params['merge_candidate_uri']
     request = JSONModel(:merge_request_detail).new
-    request.target = { 'ref' => JSONModel(@agent_type).uri_for(params[:id]) }
-    request.victims = Array.wrap({ 'ref' => params['victim_uri'] })
+    request.merge_destination = { 'ref' => merge_destination_uri }
+    request.merge_candidates = Array.wrap({ 'ref' => merge_candidate_uri })
 
     # the backend is expecting to know how the user may have re-ordered subrecords in the merge interface. This information is encoded in the params, but will be stripped out when we clean them up unless we add them as a pseudo schema attribute.
     # add_position_to_agents_merge does exactly this.
@@ -286,19 +288,24 @@ class AgentsController < ApplicationController
       render_aspace_partial partial: 'agents/merge_preview', locals: { object: @agent }
     else
       begin
+        # For each linked resource or AO, need to remember roles to re-establish with the destination agent.
+        candidate_roles = get_merge_candidate_linked_roles(merge_candidate_uri)
+
         response = JSONModel::HTTP.post_json(URI(uri), request.to_json)
 
-        flash[:success] = I18n.t('agent._frontend.messages.merged')
-        resolver = Resolver.new(request.target['ref'])
+        recreate_linked_record_agent_roles(candidate_roles, merge_destination_uri)
+
+        flash[:success] = t('agent._frontend.messages.merged')
+        resolver = Resolver.new(request.merge_destination['ref'])
         redirect_to(resolver.view_uri)
       rescue ValidationException => e
         flash[:error] = e.errors.to_s
         redirect_to({ action: :show, id: params[:id] }.merge(extra_params))
       rescue ConflictException => e
-        flash[:error] = I18n.t('errors.merge_conflict', message: e.conflicts)
+        flash[:error] = t('errors.merge_conflict', message: e.conflicts)
         redirect_to({ action: :show, id: params[:id] }.merge(extra_params))
       rescue RecordNotFound => e
-        flash[:error] = I18n.t('errors.error_404')
+        flash[:error] = t('errors.error_404')
         redirect_to({ action: :show, id: params[:id] }.merge(extra_params))
       end
     end
@@ -431,4 +438,39 @@ class AgentsController < ApplicationController
       end
     end
   end
+
+  # gathers necessary fields to recreate agent roles in affected resources/AOs
+  def get_merge_candidate_linked_roles(merge_candidate_uri)
+    filter_term = ["{ \"agent_uris\":\"#{merge_candidate_uri}\" }"]
+    search_results = Search.all(session[:repo_id], {'filter_term[]' => filter_term})['results']
+    candidate_roles = []
+    search_results.each do |result|
+      linked_agents = JSON.parse(result['json'])['linked_agents']
+      linked_agents.select { |a| a['ref'] == merge_candidate_uri }.each do |linked_agent|
+        candidate_roles.append({
+          linked_uri: result['uri'],
+          title: linked_agent['_resolved']['title'],
+          role: linked_agent['role'],
+          relator: linked_agent['relator'],
+          terms: linked_agent['terms']
+        })
+      end
+    end
+    candidate_roles
+  end
+
+  def recreate_linked_record_agent_roles(candidate_roles, destination_agent_uri)
+    candidate_roles.each do |role|
+      linked_type = role[:linked_uri].match(/.*\/(\w+)s\/\d+$/)[1]
+      linked_record = JSONModel(linked_type.to_sym).find_by_uri(role[:linked_uri])
+      linked_record.linked_agents.append({
+        'ref' => destination_agent_uri,
+        'role' => role[:role],
+        'relator' => role[:relator],
+        'terms' => role[:terms]
+      })
+      linked_record.save
+    end
+  end
+
 end

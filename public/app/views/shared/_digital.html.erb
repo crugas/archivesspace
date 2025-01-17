@@ -1,12 +1,34 @@
-<% if rep_fv.present? %>
+<% if record['json']['representative_file_version'].present? %>
 <div class="available-digital-objects">
   <div class="objectimage">
-    <div class="panel panel-default">
-      <%= render partial: 'shared/representative_file_version', locals: {:uri => rep_fv['file_uri'], :caption => rep_fv['caption']} %>
+    <div class="card">
+      <%
+        rfv = record['json']['representative_file_version']
+        img_uri = rfv['file_uri']
+        a_uri = rfv['derived_from'] || rfv['link_uri']
+        dig_materials_link = nil
+
+        if representative_link_to_digital_materials?(record)
+          digitized_link_text = t(
+            'digital_object._public.browse_number_digital_objects_in_collection',
+            num: n_digital_objects,
+            count: n_digital_objects
+          )
+          dig_materials_link = link_to digitized_link_text,
+            app_prefix("/repositories/#{params[:rid]}/resources/#{params[:id]}/digitized"),
+            data: { 'view-all-digital-objects' => true }
+        end
+      %>
+      <%= render partial: 'shared/representative_file_version_record', locals: {
+        :a_uri => a_uri,
+        :img_uri => img_uri,
+        :caption => rfv['caption'],
+        :dig_materials_link => dig_materials_link
+      } %>
     </div>
   </div>
 </div>
-<% elsif dig_objs.present? %>
+<% elsif local_assigns[:dig_objs] && dig_objs.present? %>
 <div class="available-digital-objects">
   <% dig_objs.each do |d_file| %>
     <% if !d_file['out'].blank? %>

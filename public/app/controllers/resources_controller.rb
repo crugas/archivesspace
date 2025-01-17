@@ -157,15 +157,12 @@ class ResourcesController < ApplicationController
         {:uri => @repo_info['top']['uri'], :crumb => @repo_info['top']['name'], :type => 'repository'},
         {:uri => nil, :crumb => process_mixed_content(@result.display_string), :type => 'resource'}
       ]
-#      @rep_image = get_rep_image(@result['json']['instances'])
+
       fill_request_info
-      if @result['primary_type'] == 'digital_object' || @result['primary_type'] == 'digital_object_component'
-        @dig = process_digital(@result['json'])
-        @rep_fv = @result['json']['representative_file_version']
-      else
-        @dig = process_digital_instance(@result['json']['instances'])
-        process_extents(@result['json'])
-      end
+      @dig = process_digital_instance(@result['json']['instances'])
+      process_extents(@result['json'])
+
+      @n_digital_objects = get_digital_object_count
     rescue RecordNotFound
       record_not_found(uri, 'resource')
     end
@@ -304,6 +301,13 @@ class ResourcesController < ApplicationController
     archivesspace.search(qry, 1).records.any?
   end
 
+  def get_digital_object_count
+    uri = "/repositories/#{params[:rid]}/resources/#{params[:id]}"
+    qry = "collection_uri_u_sstr:\"#{uri}\" AND (#{DIGITAL_QUERY})"
+
+    archivesspace.search(qry, 1, {:rows => 0})['total_hits']
+  end
+
   def fetch(resource_uri, page_uri, params, query, sort, type, enums = [])
     qry = "collection_uri_u_sstr:\"#{resource_uri}\" AND (#{query})"
     @base_search = "#{page_uri}?"
@@ -311,6 +315,13 @@ class ResourcesController < ApplicationController
       'sort' => sort,
       'facet.mincount' => 1
     })
+    if query == DIGITAL_QUERY
+      if search_opts.include? 'resolve[]'
+        search_opts['resolve[]'].append('linked_instance_uris:id')
+      else
+        search_opts['resolve[]'] = ['linked_instance_uris:id']
+      end
+    end
     search_opts['fq']=[qry]
     set_up_search([type], enums, search_opts, params, qry)
     @base_search= @base_search.sub("q=#{qry}", '')

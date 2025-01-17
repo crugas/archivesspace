@@ -1,6 +1,10 @@
 require 'fileutils'
 require 'rbconfig'
 
+if AppConfig[:db_url] =~ /jdbc:mysql/
+  require "db/sequel_mysql_timezone_workaround"
+end
+
 class DB
 
   Sequel.database_timezone = :utc
@@ -20,10 +24,11 @@ class DB
   class DBPool
     DATABASE_READ_ONLY_REGEX = /is read only|server is running with the --read-only option/
 
-    attr_reader :pool_size
+    attr_reader :pool_size, :pool_timeout
 
-    def initialize(pool_size = AppConfig[:db_max_connections], opts = {})
+    def initialize(pool_size = AppConfig[:db_max_connections], pool_timeout = AppConfig[:db_pool_timeout], opts = {})
       @pool_size = pool_size
+      @pool_timeout = pool_timeout
       @opts = opts
 
       @lock = Mutex.new
@@ -40,6 +45,7 @@ class DB
           Log.info("Connecting to database: #{AppConfig[:db_url_redacted]}. Max connections: #{pool_size}")
           pool = Sequel.connect(AppConfig[:db_url],
                                 :max_connections => pool_size,
+                                :pool_timeout => pool_timeout,
                                 :test => true,
                                 :loggers => (AppConfig[:db_debug_log] ? [Logger.new($stderr)] : [])
                                )
@@ -264,7 +270,7 @@ class DB
     end
 
     def sysinfo
-      jdbc_metadata.merge(system_metadata)
+      jdbc_metadata.merge(system_metadata).merge({ "archivesSpaceVersion" => ASConstants.VERSION})
     end
 
 
@@ -276,7 +282,10 @@ class DB
 
     def system_metadata
       RbConfig.const_get("CONFIG").select { |key| ['host_os', 'host_cpu',
-                                                   'build', 'ruby_version'].include? key }
+                                                   'build', 'ruby_version'].include? key }.merge({
+                                                      'java.runtime.name' => java.lang.System.getProperty('java.runtime.name'),
+                                                      'java.version' => java.lang.System.getProperty('java.version')
+                                                    })
     end
 
     def needs_savepoint?
@@ -352,22 +361,22 @@ class DB
       if !SUPPORTED_DATABASES.any? {|db| url =~ db[:pattern]}
 
         msg = <<~eof
-          
+
           =======================================================================
           UNSUPPORTED DATABASE
           =======================================================================
-          
+
           The database listed in your configuration:
-          
+
             #{url}
-          
+
           is not officially supported by ArchivesSpace.  Although the system may
           still work, there's no guarantee that future versions will continue to
           work, or that it will be possible to upgrade without losing your data.
-          
+
           It is strongly recommended that you run ArchivesSpace against one of
           these supported databases:
-          
+
         eof
 
         SUPPORTED_DATABASES.each do |db|
@@ -376,14 +385,14 @@ class DB
 
         msg += "\n"
         msg += <<~eof
-          
+
           To ignore this (very good) advice, you can set the configuration option:
-          
+
             AppConfig[:allow_unsupported_database] = true
-          
-          
+
+
           =======================================================================
-          
+
         eof
 
         Log.error(msg)
@@ -406,9 +415,9 @@ class DB
         end
       end
 
-      victims = backups.sort.reverse.drop(AppConfig[:demo_db_backup_number_to_keep])
+      expired_backups = backups.sort.reverse.drop(AppConfig[:demo_db_backup_number_to_keep])
 
-      victims.each do |backup_dir|
+      expired_backups.each do |backup_dir|
         # Proudly paranoid
         if File.exist?(File.join(backup_dir, "archivesspace_demo_db", "BACKUP.HISTORY"))
           Log.info("Expiring old backup: #{backup_dir}")
@@ -484,23 +493,23 @@ class DB
 
       unless (non_utf8_tables.empty?)
         msg = <<~EOF
-          
+
           The following MySQL database tables are not set to use UTF-8 for their character
           encoding:
-          
+
           #{non_utf8_tables.map {|t| "  * " + t[:TABLE_NAME]}.join("\n")}
-          
+
           Please refer to README.md for instructions on configuring your database to use
           UTF-8.
-          
+
           If you want to override this restriction (not recommended!) you can set the
           following option in your config.rb file:
-          
+
             AppConfig[:allow_non_utf8_mysql_database] = true
-          
+
           But note that ArchivesSpace largely assumes that your data will be UTF-8
           encoded.  Running in a non-UTF-8 configuration is not supported.
-          
+
         EOF
 
         Log.warn(msg)

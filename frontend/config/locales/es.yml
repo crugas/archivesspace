@@ -23,6 +23,10 @@ es:
     date_picker: Selector de fecha abierto
     date_picker_toggle: Cambia el selector de fecha
     defaults: Valores por defecto
+    duplicate_resource: Recurso duplicado
+    duplicate_resource_confirm_message: Se creará un trabajo para duplicar este recurso
+      con todos sus objetos de archivo. Esto puede tardar un poco según la cantidad
+      de registros.
     edit: Editar
     edit_oai: Editar la configuración de OAI
     edit_batch: Editar en bloque
@@ -39,33 +43,34 @@ es:
     more: Más
     transfer_record: Transferir
     link_to: Enlazar a
+    link_to_record: Enlace para grabar
     add_prefix: Añadir
     merge_replace: Reemplazar
     merge_add: Añadir
     merge_confirm_title: ¿Se combinan en este registro?
     merge_agent_compare_agent_details: Comparar les autoridades
     merge_from_browse_confirm_title: Fusionar registros seleccionados?
-    merge_subject_confirm_message: "La materia '%{source}' tendrá los registros seleccionados\
-      \ fusionados con él. Se eliminarán todos los registros de selectos y cualquier\
-      \ registros vinculados será nuevamente vinculados a esta materia."
-    merge_agent_confirm_message: "La autoridad '%{source}' tendrá los registros seleccionados\
-      \ fusionados con él. Se eliminarán todos los registros de selectos y cualquier\
-      \ registros vinculados será nuevamente vinculados a este autoridad. Al hacer\
-      \ clic en el botón Comparar les autoridades, aparecerá una pantalla que le brinda\
-      \ la opción de elegir qué campos y sub-registros retener de cada registro. "
-    merge_agent_from_browse_confirm_message: "El primer autoridad seleccionado tendrá\
-      \ los registros seleccionados posteriormente fusionados en él. Todos los registros\
-      \ seleccionados posteriormente se eliminarán y los registros vinculados se volverán\
-      \ a vincular al primer autoridad seleccionado."
-    merge_resource_confirm_message: "El fondo '%{source}' tendrá los registros seleccionados\
-      \ fusionados con él. Se eliminarán todos los registros de selectos y cualquier\
-      \ registros vinculados será nuevamente vinculados a este fondo."
-    merge_container_profile_confirm_message: "El perfil de contenedor '%{target}'\
-      \ tendrá los registros seleccionados fusionados en él. Todos los registros seleccionados\
-      \ se eliminarán y los registros vinculados se volverán a vincular a este recurso."
-    batch_merge: "Seleccione el registro en el que se fusionarán todos los demás registros\
-      \ enumerados. Todos los registros vinculados se volverán a vincular a este registro\
-      \ y se eliminará toda la información de los otros registros."
+    merge_subject_confirm_message: "La materia '%{source}' tendrá los registros seleccionados
+      fusionados con él. Se eliminarán todos los registros de selectos y cualquier
+      registros vinculados será nuevamente vinculados a esta materia."
+    merge_agent_confirm_message: "La autoridad '%{source}' tendrá los registros seleccionados
+      fusionados con él. Se eliminarán todos los registros de selectos y cualquier
+      registros vinculados será nuevamente vinculados a este autoridad. Al hacer clic
+      en el botón Comparar les autoridades, aparecerá una pantalla que le brinda la
+      opción de elegir qué campos y sub-registros retener de cada registro. "
+    merge_agent_from_browse_confirm_message: "El primer autoridad seleccionado tendrá
+      los registros seleccionados posteriormente fusionados en él. Todos los registros
+      seleccionados posteriormente se eliminarán y los registros vinculados se volverán
+      a vincular al primer autoridad seleccionado."
+    merge_resource_confirm_message: "El fondo '%{source}' tendrá los registros seleccionados
+      fusionados con él. Se eliminarán todos los registros de selectos y cualquier
+      registros vinculados será nuevamente vinculados a este fondo."
+    merge_container_profile_confirm_message: "El perfil de contenedor '%{merge_destination}'
+      tendrá los registros seleccionados fusionados en él. Todos los registros seleccionados
+      se eliminarán y los registros vinculados se volverán a vincular a este recurso."
+    batch_merge: "Seleccione el registro en el que se fusionarán todos los demás registros
+      enumerados. Todos los registros vinculados se volverán a vincular a este registro
+      y se eliminará toda la información de los otros registros."
     merge_n_records: "Fusionar %{n} registros"
     move: Mover
     move_up_a_level: Un nivel
@@ -83,23 +88,24 @@ es:
     set_default: Marcar como predeterminado
     suppress: Bloquear
     suppress_confirm_title: ¿Bloquear este registro?
-    suppress_confirm_message: "Mientras que un registro bloqueado permanecerá en la\
-      \ base de datos, se convertirá en ocultos a la mayoría de los usuarios y a la\
-      \ mayoría de las funciones de carácter."
+    suppress_confirm_message: "Mientras que un registro bloqueado permanecerá en la
+      base de datos, se convertirá en ocultos a la mayoría de los usuarios y a la
+      mayoría de las funciones de carácter."
+    toggle_dropdown_menu: Alternar menú desplegable
     transfer: Transferencia
     transfer_confirm_title: ¿La transferencia de este registro?
-    transfer_confirm_message: "El registro '%{target}' se transferirá en el repositorio\
-      \ seleccionado"
+    transfer_confirm_message: "El registro '%{target}' se transferirá en el repositorio
+      seleccionado"
     transfer_successful: Transferencia exitosa.  Los registros pueden tardar un momento
       en aparecer en el repositorio de destino mientras nueva indexación se lleva
       a cabo.
     transfer_failed: Transferencia fallida
-    transfer_failed_records_using_digital_objects: "Los siguientes registros se vinculan\
-      \ a objetos digitales que se transferirían, pero hacerlo rompería sus enlaces\
-      \ de instancia"
-    transfer_failed_digital_objects_linked_to_records: "Este objeto digital se vincula\
-      \ a otros registros contenidos en este repositorio. Para continuar con esta\
-      \ transferencia, elimine los enlaces en los siguientes registros"
+    transfer_failed_records_using_digital_objects: "Los siguientes registros se vinculan
+      a objetos digitales que se transferirían, pero hacerlo rompería sus enlaces
+      de instancia"
+    transfer_failed_digital_objects_linked_to_records: "Este objeto digital se vincula
+      a otros registros contenidos en este repositorio. Para continuar con esta transferencia,
+      elimine los enlaces en los siguientes registros"
     unset_default: Desactivada por defecto
     unsuppress: Desactivar
     unsuppress_confirm_title: ¿Bloquear este registro?
@@ -108,25 +114,25 @@ es:
     move_ordering_problem_message: "Grabar problema de pedido de movimiento"
     delete: Borrar
     delete_confirm_title: ¿Desea eliminar este registro? %{title}
-    delete_confirm_message: "<p>Por favor, ser conscientes de que <strong>no puede\
-      \ deshacer esta acción</strong>.</p><p>Esta acción eliminará el registro de\
-      \ la base de datos, incluyendo cualquier referencia que se tiene con otros registros.</p>"
+    delete_confirm_message: "<p>Por favor, ser conscientes de que <strong>no puede
+      deshacer esta acción</strong>.</p><p>Esta acción eliminará el registro de la
+      base de datos, incluyendo cualquier referencia que se tiene con otros registros.</p>"
     delete_repository_confirm_title: ¿Borrar este repositorio? %{name}
-    delete_repository_confirm_message: "<p><strong>No puedes deshacer este cambio</strong>.</p><p>Esta\
-      \ acción eliminará el <strong>repositorio</strong> y todos los registros asociados\
-      \ incluidas las referencias a otros registros.</p><p>Para seguir adelante por\
-      \ favor indica '%{repository}' abajo:</p><p><input id='deleteRepoConfim' data-confirm-answer='%{repository}'></input></p>"
+    delete_repository_confirm_message: "<p><strong>No puedes deshacer este cambio</strong>.</p><p>Esta
+      acción eliminará el <strong>repositorio</strong> y todos los registros asociados
+      incluidas las referencias a otros registros.</p><p>Para seguir adelante por
+      favor indica '%{repository}' abajo:</p><p><input id='deleteRepoConfim' data-confirm-answer='%{repository}'></input></p>"
     delete_multiple: Borrar registros
     delete_multiple_confirm_title: ¿Borrar registros?
-    delete_multiple_confirm_message: "<p>Por favor, ser conscientes de que <strong>no\
-      \ puede deshacer esta acción</strong>.</p><p>Esta acción eliminará estos registros\
-      \ de la base de datos, incluyendo referencias tienen a otros registros.</p>"
+    delete_multiple_confirm_message: "<p>Por favor, ser conscientes de que <strong>no
+      puede deshacer esta acción</strong>.</p><p>Esta acción eliminará estos registros
+      de la base de datos, incluyendo referencias tienen a otros registros.</p>"
     reset: Restablecer predeterminados
-    reset_confirm_title: "¿Restablecer %{preftype} a los valores predeterminados de\
-      \ la aplicación?"
-    reset_confirm_message: "<p>Tenga en cuenta que <strong>no puede deshacer esta\
-      \ acción</strong>.</p><p>Esta acción restablecerá las preferencias a los valores\
-      \ predeterminados de la aplicación.</p>"
+    reset_confirm_title: "¿Restablecer %{preftype} a los valores predeterminados de
+      la aplicación?"
+    reset_confirm_message: "<p>Tenga en cuenta que <strong>no puede deshacer esta
+      acción</strong>.</p><p>Esta acción restablecerá las preferencias a los valores
+      predeterminados de la aplicación.</p>"
     edit_multiple: Editar múltiples registros
     edit_multiple_confirm_title: ¿Editar registros?
     edit_multiple_confirm_message: "<p>Esto actualizará múltiples registros.</p>"
@@ -142,28 +148,28 @@ es:
     finish_editing: Finalizar edición
     merge: Fusión
     form_changes_message: "<small><span class='muted'>Hay cambios sin guardar</span></small>"
-    toolbar_disabled_message: "<small><span class='muted'>No se han guardado los cambios\
-      \ - Guarda o vuelve atrás </span></small>"
+    toolbar_disabled_message: "Tiene cambios no guardados: guarde o revierta para
+      acceder a la barra de herramientas y al árbol de registros."
     publish: Publicar todos
     publish_confirm_title: ¿Publicar?
-    publish_confirm_message: "<p>Realizar esta acción va a publicar este documento,\
-      \ los registros secundarios (documentos externos, notas, etc.) y todos los componentes\
-      \ de la jerarquía.</p>"
+    publish_confirm_message: "<p>Realizar esta acción va a publicar este documento,
+      los registros secundarios (documentos externos, notas, etc.) y todos los componentes
+      de la jerarquía.</p>"
     unpublish: Despublicar todos
     unpublish_confirm_title: ¿Despublicar?
-    unpublish_confirm_message: "<p>Realizar esta acción va a despublicar este documento,\
-      \ los registros secundarios (documentos externos, notas, etc.) y todos los componentes\
-      \ de la jerarquía.</p>"
+    unpublish_confirm_message: "<p>Realizar esta acción va a despublicar este documento,
+      los registros secundarios (documentos externos, notas, etc.) y todos los componentes
+      de la jerarquía.</p>"
     publish_archival_object: Publicar todos
     publish_archival_object_confirm_title: ¿Publicar?
-    publish_archival_object_confirm_message: "<p>Realizar esta acción va a publicar\
-      \ este documento de archivo, los registros secundarios (documentos externos,\
-      \ notas, etc.) y todos los componentes más bajos de la jerarquía.</p>"
+    publish_archival_object_confirm_message: "<p>Realizar esta acción va a publicar
+      este documento de archivo, los registros secundarios (documentos externos, notas,
+      etc.) y todos los componentes más bajos de la jerarquía.</p>"
     unpublish_archival_object: Despublicar todos
     unpublish_archival_object_confirm_title: ¿Despublicar?
-    unpublish_archival_object_confirm_message: "<p>Realizar esta acción va a despublicar\
-      \ este documento, los registros secundarios (documentos externos, notas, etc.)\
-      \ y todos los componentes más bajos de la jerarquía.</p>"
+    unpublish_archival_object_confirm_message: "<p>Realizar esta acción va a despublicar
+      este documento, los registros secundarios (documentos externos, notas, etc.)
+      y todos los componentes más bajos de la jerarquía.</p>"
     view_search_results: Ir a los resultados de búsqueda
     view_published: Ver publicados
     print_to_pdf: Generar PDF
@@ -184,14 +190,16 @@ es:
       están vinculados a otros registros de nivel superior en este repositorio y no
       se pueden transferir hasta que esos vínculos se corten
     container_template: Descargar plantilla de contenedor
+    digital_object_template: Descargar plantilla de objetos digitales
     run: Huir
     check_all: Comprobar todo
     uncheck_all: Desmarcar todos
     download: Descargar
+    drop_before: Soltar antes
   database_warning:
-    message: "<p><strong>Advertencia de base de datos:</strong> Estas utilizando la\
-      \ base de datos (Apache Derby) habilitada para pruebas. Le recomendamos utilizar\
-      \ MySQL para sistemas en producción.</p>"
+    message: "<p><strong>Advertencia de base de datos:</strong> Estas utilizando la
+      base de datos (Apache Derby) habilitada para pruebas. Le recomendamos utilizar
+      MySQL para sistemas en producción.</p>"
 
   states:
     auto_generated: Generado automáticamente
@@ -199,8 +207,8 @@ es:
   export_options:
     include_unpublished: Incluir sin publicar
     include_daos: Incluir etiquetas &lt; dao &gt;
+    include_uris: Incluir URI
     numbered_cs: Utilice etiquetas numeradas &lt; c &gt;
-    print_pdf: Imprimir en PDF
     ead3: EAD3 esquema
     use_mods: Utilizar MODS
     use_dc: Utilizar Dublin Core
@@ -374,6 +382,9 @@ es:
       room: Habitación
       area: Area
       location_holdings: Ejemplares
+      location_no_holdings: No hay existencias para este repositorio.
+      location_one_top_container: 1 contenedor superior.
+      location_top_containers: " contenedores superiores."
       location_profile_display_string_u_ssort: Perfil de location
       owner_repo_display_string_u_ssort: Repositorio
       none: Ninguno
@@ -383,9 +394,6 @@ es:
       create_time: Creado
       asc: Ascendente
       desc: Descendente
-      location_no_holdings: No hay existencias para este repositorio.
-      location_one_top_container: 1 contenedor superior.
-      location_top_containers: ' contenedores superiores.'
     event:
       score: Relevancia
       agents: Autoridades
@@ -672,11 +680,13 @@ es:
     no_results: No hay resultados coincidentes.  Trate de 'Examinar'.
     searching: Buscando...
     delete: "x"
+    components:
+      browse: Explorar componentes
 
   mixed_content:
     wrap_prefix: "Envolver con"
-    help: "De tipo mixto activado contenido--' <' para elementos o texto resaltado\
-      \ envolver"
+    help: "De tipo mixto activado contenido--' <' para elementos o texto resaltado
+      envolver"
 
   import:
     eac_title: Importar un archivo de EAC
@@ -743,19 +753,20 @@ es:
       acceder.
     sidebar_label: Errores y advertencias
     error_403: Incapaz de acceder la página
-    error_403_message: "Has intentado acceder a la página ya no existan o que no tenga\
-      \ permiso para verlo."
+    error_403_message: "Has intentado acceder a la página ya no existan o que no tenga
+      permiso para verlo."
     error_404: Registros no encontrados
-    error_404_message: "El récord que has intentado acceder ya no existan o que no\
-      \ tenga permiso para ver."
+    error_404_message: "El récord que has intentado acceder ya no existan o que no
+      tenga permiso para ver."
     error_tree_pane_ajax: Se ha producido un error al cargar este formulario.
     merge_conflict: "Los agentes fusionados no pudieron completar: %{message}"
-    merge_too_many_victims: Solo se puede seleccionar un agente para una fusión detallada.
+    merge_too_many_merge_candidates: Solo se puede seleccionar un agente para una
+      fusión detallada.
     merge_different_types: Los agentes seleccionados para la fusión detallada deben
       ser del mismo tipo.
     linked_to_assessment: El registro no se puede eliminar ya que está vinculado a
       una evaluación
-
+    linked_to_user: El registro no se puede eliminar porque está vinculado a un usuario
     merge_denied_relationship: Estos agentes tienen una relación. Elimine la relación
       antes de continuar con la fusión.
     cannot_delete_repository_agent: Este agente está vinculado a un repositorio y
@@ -763,16 +774,16 @@ es:
   accession:
     _frontend:
       messages:
-        created: Acta de ingreso <strong>%{accession.display_string}</strong> creada
-        unsuppressed: Acta de ingreso <strong>%{accession.display_string}</strong>
+        created: Acta de ingreso <strong>%{accession_display_string}</strong> creada
+        unsuppressed: Acta de ingreso <strong>%{accession_display_string}</strong>
           desbloqueada
-        updated: Acta de ingreso <strong>%{accession.display_string}</strong> actualizada
-        suppressed: Acta de ingreso <strong>%{accession.display_string}</strong> bloqueada
+        updated: Acta de ingreso <strong>%{accession_display_string}</strong> actualizada
+        suppressed: Acta de ingreso <strong>%{accession_display_string}</strong> bloqueada
         suppressed_info: Acta de ingreso se bloquea y no se pueden editar
-        deleted: Acta de ingreso <strong>%{accession.display_string}</strong> borrada
+        deleted: Acta de ingreso <strong>%{accession_display_string}</strong> borrada
         transfer_description: Transferencia de este acta de ingreso a...
         transfer_target: Seleccione un repositorio al que transferir
-        spawned: "Este acta de ingreso ha sido generada de entrada <strong>%{accession.display_string}</strong>"
+        spawned: "Este acta de ingreso ha sido generada de entrada <strong>%{accession_display_string}</strong>"
         delete_conflict: "La adhesión no pudo ser eliminada: <pre>%{error}</pre>"
       section:
         basic_information: Información básica
@@ -786,8 +797,8 @@ es:
         created: Autoridad creada
         updated: Autoridad guardada
         deleted: Autoridad eliminada
-        published: "El Agente <strong>%{agent.title}</strong>, sus subregistros y\
-          \ componentes se han publicado"
+        published: "El Agente <strong>%{agent_title}</strong>, sus subregistros y
+          componentes se han publicado"
         delete_conflict: "El agente no pudo ser eliminado: <pre>%{error}</pre>"
         merge_description: Seleccione el agente para fusionar en
         merged: Autoridad(es) se unificaron
@@ -800,8 +811,8 @@ es:
         search_embedded: Registros vinculados
         linked_via_rights_statement: Registros vinculados mediante declaración de
           derechos
-        target_record: Este registro será actualizado
-        victim_record: Este registro será eliminado
+        merge_destination_record: Este registro será actualizado
+        merge_candidate_record: Este registro será eliminado
         record_control_information: Información de control de registros
         identity_information: Información de identidad
         description_information: Descripción Información
@@ -852,26 +863,27 @@ es:
     external_ark_url_tooltip: External ARK URL Tooltip
     _frontend:
       messages:
-        created: Documento de archivo <strong>%{archival_object.display_string}</strong>
-          del fondo <strong>%{resource.title}</strong> creado
-        created_with_parent: Documento de archivo <strong>%{archival_object.display_string}</strong>
+        created: Documento de archivo <strong>%{archival_object_display_string}</strong>
+          del fondo <strong>%{resource_title}</strong> creado
+        duplicated: Objeto de archivo duplicado de <strong>%{archival_object_display_string}</strong>
+        created_with_parent: Documento de archivo <strong>%{archival_object_display_string}</strong>
           creado como niño de <strong>%{parent.display_string}</strong> del fondo
-          <strong>%{resource.title}</strong>
-        updated: Documento de archivo <strong>{archival_object.display_string} %</strong>
+          <strong>%{resource_title}</strong>
+        updated: Documento de archivo <strong>{archival_object_display_string} %</strong>
           actualizado
-        updated_with_parent: Documento de archivo <strong>{archival_object.display_string}
+        updated_with_parent: Documento de archivo <strong>{archival_object_display_string}
           %</strong> actualizado
         please_select_a_resource_for_transfer: Por favor, elija un fondo
-        transfer_success: Transferido con éxito el objeto de archivo <strong>%{archival_object.display_string}</strong>
-          al fondo <strong>%{resource.title}</strong>
-        transfer_error: "No se puede transferir objeto de archivo debido a un error\
-          \ o conflicto"
-        deleted: "Documento de archivo <strong>{archival_object.display_string} %</strong>\
-          \ eliminado"
-        published: "Documento de archivo <strong>{archival_object.title}</strong>,\
-          \ sus subregistros y sus componentes han sido publicados"
-        unpublished: "Documento de archivo <strong>{archival_object.title}</strong>,\
-          \ sus subregistros y sus componentes han sido despublicados"
+        transfer_success: Transferido con éxito el objeto de archivo <strong>%{archival_object_display_string}</strong>
+          al fondo <strong>%{resource_title}</strong>
+        transfer_error: "No se puede transferir objeto de archivo debido a un error
+          o conflicto"
+        deleted: "Documento de archivo <strong>{archival_object_display_string} %</strong>
+          eliminado"
+        published: "Documento de archivo <strong>{archival_object.title}</strong>,
+          sus subregistros y sus componentes han sido publicados"
+        unpublished: "Documento de archivo <strong>{archival_object.title}</strong>,
+          sus subregistros y sus componentes han sido despublicados"
         unsuppressed: Documento de archivo <strong>%{archival_object.title}</strong>
           desbloqueado
         suppressed: Documento de archivo <strong>%{archival_object.title}</strong>
@@ -885,17 +897,19 @@ es:
       action:
         add_child: Agregar hijo
         add_sibling: Añadir hermano
+        add_duplicate: Agregar duplicado
         save: Guardar objeto de archivo
         bulk_import: Carga a través de la hoja de cálculo
       tree:
         new_record_title: Nuevo objeto de archivo
+        duplicated_record_title: Crear objeto de archivo duplicado
 
   classification:
     _frontend:
       messages:
-        created: "Clasificación <strong>%{classification.title}</strong> creada"
-        updated: "Clasificación <strong>%{classification.title}</strong> actualizada"
-        deleted: "Clasificación <strong>%{classification.title}</strong> borrada"
+        created: "Clasificación <strong>%{classification_title}</strong> creada"
+        updated: "Clasificación <strong>%{classification_title}</strong> actualizada"
+        deleted: "Clasificación <strong>%{classification_title}</strong> borrada"
       section:
         basic_information: Información básica
         search_embedded: Registros vinculados
@@ -908,16 +922,16 @@ es:
   classification_term:
     _frontend:
       messages:
-        created: "Término de clasificación <strong>%{classification_term.title}</strong>\
-          \ creado"
-        created_with_parent: "Término de clasificación <strong>%{classification_term.title}</strong>\
-          \ creado"
-        updated: "Término de clasificación <strong>%{classification_term.title}</strong>\
-          \ actualizado"
-        updated_with_parent: "Término de clasificación <strong>%{classification_term.title}</strong>\
-          \ actualizado"
-        deleted: "Término de clasificación <strong>%{classification_term.title}</strong>\
-          \ borrado"
+        created: "Término de clasificación <strong>%{classification_term.title}</strong>
+          creado"
+        created_with_parent: "Término de clasificación <strong>%{classification_term.title}</strong>
+          creado"
+        updated: "Término de clasificación <strong>%{classification_term.title}</strong>
+          actualizado"
+        updated_with_parent: "Término de clasificación <strong>%{classification_term.title}</strong>
+          actualizado"
+        deleted: "Término de clasificación <strong>%{classification_term.title}</strong>
+          borrado"
       section:
         basic_information: Información básica
         search_embedded: Registros vinculados
@@ -965,18 +979,18 @@ es:
   digital_object:
     _frontend:
       messages:
-        created: "Objeto digital <strong>%{digital_object.title}</strong> creado"
-        updated: "Objeto digital <strong>%{digital_object.title}</strong> actualizado"
-        deleted: "Objeto digital <strong>%{digital_object.title}</strong> borrado"
-        published: "El objeto Digital <strong>%{digital_object.title}</strong>, sus\
-          \ subregistros y sus componentes han sido publicados"
+        created: "Objeto digital <strong>%{digital_object_title}</strong> creado"
+        updated: "Objeto digital <strong>%{digital_object_title}</strong> actualizado"
+        deleted: "Objeto digital <strong>%{digital_object_title}</strong> borrado"
+        published: "El objeto Digital <strong>%{digital_object_title}</strong>, sus
+          subregistros y sus componentes han sido publicados"
         merge_description: Seleccionar objetos digitales más abajo para fusionar en
         please_select_a_digital_object_to_merge: Por favor, seleccione un objeto digital
         merged: Objetos digitales unificados
         transfer_description: Transferencia de este fondo a...
         transfer_target: Seleccione un repositorio para transferir a
-        unsuppressed: Objetos digitales <strong>%{digital_object.title}</strong> desbloqueado
-        suppressed: Objetos digitales <strong>%{digital_object.title}</strong> bloqueado
+        unsuppressed: Objetos digitales <strong>%{digital_object_title}</strong> desbloqueado
+        suppressed: Objetos digitales <strong>%{digital_object_title}</strong> bloqueado
         suppressed_info: Objeto digital se suprime y no se pueden editar
         delete_conflict: "Objeto digital no pudo ser eliminado: <pre>%{error}</pre>"
       section:
@@ -989,19 +1003,19 @@ es:
   digital_object_component:
     _frontend:
       messages:
-        created_with_parent: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
+        created_with_parent: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
           creado como hijo de <strong>%{parent.display_string}</strong> del objeto
-          Digital <strong>%{digital_object.title}</strong>
-        created: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
-          creado el objeto Digital <strong>%{digital_object.title}</strong>
-        updated_with_parent: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
+          Digital <strong>%{digital_object_title}</strong>
+        created: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
+          creado el objeto Digital <strong>%{digital_object_title}</strong>
+        updated_with_parent: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
           actualizado
-        updated: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
+        updated: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
           actualizado
-        deleted: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
+        deleted: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
           borrado
-        unsuppressed: Desbloqueados componentes de objeto digital <strong>%{digital_object_component.display_string}</strong>
-        suppressed: Componente de objeto digital <strong>%{digital_object_component.display_string}</strong>
+        unsuppressed: Desbloqueados componentes de objeto digital <strong>%{digital_object_component_display_string}</strong>
+        suppressed: Componente de objeto digital <strong>%{digital_object_component_display_string}</strong>
           bloqueado
         suppressed_info: Componente objeto digital se bloquea y no se pueden editar
         has_unpublished_ancestor: Por favor tenga en cuenta que este registro tiene
@@ -1021,8 +1035,8 @@ es:
         value_updated: Valor actualizado
         deleted: Valor eliminado
         delete_error: No se pudo eliminar el valor
-        delete_conflict: "No se puede eliminar el valor como lo es actualmente que\
-          \ se hace referencia mediante un registro"
+        delete_conflict: "No se puede eliminar el valor como lo es actualmente que
+          se hace referencia mediante un registro"
         default_set: Conjunto de valores predeterminado
         created: Valor creado
         create_error: No se pudo crear valor
@@ -1097,9 +1111,14 @@ es:
     _plural: Idiomas
 
   linked_agent:
+    is_primary: Primario
     _frontend:
       action:
         add: Añadir enlace autoridad
+        make_primary: Hacer primario
+        make_primary_tooltip: |
+          <p>Se utiliza para indicar qué autoridad vinculado al registro es el autoridad primario. Solo se puede designar un autoridad vinculado como primario.</p>
+          <p>En la exportación MARCXML, el autoridad primario será el valor 1XX.</p>
 
   linked_record:
     _frontend:
@@ -1123,9 +1142,9 @@ es:
         batch_edit: Editar lote de ubicaciones
         save: Guardar ubicación
         single: Ubicación única
-        delete_confirm_message: "<p>Tenga en cuenta <strong>no se puede deshacer esta\
-          \ acción.</strong>.</p><p>Si esta ubicación está actualmente vinculada a\
-          \ una o más instancias no se puede eliminar.</p>"
+        delete_confirm_message: "<p>Tenga en cuenta <strong>no se puede deshacer esta
+          acción.</strong>.</p><p>Si esta ubicación está actualmente vinculada a una
+          o más instancias no se puede eliminar.</p>"
         show_space_calculator: Encuentra con la calculadora espacial
 
   location_batch:
@@ -1136,15 +1155,15 @@ es:
       messages:
         created: "<strong>%{number_created} ubicaciones</strong> creado"
         updated: "<strong>%{number_created} ubicaciones</strong> Actualizado"
-        location_batch_info: "Definir los valores base que serán aplicados a todas\
-          \ las ubicaciones generadas a partir de las <strong>Coordenadas rangos</strong>\
-          \ por debajo."
-        location_batch_update_info: "Por favor introduce los valores que quieres aplicar\
-          \ abajo."
-        ranges_info: "Tenga en cuenta que cualquier coordenados campos entró en la\
-          \ anterior <strong>Base ubicación</strong> serán reemplazados con los valores\
-          \ generados por las gamas más abajo.  Un máximo de ubicaciones %{max_range}\
-          \ será creado."
+        location_batch_info: "Definir los valores base que serán aplicados a todas
+          las ubicaciones generadas a partir de las <strong>Coordenadas rangos</strong>
+          por debajo."
+        location_batch_update_info: "Por favor introduce los valores que quieres aplicar
+          abajo."
+        ranges_info: "Tenga en cuenta que cualquier coordenados campos entró en la
+          anterior <strong>Base ubicación</strong> serán reemplazados con los valores
+          generados por las gamas más abajo.  Un máximo de ubicaciones %{max_range}
+          será creado."
         number_to_create: Número de ubicaciones
         warning: Dependiendo del tamaño de sus gamas, este proceso puede tardar unos
           minutos para completar.
@@ -1165,7 +1184,6 @@ es:
         add: Agregar un formulario de nombre
         make_authorized: Convertir en nombre autorizado
         make_display_name: Convertir en nombre a presentar en pantalla
-        make_primary: Hacer primaria
 
   note:
     _frontend:
@@ -1233,11 +1251,11 @@ es:
         deleted: Repositorio eliminado
         selected: Repositorio seleccionado
         selected_short: Seleccionado
-        changed: Ahora está activado el repositorio <strong>%{repository.repo_code}</strong>
-        create_first_repository: "Para crear su primer repositorio, haga clic en el\
-          \ menú del <strong>sistema</strong> anterior y luego <strong>Gestionar repositorios</strong>."
-        no_access_to_repositories: "<p>No tiene acceso a los repositorios.</p><p>Póngase\
-          \ en contacto con el administrador del sistema para solicitar el acceso.</p>"
+        changed: Ahora está activado el repositorio <strong>%{repository_repo_code}</strong>
+        create_first_repository: "Para crear su primer repositorio, haga clic en el
+          menú del <strong>sistema</strong> anterior y luego <strong>Gestionar repositorios</strong>."
+        no_access_to_repositories: "<p>No tiene acceso a los repositorios.</p><p>Póngase
+          en contacto con el administrador del sistema para solicitar el acceso.</p>"
         continue_with_transfer: ¿Continuar con la transferencia?
         transfer_failed: Transferencia no se pudo completar debido a los siguientes
           errores
@@ -1260,21 +1278,21 @@ es:
   resource:
     _frontend:
       messages:
-        created: "Fondo <strong>%{resource.title}</strong> creado"
-        updated: "fondo <strong>%{resource.title}</strong> actualizado"
-        spawned: "Ha sido generado un nuevo fondo de acta de ingreso <strong>%{accession.display_string}</strong>"
-        deleted: "Fondo <strong>%{resource.title}</strong> borrado"
-        published: "El fondo <strong>%{resource.title}</strong>, sus subregistros\
-          \ y sus componentes han sido publicados"
-        unpublished: "El fondo <strong>%{resource.title}</strong>, sus subregistros\
-          \ y sus componentes han sido despublicados"
+        created: "Fondo <strong>%{resource_title}</strong> creado"
+        updated: "fondo <strong>%{resource_title}</strong> actualizado"
+        spawned: "Ha sido generado un nuevo fondo de acta de ingreso <strong>%{accession_display_string}</strong>"
+        deleted: "Fondo <strong>%{resource_title}</strong> borrado"
+        published: "El fondo <strong>%{resource_title}</strong>, sus subregistros
+          y sus componentes han sido publicados"
+        unpublished: "El fondo <strong>%{resource_title}</strong>, sus subregistros
+          y sus componentes han sido despublicados"
         merge_description: Seleccione los fondos abajo para fusionar en
         please_select_a_resource_to_merge: Por favor, seleccione un fondo
         merged: Los fondos se fusionaron
         transfer_description: Transferencia de este fondo para...
         transfer_target: Seleccione un repositorio para transferir a
-        unsuppressed: Fondo <strong>%{resource.title}</strong> suprimidas
-        suppressed: Fondo <strong>%{resource.title}</strong> bloqueado
+        unsuppressed: Fondo <strong>%{resource_title}</strong> suprimidas
+        suppressed: Fondo <strong>%{resource_title}</strong> bloqueado
         suppressed_info: Se suprimieron y no se pueden editar fondos
         delete_conflict: "El recurso no pudo ser eliminado: <pre>%{error}</pre>"
       section:
@@ -1295,8 +1313,8 @@ es:
       messages:
         updated: Preferencias actualizadas
         reset: Preferencias establecidas en los valores predeterminados de la aplicación
-        reset_error: "No se pueden restablecer las preferencias debido a un error:\
-          \ %{exception}"
+        reset_error: "No se pueden restablecer las preferencias debido a un error:
+          %{exception}"
       action:
         save: Guardar preferencias
 
@@ -1416,8 +1434,8 @@ es:
       sequence_count_warning: Hay más filas que elementos en la secuencia.
       preview_sequence: Valores de secuencia de vista previa
       sequence_summary: "%{count} elementos de la secuencia"
-      sequence_summary_with_maxsize: "Para sus filas %{limit}, los valores de secuencia\
-        \ de %{count} son"
+      sequence_summary_with_maxsize: "Para sus filas %{limit}, los valores de secuencia
+        de %{count} son"
       sequence_from_required: Requeridas
       sequence_to_required: Necesarias
     reorder_columns:
@@ -1434,8 +1452,8 @@ es:
       error_prefix: Fila
       success: "<div class='alert alert-success'>Hijos creados. Actualiza la página...</div>"
       no_rows: Por favor, introduzca valores para al menos una fila
-      rows_with_errors: "%{count} filas con un error - haga clic en un campo de fila\
-        \ para ver los errores de esa fila"
+      rows_with_errors: "%{count} filas con un error - haga clic en un campo de fila
+        para ver los errores de esa fila"
       rows_no_errors: "Todas las filas son válidas"
       error_summary_header: "Errores en fila"
       select_prompt: Aplicar una plantilla RDE
@@ -1465,11 +1483,11 @@ es:
     stale_record: Este documento ha sido actualizado por otro usuario. Por favor,
       actualice la página para acceder a la versión más reciente.
     other_editors: "Este documento se está editando actualmente por otro usuario.\
-      \  Por favor, póngase en contacto con los usuarios siguientes para asegurar\
-      \ que sin conflictos se producen"
-    repository_changed: "Este registro no puede guardarse, porque ha cambiado su repositorio\
-      \ activo. Para guardar este registro, abra otra ventana y restablecer su repositorio\
-      \ activo."
+      \  Por favor, póngase en contacto con los usuarios siguientes para asegurar
+      que sin conflictos se producen"
+    repository_changed: "Este registro no puede guardarse, porque ha cambiado su repositorio
+      activo. Para guardar este registro, abra otra ventana y restablecer su repositorio
+      activo."
   job:
     _frontend:
       audit_data: Datos de auditoría
@@ -1506,10 +1524,11 @@ es:
           to your database. You are <strong>strongly</strong> advised to backup your
           database AND to run your job in a test instance before proceeding. There
           is no "undo".
-        find_and_replace_instructions: Choose a base record to scope this find and
-          replace operation. Then choose a record type to target and a property of
-          that type. The operation will run in every target record in the tree of
-          the base record, or in the base record itself if the target type is "Resource".
+        find_and_replace_instructions: Seleccione un registro base para delimitar
+          esta operación de búsqueda y reemplazo. A continuación, seleccione un tipo
+          de registro para fusionar el destino y una propiedad de ese tipo. La operación
+          se ejecutará en cada registro de destino de fusión en el árbol del registro
+          base, o en el propio registro base si el tipo de destino de fusión es "Recurso".
         report_instructions: Elige el informe utilizando el botón <b>Seleccionar</b>.
         slug_lost_warning: <b> ¡ADVERTENCIA! </b> ¡Todas las babosas generadas automáticamente
           serán regeneradas! Este trabajo se aplica a todos los registros en todos
@@ -1642,8 +1661,8 @@ es:
         filter_required: Por favor proporcionar un filtro
         max_results_limit_reached: No se han incluido todos los resultados. Por favor
           refine su búsqueda.
-        max_results_limit_details: "Mostrando <strong>% {visibles} </strong> de <strong>\
-          \ %{num_found} </strong> Resultados de la búsqueda"
+        max_results_limit_details: "Mostrando <strong>% {visibles} </strong> de <strong>
+          %{num_found} </strong> Resultados de la búsqueda"
         results_summary: "Los resultados coinciden con: <strong> %{num_found} </strong>"
         bulk_selection_sort_help: Haga clic en una columna para establecer el orden
           de clasificación. Deja la tecla shift presionada para ordenar por varias
@@ -1708,12 +1727,13 @@ es:
         batch_merge_container_profile_mismatch_warning: Estos contenedores superiores
           tienen un perfil de recipiente diferente que el recipiente superior objetivo.
           El perfil contenedor no se fusionará con el contenedor de destino.
-        batch_merge_confirm_victims: "Combinar los siguientes contenedores superiores:"
-        batch_merge_confirm_target: "En este contenedor superior:"
+        batch_merge_confirm_merge_candidates: "Combinar los siguientes contenedores
+          superiores:"
+        batch_merge_confirm_merge_destination: "En este contenedor superior:"
         batch_delete: Borrar Contenedores Top
         batch_delete_help: Borrar todos los contenedores seleccionados.
         update_n_records: "Actualizar %{n} registros"
-        select_merge_target: Seleccionar objetivo de fusión
+        select_merge_destination: Seleccionar objetivo de fusión
         merge_n_records: "Va %{n} registros"
         delete_n_records: "Borrar %{n} registros"
         update_locations_current_location: Ubicación actual
@@ -1742,12 +1762,12 @@ es:
           todos los demás perfiles de contenedor enumerados. Todos los registros vinculados
           se volverán a vincular a este perfil y se eliminará toda la información
           para los otros perfiles de contenedor.
-        merge_select_target: Seleccionar objetivo de fusión
+        merge_select_merge_destination: Seleccionar objetivo de fusión
         confirm_merge: Confirmar perfiles de contenedor de fusión
         confirm_merge_question: ¿Está seguro de que desea fusionar los perfiles del
           contenedor como se enumeran a continuación? Esta acción es irreversible.
-        confirm_merge_victims: "Combinar los siguientes perfiles de contenedor:"
-        confirm_merge_target: "En este perfil de contenedor:"
+        confirm_merge_candidates: "Combinar los siguientes perfiles de contenedor:"
+        confirm_merge_destination: "En este perfil de contenedor:"
     name: Nombre
     name_tooltip: |
       <p>CAMPO REQUERIDO. El nombre del perfil de contenedores. Pueden ser genéricos o específicos.</p>
@@ -1797,8 +1817,8 @@ es:
     end_tooltip: |
       <p>Fecha de finalización de una restricción de acceso. Serán disociados de los contenedores una vez que caduque</p>
     local_access_restriction_type: Restricción de tipo de acceso local
-    local_access_restriction_type_inline_help: "Mantenga pulsados  CTRL (Windows)\
-      \ / Command (Mac) para seleccionar varias opciones o anular la selección"
+    local_access_restriction_type_inline_help: "Mantenga pulsados  CTRL (Windows)
+      / Command (Mac) para seleccionar varias opciones o anular la selección"
     local_access_restriction_type_tooltip: |
       <p>Para aquellas restricciones sin tiempo indicar la razón de la restricción.</p>
       <p>Los valores de esta lista de valores controlada pueden ser modificados.</p>
@@ -1856,10 +1876,10 @@ es:
     message_locations_required: La Calculadora de espacio requiere ubicaciones
     message_select_locations: "Calcula el espacio en las siguientes ubicaciones:"
     message_no_locations_with_space: No se han encontrado ubicaciones con espacio
-    message_total_spaces: "Cantidad total de espacios disponibles para este tipo de\
-      \ contenedores: %{total_spaces}"
-    message_total_containers: "Número total de contenedores de este tipo que se encuentran\
-      \ en estas ubicaciones: %{total_containers}"
+    message_total_spaces: "Cantidad total de espacios disponibles para este tipo de
+      contenedores: %{total_spaces}"
+    message_total_containers: "Número total de contenedores de este tipo que se encuentran
+      en estas ubicaciones: %{total_containers}"
     message_loading: Cargando...
     count: Espacio disponible (de tipo de contenedor)
     calculate_space: Calcula el espacio
@@ -1900,6 +1920,28 @@ es:
     _frontend:
       action:
         add: Añadir ley
+
+  bulk_archival_object_update_spreadsheet:
+    title: Generar hoja de cálculo de objetos archivados en masa
+    description: Utilice el formulario a continuación para seleccionar los objetos
+      de archivo que desea actualizar de forma masiva.
+    selected_records: Registros Seleccionados
+    selected: Seleccionada
+    record_title: Título del registro
+    column_types_to_include_in_spreadsheet: Tipos de columnas para incluir en la hoja
+      de cálculo
+    note_types: Tipos de notas
+    minimum_subrecords: Subregistros mínimos
+    minimum_subrecords_description: El número mínimo de subregistros ya existentes de cada tipo
+      que se incluirán.
+    extra_subrecords: Subregistros adicionales
+    extra_subrecords_description: La cantidad de nuevos subregistros que se incluirán además de la mayor cantidad de subregistros existentes ya encontrados en cualquiera de los registros seleccionados.
+    minimum_notes: Notas mínimas
+    minimum_notes_description: El número mínimo de subregistros de notas ya existentes de cada tipo que se deben incluir.
+    download_spreadsheet: Descargar hoja de cálculo
+    download_spreadsheet_modal_message: Generar esta hoja de cálculo puede tardar
+      unos minutos.
+
   assessment:
     _frontend:
       form_header: Evaluación %{display_string}
@@ -1981,8 +2023,8 @@ es:
       messages:
         updated: Atributos de evaluación actualizados
         error: Error al actualizar los atributos de evaluación
-        conflict: "Error al actualizar los atributos de evaluación. Las siguientes\
-          \ etiquetas entran en conflicto con las entradas existentes: %{conflicts}"
+        conflict: "Error al actualizar los atributos de evaluación. Las siguientes
+          etiquetas entran en conflicto con las entradas existentes: %{conflicts}"
         attribute_in_use: No se puede eliminar un atributo que está actualmente en
           uso por una evaluación
       database_value: Valor de la base de datos
@@ -2058,11 +2100,11 @@ es:
         error: "ERROR: Error (s) detectada:"
         copied: Copiado!
         uncopied: No se puede copiar
-        submitted: "<p>El trabajo se ha enviado a Trabajos en segundo plano.<br/>\
-          \ Haga clic en 'Cerrar' para actualizar esta pantalla.</p>"
+        submitted: "<p>El trabajo se ha enviado a Trabajos en segundo plano.<br/>
+          Haga clic en 'Cerrar' para actualizar esta pantalla.</p>"
   bulk_import_job:
-    active: "Hay un trabajo de importación masiva activo para este registro, intente\
-      \ editar más tarde:<a href ='%{url}'>%{uri}</a>"
+    active: "Hay un trabajo de importación masiva activo para este registro, intente
+      editar más tarde:<a href ='%{url}'>%{uri}</a>"
     resource_id: Recurso ID
     format: Descargar formato de archivo
     filename: Nombre del archivo de la hoja de cálculo
@@ -2184,7 +2226,7 @@ es:
     script: Texto
     language_note: Nota de idioma
 
-  agent_record_control_merge_target:
+  agent_record_control_merge_destination:
     _plural: Información de registro
     _singular: Información de registro
     _frontend:
@@ -2206,7 +2248,7 @@ es:
     script: Texto
     language_note: Nota de idioma
 
-  agent_record_control_merge_victim:
+  agent_record_control_merge_candidate:
     _plural: Información de registro
     _singular: Información de registro
     _frontend:
@@ -2258,7 +2300,7 @@ es:
     note: Nota
     dates: fechas
 
-  agent_gender_merge_target:
+  agent_gender_merge_destination:
     _plural: Géneros de agentes
     _singular: Género del agente
     _frontend:
@@ -2295,7 +2337,7 @@ es:
     language: Idioma
     script: Texto
 
-  used_language_merge_victim:
+  used_language_merge_candidate:
     _plural: Idiomas
     _singular: Idioma
     _frontend:
@@ -2304,7 +2346,7 @@ es:
     language: Idioma
     script: Texto
 
-  used_language_merge_target:
+  used_language_merge_destination:
     _plural: Idiomas
     _singular: Idioma
     _frontend:
@@ -2313,7 +2355,7 @@ es:
     language: Idioma
     script: Texto
 
-  agent_gender_merge_victim:
+  agent_gender_merge_candidate:
     _plural: Géneros de agentes
     _singular: Género del agente
     _frontend:
@@ -2350,7 +2392,7 @@ es:
     identifier_type: Tipo de identificador
     entity_identifier: ID de entidad
 
-  agent_identifier_merge_target:
+  agent_identifier_merge_destination:
     _plural: ID de entidad
     _singular: Identificador
     _frontend:
@@ -2359,7 +2401,7 @@ es:
     identifier_type: Tipo de identificador
     entity_identifier: ID de entidad
 
-  agent_identifier_merge_victim:
+  agent_identifier_merge_candidate:
     _plural: ID de entidad
     _singular: Identificador
     _frontend:
@@ -2410,7 +2452,7 @@ es:
     subjects: Lugares
     publish: Publicado
 
-  agent_place_merge_target:
+  agent_place_merge_destination:
     _frontend:
       action:
         add: Añadir lugar
@@ -2424,7 +2466,7 @@ es:
     subjects: Lugares
     publish: Publicado
 
-  agent_place_merge_victim:
+  agent_place_merge_candidate:
     _frontend:
       action:
         add: Añadir lugar
@@ -2480,7 +2522,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_occupation_merge_target:
+  agent_occupation_merge_destination:
     _frontend:
       action:
         add: Agregar ocupación
@@ -2494,7 +2536,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_occupation_merge_victim:
+  agent_occupation_merge_candidate:
     _frontend:
       action:
         add: Agregar ocupación
@@ -2550,7 +2592,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_function_merge_target:
+  agent_function_merge_destination:
     _frontend:
       action:
         add: Agregar función
@@ -2564,7 +2606,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_function_merge_victim:
+  agent_function_merge_candidate:
     _frontend:
       action:
         add: Agregar función
@@ -2620,7 +2662,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_topic_merge_target:
+  agent_topic_merge_destination:
     _frontend:
       action:
         add: Agregar tema
@@ -2634,7 +2676,7 @@ es:
     places: Lugares
     publish: Publicado
 
-  agent_topic_merge_victim:
+  agent_topic_merge_candidate:
     _frontend:
       action:
         add: Agregar tema
@@ -2702,7 +2744,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_alternate_set_merge_target:
+  agent_alternate_set_merge_destination:
     _plural: Conjuntos alternativos
     _singular: Conjunto alternativo
     _frontend:
@@ -2718,7 +2760,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_alternate_set_merge_victim:
+  agent_alternate_set_merge_candidate:
     _plural: Conjuntos alternativos
     _singular: Conjunto alternativo
     _frontend:
@@ -2785,7 +2827,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_conventions_declaration_merge_target:
+  agent_conventions_declaration_merge_destination:
     _plural: Declaraciones de la Convención
     _singular: Declaración de la Convención
     _frontend:
@@ -2802,7 +2844,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_conventions_declaration_merge_victim:
+  agent_conventions_declaration_merge_candidate:
     _plural: Declaraciones de la Convención
     _singular: Declaración de la Convención
     _frontend:
@@ -2846,7 +2888,7 @@ es:
     agency_code_type: Tipo de código de la agencia de control de registros
     maintenance_agency: Agencia de mantenimiento
 
-  agent_other_agency_code_merge_target:
+  agent_other_agency_code_merge_destination:
     _plural: Otros códigos de agencia
     _singular: Otro código de agencia
     _frontend:
@@ -2855,7 +2897,7 @@ es:
     agency_code_type: Tipo de código de la agencia de control de registros
     maintenance_agency: Agencia de mantenimiento
 
-  agent_other_agency_code_merge_victim:
+  agent_other_agency_code_merge_candidate:
     _plural: Otros códigos de agencia
     _singular: Otro código de agencia
     _frontend:
@@ -2900,7 +2942,7 @@ es:
     descriptive_note: Nota descriptiva
     event_date: Fecha del evento
 
-  agent_maintenance_history_merge_target:
+  agent_maintenance_history_merge_destination:
     _plural: Historial de mantenimiento
     _singular: Historial de mantenimiento del agente
     _frontend:
@@ -2912,7 +2954,7 @@ es:
     descriptive_note: Nota descriptiva
     event_date: Fecha del evento
 
-  agent_maintenance_history_merge_victim:
+  agent_maintenance_history_merge_candidate:
     _plural: Historial de mantenimiento
     _singular: Historial de mantenimiento del agente
     _frontend:
@@ -2960,7 +3002,7 @@ es:
     primary: Primario
     record_identifier: Identificador de registro
 
-  agent_record_identifier_merge_target:
+  agent_record_identifier_merge_destination:
     _plural: ID de registro
     _singular: ID de registro
     _frontend:
@@ -2972,7 +3014,7 @@ es:
     primary: Primario
     record_identifier: Identificador de registro
 
-  agent_record_identifier_merge_victim:
+  agent_record_identifier_merge_candidate:
     _plural: ID de registro
     _singular: ID de registro
     _frontend:
@@ -3032,7 +3074,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_source_merge_target:
+  agent_source_merge_destination:
     _plural: Fuentes
     _singular: Fuente del agente
     _frontend:
@@ -3048,7 +3090,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_source_merge_victim:
+  agent_source_merge_candidate:
     _plural: Fuentes
     _singular: Fuente del agente
     _frontend:
@@ -3140,7 +3182,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_resource_merge_victim:
+  agent_resource_merge_candidate:
     _frontend:
       action:
         add: Agregar recurso externo relacionado
@@ -3163,7 +3205,7 @@ es:
     file_version_xlink_show_attribute: Atributo de Xlink Show
     last_verified_date: Última fecha de verificación
 
-  agent_resource_merge_target:
+  agent_resource_merge_destination:
     _frontend:
       action:
         add: Agregar recurso externo relacionado
@@ -3191,25 +3233,28 @@ es:
     dates: fechas
 
   section_headings:
-    basic_information_tooltip: "<p>Esta sección indica el tipo de agente y si el agente\
-      \ está publicado o no.</p>"
-    record_control_information_tooltip: "<p>Esta sección contiene información sobre\
-      \ el registro en sí, con la expectativa de que se originó fuera de ArchivesSpace\
-      \ o se compartirá con un sistema que no sea ArchivesSpace.</p>"
-    identity_information_tooltip: "<p>Esta sección es la información principal sobre\
-      \ el agente en sí. Un formulario de nombre es el único subregistro obligatorio\
-      \ en un registro de agente.</p>"
-    description_information_tooltip: "<p>Esta sección es la información principal\
-      \ sobre el agente en sí. Un formulario de nombre es el único subregistro obligatorio\
-      \ en un registro de agente.</p>"
-    relation_information_tooltip: "<p>Esta sección se utiliza para indicar relaciones\
-      \ con otros agentes o materiales dentro o fuera de ArchivesSpace.</p>"
+    basic_information_tooltip: "<p>Esta sección indica el tipo de agente y si el agente
+      está publicado o no.</p>"
+    record_control_information_tooltip: "<p>Esta sección contiene información sobre
+      el registro en sí, con la expectativa de que se originó fuera de ArchivesSpace
+      o se compartirá con un sistema que no sea ArchivesSpace.</p>"
+    identity_information_tooltip: "<p>Esta sección es la información principal sobre
+      el agente en sí. Un formulario de nombre es el único subregistro obligatorio
+      en un registro de agente.</p>"
+    description_information_tooltip: "<p>Esta sección es la información principal
+      sobre el agente en sí. Un formulario de nombre es el único subregistro obligatorio
+      en un registro de agente.</p>"
+    relation_information_tooltip: "<p>Esta sección se utiliza para indicar relaciones
+      con otros agentes o materiales dentro o fuera de ArchivesSpace.</p>"
 
+  bulk_archival_object_updater_job:
+    _singular: Trabajo de actualización masiva de objetos archivados en hojas de cálculo
+    create_missing_top_containers: Crear contenedores superiores faltantes
 
   note_contact_note:
     contact_notes_tooltip: "<p>Detalles sobre la interacción con el contacto</p>"
-    date_of_contact_tooltip: "<p>Se utiliza para registrar la fecha o el período de\
-      \ tiempo específicos de una interacción.</p>"
+    date_of_contact_tooltip: "<p>Se utiliza para registrar la fecha o el período de
+      tiempo específicos de una interacción.</p>"
   metadata_rights_declaration: &metadata_rights_declaration_attributes
     descriptive_note: Nota descriptiva
     file_uri: URI Archivo
@@ -3232,10 +3277,10 @@ es:
   metadata_rights_declaration_required:
     <<: *metadata_rights_declaration_attributes
 
-  metadata_rights_declaration_merge_target:
+  metadata_rights_declaration_merge_destination:
     <<: *metadata_rights_declaration_attributes
 
-  metadata_rights_declaration_merge_victim:
+  metadata_rights_declaration_merge_candidate:
     <<: *metadata_rights_declaration_attributes
   bulk_import_templates:
     aspace_accession_import_template_csv: Cree registros de accesiones y registros
@@ -3243,17 +3288,17 @@ es:
     bulk_import_DO_template_xlsx: Cree y vincule objetos digitales a objetos de archivo
       existentes en un recurso. El formato XLSX es para quienes tienen acceso a Microsoft
       Excel.
-    overview: "<p> Estas son plantillas para cargar datos de hojas de cálculo en ArchivesSpace\
-      \ usando las diferentes opciones de importación en el área de Trabajos en segundo\
-      \ plano. Los datos necesarios para una importación exitosa dependen del tipo\
-      \ de registro que se está creando. No es necesario que complete todas las filas\
-      \ y columnas. </p> <p> Cada plantilla CSV incluye una fila de datos de muestra.\
-      \ A menos que desee crear un registro con los datos de muestra, elimine los\
-      \ datos de muestra antes de cargar su hoja de cálculo. <b> No elimine la fila\
-      \ de encabezado, agregue columnas adicionales o reorganice las columnas existentes.\
-      \ </b> </p> <p> Las plantillas de Excel incluyen instrucciones adicionales para\
-      \ usar las plantillas y validaciones para ciertas celdas. No elimine las instrucciones\
-      \ o validaciones. </p>\n"
+    overview: "<p> Estas son plantillas para cargar datos de hojas de cálculo en ArchivesSpace
+      usando las diferentes opciones de importación en el área de Trabajos en segundo
+      plano. Los datos necesarios para una importación exitosa dependen del tipo de
+      registro que se está creando. No es necesario que complete todas las filas y
+      columnas. </p> <p> Cada plantilla CSV incluye una fila de datos de muestra.
+      A menos que desee crear un registro con los datos de muestra, elimine los datos
+      de muestra antes de cargar su hoja de cálculo. <b> No elimine la fila de encabezado,
+      agregue columnas adicionales o reorganice las columnas existentes. </b> </p>
+      <p> Las plantillas de Excel incluyen instrucciones adicionales para usar las
+      plantillas y validaciones para ciertas celdas. No elimine las instrucciones
+      o validaciones. </p>\n"
     aspace_digital_object_import_template_csv: Cree registros de objetos digitales
       y registros vinculados a objetos digitales como agentes, sujetos y eventos.
     bulk_import_template_xlsx: Crea objetos de archivo adjuntos a un recurso existente.
@@ -3274,307 +3319,6 @@ es:
       recursos, objetos de archivo u objetos digitales existentes.
   footer:
     archivesspace_home: Visitar <a href='http://archivesspace.org'>ArchivesSpace.org</a>
-    feedback: <a id='aspaceFeedbackLink' href='%{feedback_url}' target='_blank'>Enviar
+    feedback: <a id='aspaceFeedbackLink' href='%{feedback_url}' merge_destination='_blank'>Enviar
       comentarios o informar un problema</a>
     public_interface: Vistar <a href="%{public_url}">Interfaz Pública</a>
-
-  reports:
-    custom_report:
-      title: Informe personalizado
-      
-    digital_object_list_table_report:
-      title: Tabla de objetos digitales
-      description: Muestra objetos digitales en formato de tabla. El informe contiene el título, el identificador de objeto digital, el tipo de objeto, las fechas y el título y el identificador de los recursos vinculados.
-
-    digital_object_file_versions_report:
-      title: Lista de versiones de archivo
-      description: Muestra las versiones de archivo asociadas con los objetos digitales seleccionados.
-
-    accession_inventory_report:
-      title: Adhesiónes con inventarios
-      description: Muestra solo los registros de adhesiónes con inventario. El informe contiene el número de acceso, recursos vinculados, título, extensión, fecha de acceso, resumen del contenedor e inventario.
-      number_with_inventories: Adhesiónes con inventarios
-      identifier_prefix: Adhesión
-
-    accession_receipt_report:
-      title: Informe de recepción de adhesión
-      description: Muestra un recibo que indica la adhesión de materiales. El informe contiene el número de acceso, el título, el alcance, la fecha de acceso y el depósito.
-      identifier_prefix: Adhesión
-
-    created_accessions_report:
-      title: Adhesión creadas
-      description: Informe sobre adhesiónes creadas dentro de un rango de fechas
-      identifier_prefix: Adhesión
-
-    accession_subjects_names_classifications_list_report:
-      title: Adhesiónes y materias vinculadas, nombres y clasificaciones
-      description: Muestra las adhesiónes y sus nombres vinculados, materias y clasificaciones. El informe contiene el número de acceso, los recursos vinculados, la fecha de adhesión, el título, la extensión, los nombres vinculados y los temas vinculados.
-      identifier_prefix: Adhesión
-
-    accession_report:
-      title: Informe de adhesión
-      description: Muestra todas las adhesiónes de un repositorio determinado. El informe incluye datos ingresados en campos de información básica para cada adhesión.
-      identifier_prefix: Adhesión
-    accession_classifications_subreport:
-      test_value: test value
-
-    accession_unprocessed_report:
-      title: Adhesiónes sin procesar
-      description: Muestra solo las adhesiónes que no se han procesado. El informe contiene el número de acceso, los recursos vinculados, el título, la extensión, catalogado, la fecha de procesamiento, un recuento del número de registros seleccionados con la fecha de procesamiento y el número de extensión total de esos registros sin un campo de fecha de procesamiento completo.
-      total_count: Número de adhesiónes
-      identifier_prefix: Adhesión
-      total_extent: Extensión total sin procesar
-
-    accession_deaccessions_list_report:
-      title: Registros de adhesiónes adquiridas y bajas vinculadas
-      description: Muestra una lista de registros de adhesión y registros de bajas vinculados. El informe contiene el número de acceso, título, extensión, fecha de acceso, resumen del contenedor, catalogado, fecha de procesamiento, derechos transferidos, bajas vinculadas y alcance total de todas las bajas.
-      total_extent: Extensión total de adhesiónes
-      identifier_prefix: Adhesión
-
-    accession_deaccessions_subreport:
-      test_value: test value
-
-    accession_rights_transferred_report:
-      title: Adhesiónes con derechos transferidos
-      description: Muestra solo las adhesiónes para las que se han transferido derechos. El informe contiene el número de acceso, recursos vinculados, título, extensión, catalogado, fecha de procesamiento, restricciones de acceso, restricciones de uso, derechos transferidos y un recuento del número de registros seleccionados con derechos transferidos.
-      identifier_prefix: Adhesión
-
-    user_groups_report:
-      title:  Informe de grupos de usuarios
-      description: Muestra usuarios y grupos de acceso al repositorio.
-      name: Nombre
-      department: Departamento
-      user_title: Título
-      groups: Los grupos
-      email: Email
-      telephone: Teléfono
-
-    resource_deaccessions_list_report:
-      title: Recursos y Expurgo(s)
-      description: Muestra recursos y linked expurgo registro(s). El informe contiene título, identificador de recurso, nivel, rango de fechas, bajas vinculadas, nombres de creadores y totales de extensión física.
-      total_extent: Extensión total de recursos
-      identifier_prefix: Recurso
-
-    resource_instances_list_report:
-      title: Lista de recursos y instancias
-      description: Muestra los recursos y toda la información de ubicación especificada. El informe contiene título, identificador de recurso, nivel, rango de fechas y contenedores asignados.
-      total_extent: Extensión total de recursos
-      identifier_prefix: Recurso
-
-    resource_locations_list_report:
-      title: Lista de recursos y ubicaciones
-      description: Muestra los recursos y toda la información de ubicación especificada. El informe contiene título, identificador de recurso, nivel, rango de fechas y ubicaciones asignadas.
-      total_extent: Extensión total de recursos
-      identifier_prefix: Recurso
-
-    resources_list_report:
-      title: Informe de lista de recursos
-      description: El Informe de lista de recursos incluye información básica, fechas y extensiones para los registros de recursos.
-
-    resource_restrictions_list_report:
-      title: Resources Restrictions List
-      description: Displays resources with restrictions and location information. Report contains title, resource identifier, level, date range, and assigned locations.
-      total_count: Total Resources with Restrictions
-      total_extent: Total Extent of Resources with Restrictions
-      identifier_prefix: Resource
-
-    assessment_rating_report:
-      title: Informe de calificación de evaluación
-      description: Muestra información para evaluaciones con una calificación específica en un rango específico. Debe seleccionar al menos un valor; para mostrar todos los registros, seleccione todos los valores.
-      identifier_prefix: Evaluación
-
-    assessment_list_report:
-      description: Todos los registros de evaluación creados
-      title: Lista de registros de evaluación
-      identifier_prefix: Evaluación
-
-    agent_list_report:
-      title: Lista de registros de nombres
-      description: Muestra los registros de nombres seleccionados. El informe enumera el nombre, el tipo de nombre y la fuente del nombre.
-
-    location_report:
-      title: Location Report
-      description: Displays a list of locations, indicating any accessions or resources assigned to defined locations.
-      total_count: Number of Locations
-
-    location_holdings_report:
-      title: Posiciones de ubicación
-      identifier_prefix: Ubicación
-      description: Informar sobre contenedores en estantes en una o más ubicaciones
-      repository_report_type: Repositorio
-      building_report_type: Edificio
-      single_location_report_type: Única ubicación
-      location_range_report_type: Rango de ubicaciones
-      start_range: Primera ubicación
-      end_range: última ubicación
-
-    shelflist_report:
-      title: Shelflist Report
-      description: The Shelflist Report includes a list of all locations and their associated top containers.
-
-    translation_defaults:
-      select: Seleccione
-      back: Devolver
-      accession_processed_date: Fecha de tratamiento
-      access_restrictions_note: Nota de las restricciones de acceso
-      access_restrictions: Restricciones de acceso
-      accession_date: Fecha de entrada
-      accession_number: Número de acta de ingreso
-      accession_processed: Procesado
-      accession_report: Accession Report
-      total_transferred: Accessions with Rights Transferred
-      acknowledgement_sent: Reconocimiento enviado
-      acquisition_type: Tipo de entrada
-      appraisal: Appraisal
-      area: Area
-      barcode: Código de barras
-      begin_date: Fecha de inicio
-      container_list: Box/Container List
-      building: Edificio
-      bulk_begin_date: Fecha de inicio de la parte principal
-      bulk_end_date: Fecha de finalización de la parte principal
-      catalog_record: Catalog Record (MARC)
-      cataloged: Catalogado
-      classification_number: Número de clasificación
-      classifications: Clasificaciones
-      control_file: Collection/Control File
-      component_identifier: Identificador de componente
-      component_title: Título de componente
-      condition_note: Descripción de la condición
-      conservation_issues: Conservation Issues
-      conservation_note: Conservation Note
-      container: Contenedor
-      container_2: Contenedor 2
-      container_3: Contenedor 3
-      container_profile: Perfil de contenedor
-      container_summary: Resumen de contenedor
-      containers: Contenedores
-      date: Fecha
-      date_expression: Expresión de fecha
-      survey_end: Date Survey Ended
-      survey_begin: Date Survey Started
-      dates: Fechas
-      deaccessions: Expurgos
-      deed_of_gift: Deed Of Gift
-      description: Descripción
-      description_note: Descripción
-      disposition_note: Disposición
-      end_date: Fecha de finalización
-      exhibition_value_note: Exhibition Value Note
-      existing_description_notes: Existing Description Notes
-      extent: Extensión
-      surveyed_extent: Extent Surveyed
-      field: Field
-      file_versions: Versiones del archivo
-      finding_aid_ead: Finding Aid (EAD-encoding)
-      finding_aid_online: Finding Aid (Online)
-      finding_aid_paper: Finding Aid (paper only)
-      finding_aid_spreadsheet: Finding Aid (spreadsheet)
-      finding_aid_word: Finding Aid (word processing document)
-      floor: Piso
-      function: Función
-      general_assessment_note: General Assessment Note
-      general_note: Nota general
-      id: ID
-      identifier: Identificador
-      ils_holding_id: ILD Holding ID
-      ils_item_id: ILS Item ID
-      inactive: Inactive
-      instance_type: Tipo de representación
-      instances: Representaciones
-      inventory: Inventario
-      language: Idioma
-      level: Nivel
-      linked_records: Registros vinculados
-      linked_resources: Recursos vinculados
-      formats: Lista de tipos de materiales / Formatos
-      location: Ubicación
-      location_barcode: Código de barras de ubicación
-      location_in_room: Ubicación en la habitación
-      location_profile: Perfil de ubicación
-      location_url: URL de ubicación
-      locations: Ubicaciones
-      monetary_value: Valor monetario
-      monetary_value_note: Nota de valor monetario
-      name: Nombre
-      name_source: Fuente de nombre
-      name_type: Tipo de nombre
-      names: Nombres
-      note: Nota
-      notification_sent: Notificación está enviado
-      number_of_accessions: Número de ingresos
-      total_count: Número de registros
-      number_with_inventories: Número con inventarios
-      object_type: Tipo de objeto
-      provenance: Procedencia
-      purpose: Propósito de la evaluación
-      rating: Clasificación
-      ratings: Calificaciones
-      record_id: ID de registro
-      linked_record_type: Tipo de registro
-      related_eac_records: Registro(s) de EAC relacionados
-      repository: Repositorio
-      resource_identifier: Identificador de recursos
-      resources: Recursos
-      records: Recursos y Accesiones
-      retention_rule: Retencion
-      restrictions_apply: ¿Se aplican restricciones?
-      review_note: Nota de revisión
-      review_required: Revisión requerida?
-      reviewer: Crítico
-      rights_transferred_note: Derechos transferidos Nota
-      rights_transferred: ¿Derechos transferidos?
-      role: Role
-      room: Sala
-      script: Texto
-      scope: Alcance de la evaluación
-      scoped_by_rating: Alcance por Calificación
-      sensitive_material: ¿Material sensible?
-      scoped_by_date_range: Mostrando registros creados entre
-      showing_values: Mostrando registros con valores de calificación
-      sort_name: Ordenar Nombre
-      source: Origen
-      special_format_note: Nota de formato especial
-      subjects: Asignaturas
-      surveyed_by: Encuestados por
-      term: Term
-      surveyed_duration: Tiempo que llevó completar la encuesta
-      record_title: Título
-      title: Título
-      top_container_barcode: Código de barras del contenedor superior
-      top_container_indicator: Indicador de contenedor superior
-      total_deaccessions_extent: Extensión total de desaccesiones
-      total_extent: Extensión total de los registros
-      type: Tipo
-      total_unprocessed: Accesiones sin procesar
-      uri: URI
-      use_restrictions_note: Nota de restricciones de uso
-      use_restrictions: Usar restricciones?
-      use_statement: Declaración de uso
-      accessions: Accesiones
-      deaccession_date: Fecha de salida
-      rating_note: Nota de Calificación
-      temporary_location: Ubicación temporal
-      rights_statements: Declaraciones de derechos
-      rights_type: Tipo de derechos
-      statute_citation: Citación del Estatuto
-      jurisdiction: Jurisdicción
-      status: Estado
-      determination_date: Fecha de determinación
-      license_terms: Condiciones de la licencia
-      other_rights_basis: Otras bases de derechos
-      custom_record_type: Informe personalizado para
-      digital_object: Objeto digital
-      is_representative: Es representativo?
-      sorted_by: Ordenado por
-      root_record: Registro raíz
-      dimension_units: Unidades de dimensión
-      depth: Depth
-      height: Height
-      width: Width
-      template_name: Nombre de la plantilla
-      template_description: Descripción de la plantilla
-
-    subject_list_report:
-      title: Lista de registros de sujetos
-      description: Muestra los registros del sujeto seleccionado. El informe enumera el término del tema, el tipo de término del tema y la fuente del tema.

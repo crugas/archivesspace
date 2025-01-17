@@ -1,7 +1,7 @@
 module JSONModelI18nMixin
 
   def t(*args)
-    JSONModel::init_args[:i18n_source].t(*args)
+    JSONModel::init_args[:i18n_source].t(args&.[](0), **(args&.[](1) || {}))
   end
 
   def _exceptions
@@ -28,7 +28,7 @@ module JSONModelI18nMixin
 
   def translate_exception_message(msg, path = nil)
     if path == 'conflicting_record'
-      return t("validation_errors.conflicting_record", {:record_uri => msg})
+      return "<a href='#{AppConfig[:frontend_proxy_url]}/resolve/readonly?uri=#{msg}' target='_blank'>#{t("validation_errors.conflicting_record")}</a>"
     end
 
     msg_data = case msg

@@ -299,23 +299,25 @@ module SearchHelper
   end
 
   def add_columns
-    return if @columns
-    type = @search_data.get_type
-    type = 'agent' if type.include? 'agent'
-    type = 'classification' if type == 'classification_term'
+    if @search_data
+      return if @columns
+      type = @search_data.get_type
+      type = 'agent' if type.include? 'agent'
+      type = 'classification' if type == 'classification_term'
 
-    add_multiselect_column if can_delete_search_results?(type) && !(request.path =~ /\/(advanced_)*search/)
-    add_linker_column if params[:linker]==='true'
+      add_multiselect_column if can_delete_search_results?(type) && !(request.path =~ /\/(advanced_)*search/)
+      add_linker_column if params[:linker]==='true'
 
-    if params[:include_components]
-      case type
-      when 'resource'
-        add_pref_columns ['resource', 'archival_object']
-      when 'digital_object'
-        add_pref_columns ['digital_object', 'digital_object_component']
+      if params[:include_components]
+        case type
+        when 'resource'
+          add_pref_columns ['resource', 'archival_object']
+        when 'digital_object'
+          add_pref_columns ['digital_object', 'digital_object_component']
+        end
+      else
+        add_pref_columns(type)
       end
-    else
-      add_pref_columns(type)
     end
 
     add_actions_column if !params[:linker] || params[:linker] === 'false'
@@ -326,6 +328,9 @@ module SearchHelper
   end
 
   def get_ancestor_title(field)
+    titles = @ancestor_titles
+    return titles[field] if titles.key? field
+
     begin
       field_json = JSONModel::HTTP.get_json(field)
     # one record might be "found in" another that is suppressed
@@ -333,13 +338,15 @@ module SearchHelper
     rescue RecordNotFound
       return nil
     end
-    unless field_json.nil?
-      if field.include?('resources') || field.include?('digital_objects')
-        clean_mixed_content(field_json['title'])
-      else
-        clean_mixed_content(field_json['display_string'])
-      end
+    return if field_json.nil?
+
+    if field.include?('resources') || field.include?('digital_objects')
+      titles[field] = clean_mixed_content(field_json['title'])
+    else
+      titles[field] = clean_mixed_content(field_json['display_string'])
     end
+
+    titles[field]
   end
 
   def context_separator(result)

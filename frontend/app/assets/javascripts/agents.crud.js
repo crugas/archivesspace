@@ -29,6 +29,7 @@ $(function () {
 
     $('.btn-primary-id-toggle', $subform).click(function (event) {
       event.preventDefault();
+      $(this).parent().off('click');
 
       $primarySection.triggerHandler('isprimarytoggle.aspace', [$subform]);
     });
@@ -72,7 +73,7 @@ $(function () {
         disableSortName();
       } else {
         $sortNameField.prop('disabled', false);
-        $sortNameField.removeAttr('readonly');
+        $sortNameField.attr('readonly', null);
 
         if (typeof originalSortNameFieldValue !== 'undefined') {
           $sortNameField[0].value = originalSortNameFieldValue;
@@ -144,7 +145,7 @@ $(function () {
     $subform.find('select.linked_agent_role').on('change', function () {
       var form = $subform.find('.agent-terms');
       if ($(this).val() == 'subject') {
-        form.find(':input').removeAttr('disabled');
+        form.find(':input').attr('disabled', null);
         form.show();
       } else {
         form.find(':input').attr('disabled', 'disabled');
@@ -153,7 +154,7 @@ $(function () {
 
       var creator_title = $subform.find('.agent-creator-title').show();
       if ($(this).val() == 'creator' || $(this).val() == 'subject') {
-        creator_title.show().find(':input').removeAttr('disabled');
+        creator_title.show().find(':input').attr('disabled', null);
       } else {
         creator_title.hide().find(':input').attr('disabled', 'disabled');
       }

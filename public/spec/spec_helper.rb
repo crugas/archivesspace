@@ -12,8 +12,6 @@ require 'securerandom'
 require 'axe-rspec'
 require 'nokogiri'
 
-require_relative '../../indexer/app/lib/pui_indexer'
-
 if ENV['COVERAGE_REPORTS'] == 'true'
   require 'aspace_coverage'
   ASpaceCoverage.start('public:test', 'rails')
@@ -22,39 +20,32 @@ end
 require 'aspace_gems'
 
 $server_pids = []
-$backend_port = TestUtils::free_port_from(3636)
-$frontend_port = TestUtils::free_port_from(4545)
-$backend = ENV['ASPACE_TEST_BACKEND_URL'] || "http://localhost:#{$backend_port}"
-$test_db_url = ENV['ASPACE_TEST_DB_URL'] || AppConfig[:db_url]
-$frontend = "http://localhost:#{$frontend_port}"
 $expire = 30000
-
-AppConfig[:backend_url] = $backend
-AppConfig[:pui_hide][:record_badge] = false # we want this for testing
-AppConfig[:arks_enabled] = true # ARKs have to be enabled to be able to test them
+AppConfig[:backend_url] = ENV['ASPACE_TEST_BACKEND_URL'] || "http://localhost:#{TestUtils::free_port_from(3636)}"
+AppConfig[:db_url] = ENV['ASPACE_TEST_DB_URL'] || AppConfig[:db_url]
+AppConfig[:solr_url] = ENV['ASPACE_TEST_SOLR_URL'] || AppConfig[:solr_url]
+AppConfig[:pui_hide][:record_badge] = false
+AppConfig[:arks_enabled] = true
+app_logfile = File.join(ASUtils.find_base_directory, "ci_logs", "public_app_log.out")
+AppConfig[:pui_log] = app_logfile
+AppConfig[:public_url] = ENV['ASPACE_TEST_APP_SERVER_URL'] || AppConfig[:public_url]
 
 $backend_start_fn = proc {
-  TestUtils::start_backend($backend_port,
+  TestUtils::start_backend(URI(AppConfig[:backend_url]).port,
                            {
                              :session_expire_after_seconds => $expire,
                              :realtime_index_backlog_ms => 600000,
-                             :db_url => $test_db_url
+                             :db_url => AppConfig[:db_url]
                            })
 }
 
-module IndexTestRunner
-  def run_indexers
-    @@period ||= PeriodicIndexer.new($backend)
-    @@pui ||= PUIIndexer.new($backend)
-    @@period.run_index_round
-    @@pui.run_index_round
-  end
-end
+
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 include FactoryBot::Syntax::Methods
+include TestUtils::SpecIndexing::Methods
 
 def setup_test_data
   repo = create(:repo, :repo_code => "test_#{Time.now.to_i}", publish: true)
@@ -70,7 +61,7 @@ def setup_test_data
          names: [build(:name_person,
                        name_order: 'direct',
                        primary_name: "Agent",
-                       rest_of_name: "Published",
+                       rest_of_name: "Published #{Time.now.to_i}",
                        sort_name: "Published Agent",
                        number: nil,
                        dates: nil,
@@ -122,6 +113,8 @@ def setup_test_data
 
   resource = create(:resource, title: "Published Resource",
                     publish: true,
+                    is_finding_aid_status_published: false,
+                    finding_aid_status: "in_progress",
                     instances: [build(:instance_digital)],
                     subjects: [{'ref' => subject.uri}])
 
@@ -175,7 +168,6 @@ def setup_test_data
                     instances: [build(:instance_digital)],
                     subjects: [{'ref' => subject2.uri}])
 
-
   resource_with_scope = create(:resource_with_scope, title: "Resource with scope note", publish: true)
   aos = (0..5).map do
     create(:archival_object,
@@ -191,6 +183,13 @@ def setup_test_data
   )
 
   create(:archival_object,
+    title: "AO with DO unpublished",
+    resource: { 'ref' => resource_with_tree.uri },
+    instances: [build(:instance_digital)],
+    publish: false
+  )
+
+  create(:archival_object,
     title: "AO without DO",
     resource: { 'ref' => resource_with_tree.uri },
     publish: true
@@ -199,18 +198,41 @@ def setup_test_data
   create(:digital_object_component,
          publish: true,
          component_id: '12345')
+
+  create(:resource,
+    title: "Resource with whole extent",
+    publish: true,
+    extents: [
+      build(:extent,
+        portion: 'whole',
+        number: '5',
+        extent_type: 'linear_feet'
+      )
+    ]
+  )
+
+  create(:resource,
+    title: "Resource with partial extent",
+    publish: true,
+    extents: [
+      build(:extent,
+        portion: 'part',
+        number: '2',
+        extent_type: 'linear_feet'
+      )
+    ]
+  )
 end
 
 RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
   config.include BackendClientMethods
-  config.include IndexTestRunner
+  config.include TestUtils::SpecIndexing::Methods
 
   # show retry status in spec process
   config.verbose_retry = true
-  # Try thrice (retry twice)
-  config.default_retry_count = ENV['ASPACE_TEST_RETRY_COUNT'] || 3
+  config.default_retry_count = ENV['ASPACE_TEST_RETRY_COUNT'] || 1
 
   [:controller, :view, :request].each do |type|
     config.include ::Rails::Controller::Testing::TestProcess, :type => type
@@ -220,9 +242,9 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     if ENV['ASPACE_TEST_BACKEND_URL']
-      puts "Running tests against #{$backend}"
+      puts "Running tests against #{AppConfig[:backend_url]}"
     else
-      puts "Starting backend using #{$backend}"
+      puts "Starting backend using #{AppConfig[:backend_url]}"
       $server_pids << $backend_start_fn.call
     end
     ArchivesSpaceClient.init
@@ -233,20 +255,21 @@ RSpec.configure do |config|
 
     require_relative 'factories'
     AspaceFactories.init
-    setup_test_data unless ENV['ASPACE_TEST_SKIP_FIXTURES']
-    unless ENV['ASPACE_TEST_SKIP_INDEXING']
-      PeriodicIndexer.new($backend).run_index_round
-      PUIIndexer.new($backend).run_index_round
+    unless ENV['ASPACE_TEST_SKIP_FIXTURES']
+      setup_test_data
     end
+    run_indexers
   end
 
   config.after(:suite) do
     $server_pids.each do |pid|
       TestUtils::kill(pid)
     end
-    # For some reason we have to manually shutdown mizuno for the test suite to
-    # quit.
-    Rack::Handler.get('mizuno').instance_variable_get(:@server) ? Rack::Handler.get('mizuno').instance_variable_get(:@server).stop : next
+    begin
+      $puma.halt
+    rescue
+      # we do not care about exceptions while shutting down puma at this point
+    end
   end
 end
 

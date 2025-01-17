@@ -452,6 +452,7 @@ class EAD3Serializer < EADSerializer
     @fragments = ASpaceExport::RawXMLHandler.new
     @include_unpublished = data.include_unpublished?
     @include_daos = data.include_daos?
+    @include_uris = data.include_uris?
     @use_numbered_c_tags = data.use_numbered_c_tags?
     @id_prefix = I18n.t('archival_object.ref_id_export_prefix', :default => 'aspace_')
 
@@ -486,7 +487,10 @@ class EAD3Serializer < EADSerializer
 
               handle_arks(data, xml)
 
-              serialize_aspace_uri(data, xml)
+
+              if @include_uris
+                serialize_aspace_uri(data, xml)
+              end
 
               unless data.repo.nil? || data.repo.name.nil?
                 xml.repository {
@@ -794,10 +798,16 @@ class EAD3Serializer < EADSerializer
         }
       end
 
-      unless data.finding_aid_status.nil?
+      if @include_unpublished || data.is_finding_aid_status_published
+        finding_aid_status = data.finding_aid_status
+      else
+        finding_aid_status = nil
+      end
+
+      unless finding_aid_status.nil?
         xml.localcontrol( { localtype: 'findaidstatus'} ) {
           xml.term() {
-            xml.text(data.finding_aid_status)
+            xml.text(finding_aid_status)
           }
         }
       end
@@ -1006,7 +1016,7 @@ class EAD3Serializer < EADSerializer
         xml.physdesc(atts) {
           append_note_content.(note, xml, fragments, 'physdesc')
         }
-      when 'physdesc'
+      when 'physdesc', 'physloc'
         atts[:label] = note['label'] if note['label']
         xml.send(note['type'], atts) {
           append_note_content.(note, xml, fragments, note['type'])
@@ -1121,6 +1131,7 @@ class EAD3Serializer < EADSerializer
           xml.send(node_name, atts) {
             xml.part() {
               sanitize_mixed_content(sort_name, xml, fragments )
+              EAD3Serializer.run_serialize_step(agent, xml, fragments, node_name.to_sym)
             }
           }
         }
@@ -1166,7 +1177,9 @@ class EAD3Serializer < EADSerializer
 
           handle_arks(data, xml)
 
-          serialize_aspace_uri(data, xml)
+          if @include_uris
+            serialize_aspace_uri(data, xml)
+          end
 
           if !data.component_id.nil? && !data.component_id.empty?
             xml.unitid data.component_id
@@ -1195,7 +1208,8 @@ class EAD3Serializer < EADSerializer
 
           if @include_daos
             data.instances_with_digital_objects.each do |instance|
-              serialize_digital_object(instance['digital_object']['_resolved'], xml, fragments)
+              digital_object = instance['digital_object']['_resolved']
+              serialize_digital_object(digital_object, xml, fragments)
             end
           end
         }
@@ -1255,10 +1269,10 @@ class EAD3Serializer < EADSerializer
 
 
   def serialize_controlaccess(data, xml, fragments)
-    if (data.controlaccess_subjects.length + data.controlaccess_linked_agents(@include_unpublished).length) > 0
+    if (data.controlaccess_subjects.length + data.controlaccess_linked_agents(@include_unpublished).reject {|x| x.empty?}.length) > 0
       xml.controlaccess {
 
-        data.controlaccess_subjects.each do |node_data|
+        data.controlaccess_subjects.zip(data.subjects).each do |node_data, subject|
 
           if node_data[:atts]['authfilenumber']
             node_data[:atts]['identifier'] = node_data[:atts]['authfilenumber'].clone
@@ -1268,11 +1282,14 @@ class EAD3Serializer < EADSerializer
           xml.send(node_data[:node_name], node_data[:atts]) {
             xml.part() {
               sanitize_mixed_content( node_data[:content], xml, fragments, ASpaceExport::Utils.include_p?(node_data[:node_name]) )
+              EAD3Serializer.run_serialize_step(subject['_resolved'], xml, fragments, node_data[:node_name].to_sym)
             }
           }
         end
 
-        data.controlaccess_linked_agents(@include_unpublished).each do |node_data|
+        data.controlaccess_linked_agents(@include_unpublished).zip(data.linked_agents).each do |node_data, agent|
+
+          next if node_data.empty?
 
           if node_data[:atts][:role]
             node_data[:atts][:relator] = node_data[:atts][:role]
@@ -1287,6 +1304,7 @@ class EAD3Serializer < EADSerializer
           xml.send(node_data[:node_name], node_data[:atts]) {
             xml.part() {
               sanitize_mixed_content( node_data[:content], xml, fragments, ASpaceExport::Utils.include_p?(node_data[:node_name]) )
+              EAD3Serializer.run_serialize_step(agent['_resolved'], xml, fragments, node_data[:node_name].to_sym)
             }
           }
         end
@@ -1400,6 +1418,17 @@ class EAD3Serializer < EADSerializer
 
 
   def serialize_digital_object(digital_object, xml, fragments)
+    if (digital_object['file_versions'].count > 1) && digital_object['_is_in_representative_instance']
+      xml.daoset(linkrole: "representative") {
+        serialize_digital_object_dao(digital_object, xml, fragments)
+      }
+    else
+      serialize_digital_object_dao(digital_object, xml, fragments)
+    end
+  end
+
+
+  def serialize_digital_object_dao(digital_object, xml, fragments)
     return if digital_object["publish"] === false && !@include_unpublished
     return if digital_object["suppressed"] === true
 
@@ -1445,6 +1474,9 @@ class EAD3Serializer < EADSerializer
         atts['show'] = (file_version['xlink_show_attribute'].respond_to?(:downcase) && file_version['xlink_show_attribute'].downcase) || 'new'
         atts['localtype'] = file_version['use_statement'] if file_version['use_statement']
         atts['audience'] = 'internal' unless is_digital_object_published?(digital_object, file_version)
+        if digital_object['_is_in_representative_instance']
+          atts['linkrole'] = [file_version['use_statement'], 'representative'].compact.join(" ")
+        end
         xml.dao(atts) {
           xml.descriptivenote { sanitize_mixed_content(content, xml, fragments, true) } if content
         }

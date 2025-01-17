@@ -1,0 +1,497 @@
+@import 'archivesspace/variables';
+@import 'archivesspace/mixins';
+@import './vendor/bootstrap/scss/bootstrap.scss';
+@import './vendor/bootstrap/scss/mixins.scss';
+@import '../jquery.kiketable.colsizable-1.1.css';
+
+#rde_form {
+  .sections {
+    @include vertical(
+      $navbarBackgroundHighlight,
+      darken($navbarBackgroundHighlight, 3%)
+    );
+    th {
+      border-bottom-color: darken($navbarBackgroundHighlight, 6%);
+    }
+  }
+
+  // Overwrite Bootstrap for sticky table header, ANW-919
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-right: 1rem;
+  }
+
+  thead tr:first-child th {
+    position: sticky;
+    top: -16px; // 0 leaves visible space above row
+    border-top-width: 0;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0;
+    background: #fafafa;
+  }
+  thead tr:first-child th:last-of-type {
+    border-right-width: 0;
+  }
+
+  thead tr:nth-child(2) th {
+    position: sticky;
+    top: 15px; // height of thead tr:first-child + thead tr:first-child th top
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0;
+  }
+  thead tr:nth-child(2) th:last-of-type {
+    border-right-width: 0;
+  }
+  thead tr:nth-child(2) th.fieldset-label.kiketable-th:not(.sticky),
+  thead tr:nth-child(2) th[data-section='empty'] {
+    background: #fafafa;
+  }
+
+  thead tr:first-child th:first-of-type,
+  thead tr:first-child th:last-of-type,
+  thead tr:nth-child(2) th[data-section='empty'] {
+    z-index: 3;
+  }
+
+  tbody tr td {
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 0;
+    border-left-width: 0;
+  }
+  tbody tr td:last-of-type {
+    border-right-width: 0;
+  }
+
+  .fieldset-labels {
+    @include vertical(
+      darken($navbarBackgroundHighlight, 3%),
+      darken($navbarBackgroundHighlight, 6%)
+    );
+
+    th {
+      border-top-color: darken($navbarBackgroundHighlight, 6%);
+    }
+  }
+
+  .dropdown-menu > .disabled > a {
+    background-color: transparent;
+  }
+
+  .dropdown-menu-inner {
+    min-width: 10rem;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+
+    a {
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .sections,
+  .fieldset-labels {
+    th {
+      &.required {
+        &::before {
+          // apply required icon to the inner kiketable container
+          display: none;
+        }
+        .kiketable-th-text {
+          background-image: asset-url('archivesspace/required_loud.png');
+          background-repeat: no-repeat;
+          background-position: 2px center;
+          padding-left: 16px;
+        }
+      }
+
+      &.conditionally-required {
+        &::before {
+          // apply required icon to the inner kiketable container
+          display: none;
+        }
+        .kiketable-th-text {
+          background-image: asset-url(
+            'archivesspace/conditionally_required.png'
+          );
+          background-repeat: no-repeat;
+          background-position: 2px center;
+          padding-left: 16px;
+        }
+      }
+    }
+  }
+
+  th {
+    &.fieldset-label {
+      cursor: pointer;
+    }
+
+    &.sticky {
+      @include vertical(#dcf1fa, #caecfa);
+    }
+
+    /* Fix https://archivesspace.atlassian.net/browse/AR-1211 */
+    &.kiketable-th {
+      height: 30px !important;
+      padding: 0.25rem;
+    }
+
+    .kiketable-th-text {
+      height: auto;
+      line-height: 30px; // Vertically center text
+    }
+
+    .kiketable-colsizable-handler {
+      position: relative;
+      height: 30px;
+      width: 4px;
+      right: -0.2rem;
+      float: right;
+      border: none;
+      background-image: asset-url('archivesspace/drag_handle.png');
+      cursor: e-resize;
+    }
+  }
+  td {
+    &.form-group {
+      &.has-error {
+        background-color: $errorBackground;
+      }
+    }
+
+    &.form--group {
+      min-width: 60px;
+      select {
+        width: 100%;
+      }
+      input {
+        padding: 4px 1%;
+        width: 98%;
+      }
+
+      overflow: auto;
+    }
+  }
+  tr {
+    td.status {
+      .valid,
+      .invalid {
+        display: none;
+        margin-top: 0.5em;
+      }
+    }
+    &.valid {
+      td {
+        background-color: $successBackground;
+      }
+      td.status {
+        .valid {
+          display: block;
+        }
+      }
+    }
+    &.invalid {
+      td.status {
+        background-color: $errorBackground;
+        .invalid {
+          display: block;
+        }
+      }
+    }
+  }
+  .add-rows-form {
+    padding: 8px;
+
+    button {
+      margin-top: 4px;
+    }
+  }
+  .rde-inline-form {
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    background-color: #fafafa;
+    margin-bottom: 10px;
+    padding: 10px;
+    position: relative;
+
+    .nav-tabs {
+      margin: 0;
+      a {
+        padding: 4px 8px;
+      }
+    }
+    .tab-content {
+      border: 1px solid #ddd;
+      background-color: white;
+      padding: 10px;
+      margin-top: -1px;
+      @include border-top-radius(0);
+      @include border-right-radius(0);
+      @include border-bottom-radius(4px);
+      @include border-left-radius(0);
+    }
+    .btn-cancel {
+      float: none;
+    }
+  }
+  #columnOrderUp {
+    position: absolute;
+    top: 70px;
+    margin-left: 10px;
+  }
+  #columnOrderDown {
+    position: absolute;
+    top: 100px;
+    margin-left: 10px;
+  }
+
+  .error-summary {
+    position: absolute;
+    @include opacity(90);
+
+    z-index: 1;
+    box-shadow: 1px 1px 3px #aaa;
+    margin-left: -5px;
+    border-top: none;
+    background-color: $errorBackground;
+    color: $errorText;
+    max-width: none;
+    top: initial !important;
+
+    .error-summary-header {
+      overflow: hidden;
+
+      .error-summary-header-text {
+        display: none;
+        float: left;
+        color: #444;
+      }
+    }
+
+    .hide-error-summary {
+      float: right;
+      display: block;
+      @include opacity(60);
+
+      &:hover {
+        @include opacity(100);
+      }
+    }
+
+    .hide-error-summary,
+    .error {
+      display: none;
+    }
+
+    .error {
+      position: relative;
+      padding-right: 20px;
+      cursor: pointer;
+
+      .icon {
+        position: absolute;
+        right: 0;
+        @include opacity(60);
+      }
+
+      &:hover {
+        .icon {
+          @include opacity(100);
+        }
+      }
+    }
+  }
+  tbody tr {
+    @include opacity(80);
+  }
+  .last-focused {
+    @include opacity(100);
+
+    td {
+      background-color: #d5effa;
+    }
+  }
+  .last-focused {
+    .error-summary {
+      display: block;
+      margin-top: 0.9em;
+      @include border-top-radius(0);
+      @include border-right-radius(0);
+      @include border-bottom-radius(4px);
+      @include border-left-radius(0);
+
+      .show-error-summary {
+        padding: 4px;
+        display: block;
+        text-align: center;
+      }
+    }
+  }
+  .show-inline-errors {
+    .last-focused {
+      .error-summary {
+        padding: 5px 10px;
+        margin-top: 1.1em;
+        @include border-top-radius(4px);
+        @include border-right-radius(4px);
+        @include border-bottom-radius(4px);
+        @include border-left-radius(4px);
+
+        .hide-error-summary,
+        .error {
+          display: block;
+        }
+        .show-error-summary {
+          display: none;
+        }
+        .error-summary-header {
+          border-bottom: 1px dotted #aaa;
+          margin-bottom: 10px;
+          padding-bottom: 5px;
+
+          .error-summary-header-text {
+            display: block;
+          }
+        }
+      }
+    }
+    .valid {
+      .error-summary {
+        display: none;
+      }
+    }
+  }
+}
+
+// ANW-897 and ANW-347: Override jquery.kiketable.colsizable-1.1
+// Show overflow on linker <td>
+.kiketable-colsizable td.overflow-visible {
+  overflow: visible;
+}
+
+// ANW-2001: Restore the Top Containers linker layout after the Bootstrap v4 upgrade
+.rde-top-containers-linker-grid {
+  display: grid;
+  grid-template-columns: minmax(auto, 1fr) minmax(max-content, auto);
+}
+.rde-top-containers-linker-grid > ul.token-input-list {
+  order: 1;
+  width: 100%;
+}
+.rde-top-containers-linker-grid > div.input-group-append {
+  order: 2;
+}
+.rde-top-containers-linker-grid > section {
+  order: 3;
+}
+
+/* ANW-2001: Restore `.btn-group > .btn.btn-default` for the Top Containers
+   linker button after the Bootstrap v4 upgrade */
+.rde-top-containers-linker {
+  position: relative;
+  margin-left: -1px;
+  flex: 1 1 auto;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-color: var(--secondary);
+  background-color: var(--white);
+  color: var(--bs-text-body);
+  cursor: pointer;
+}
+.rde-top-containers-linker:hover {
+  z-index: 1;
+  background-color: #e9ecef;
+  color: var(--bs-text-body);
+}
+
+/* ANW-2001: Restore `.btn.btn-default` styles for the footer
+   action buttons after the Bootstrap v4 upgrade */
+#rapidDataEntryModal .btn.btn-default {
+  color: var(--bs-text-body);
+  background-color: var(--white);
+  border-color: var(--secondary);
+  cursor: pointer;
+}
+#rapidDataEntryModal .btn.btn-default:hover {
+  z-index: 1;
+  background-color: #e9ecef;
+  color: var(--bs-text-body);
+}
+
+// ANW-2001: Fix the RDE form toolbar
+#rapidDataEntryModal [data-id='rde_select_template'] {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+// ANW-2001: Fix the RDE 'Apply RDE Template' toolbar dropdown
+// by rectifying the missing bootstrap-select.css
+#rapidDataEntryModal
+  .bootstrap-select.btn-group
+  .dropdown-menu
+  li
+  a
+  span.check-mark {
+  display: none;
+}
+
+#rapidDataEntryModal .bootstrap-select.btn-group > .disabled {
+  cursor: not-allowed;
+}
+#rapidDataEntryModal .bootstrap-select.btn-group > .disabled:focus {
+  outline: none !important;
+}
+
+#rapidDataEntryModal .bootstrap-select.btn-group ul.dropdown-menu-inner {
+  > li {
+    > a {
+      display: block;
+      padding: 3px 20px;
+      font-weight: normal;
+      line-height: 1.4286;
+      color: #333;
+      white-space: nowrap;
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
+        color: #262626;
+        background-color: #f5f5f5;
+      }
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    &.selected:not(.disabled) > a {
+      color: #fff;
+      text-decoration: none;
+      outline: 0;
+      background-color: #2e6ea5;
+    }
+
+    &.disabled > a,
+    &.disabled > a:hover {
+      color: #262626;
+      text-decoration: none;
+      outline: 0;
+      background-color: #fff;
+      cursor: not-allowed;
+    }
+  }
+}

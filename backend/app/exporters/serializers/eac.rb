@@ -62,7 +62,7 @@ class EACSerializer < ASpaceExport::Serializer
                           'xmlns:html' => 'http://www.w3.org/1999/xhtml',
                           'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
                           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-                          'xsi:schemaLocation' => 'urn:isbn:1-931666-33-4 http://eac.staatsbibliothek-berlin.de/schema/cpf.xsd',
+                          'xsi:schemaLocation' => 'urn:isbn:1-931666-33-4 https://eac.staatsbibliothek-berlin.de/schema/cpf.xsd',
                           'xml:lang' => 'eng' }) do
       _control(json, xml)
       _cpfdesc(json, xml, obj)

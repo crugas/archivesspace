@@ -96,7 +96,9 @@ describe "EAD export mappings" do
                       :metadata_rights_declarations => [build(:json_metadata_rights_declaration)]
                       )
 
+
     @resource = JSONModel(:resource).find(resource.id, 'resolve[]' => 'top_container')
+
     @archival_objects = {}
 
     10.times {
@@ -141,7 +143,6 @@ describe "EAD export mappings" do
     end
 
     node = doc.at(path)
-    val = nil
 
     if data
       expect(doc).to have_node(path)
@@ -245,11 +246,16 @@ describe "EAD export mappings" do
 
         as_test_user("admin", true) do
           load_export_fixtures
-          @doc = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_unpublished=true&include_daos=true")
-          @doc_unpub = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_daos=true")
-
+          @doc = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_unpublished=true&include_daos=true&include_uris=true")
+          @doc_unpub = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_daos=true&include_uris=true")
           @doc_nsless = Nokogiri::XML::Document.parse(@doc.to_xml)
           @doc_nsless.remove_namespaces!
+
+          @doc_include_uris_false = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_daos=true&include_uris=false")
+          @doc_include_uris_missing = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_daos=true")
+          @doc_include_uris_false.remove_namespaces!
+          @doc_include_uris_missing.remove_namespaces!
+
           raise Sequel::Rollback
         end
       end
@@ -297,6 +303,14 @@ describe "EAD export mappings" do
 
     it "maps {archival_object}.uri to {desc_path}/did/unitid[@type='aspace_uri']" do
       mt(object.uri, "#{desc_path}/did/unitid[@type='aspace_uri']")
+    end
+
+    it "does not map {archival_object}.uri to {desc_path}/did/unitid[@type='aspace_uri'] if include_uris is false" do
+      expect(@doc_include_uris_false).not_to have_node(desc_path + "/did/unitid[@type='aspace_uri']")
+    end
+
+    it "does map {archival_object}.uri to {desc_path}/did/unitid[@type='aspace_uri'] if include_uris is missing" do
+      expect(@doc_include_uris_missing).to have_node(desc_path + "/did/unitid[@type='aspace_uri']")
     end
 
     it "maps {archival_object}.lang_materials['language_and_script'] to {desc_path}/did/langmaterial/language" do
@@ -734,7 +748,7 @@ describe "EAD export mappings" do
       def node_name_for_term_type(type)
         case type
         when 'function'; 'function'
-        when 'genre_form', 'style_period';  'genreform'
+        when 'genre_form', 'style_period'; 'genreform'
         when 'geographic', 'cultural_context'; 'geogname'
         when 'occupation'; 'occupation'
         when 'topical'; 'subject'
@@ -1308,16 +1322,186 @@ describe "EAD export mappings" do
     it "will replace MSWord-style smart quotes with ASCII characters" do
       expect(serializer.remove_smart_quotes(note_with_smart_quotes)).to eq("This note has \"smart quotes\" and \'smart apostrophes\' from MSWord.")
     end
+
+    context 'when revision statement starts with mixed content' do
+      let(:resource) do
+        create(:json_resource,
+          :publish => true,
+          :revision_statements => [
+            {
+              :date => '1999-9-9',
+              :description => '<change><date>9/9/99</date><item>mixed content revision</item></change>',
+              :publish => true
+            },
+            {
+              :date => '1999-9-9',
+              :description => '<name>revision name</name> that made some changes',
+              :publish => true
+            }
+          ]
+        )
+      end
+
+      it "properly exports revisiondesc starting with mixed content" do
+        document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+        document.remove_namespaces!
+        expect(document.xpath('//revisiondesc/change').length).to eq(2)
+      end
+    end
+
+    context 'when revision statement fields contain ampersand' do
+      let(:resource) do
+        create(:json_resource,
+          :publish => true,
+          :revision_statements => [
+            {
+              :date => 'date1&date1',
+              :description => '111111111&111111111',
+              :publish => true
+            },
+            {
+              :date => 'date2 & date2',
+              :description => '222222222 & 222222222',
+              :publish => true
+            }
+          ]
+        )
+      end
+
+      it "replaces ampersand with &amp; for revsion statement" do
+        document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+        document_xml_string = document.to_xml
+
+        expect(document_xml_string).to_not include 'date1&date1'
+        expect(document_xml_string).to include 'date1&amp;date1'
+
+        expect(document_xml_string).to_not include '111111111&111111111'
+        expect(document_xml_string).to include '111111111&amp;111111111'
+
+        expect(document_xml_string).to_not include 'date2 & date2'
+        expect(document_xml_string).to include 'date2 &amp; date2'
+
+        expect(document_xml_string).to_not include '222222222 & 222222222'
+        expect(document_xml_string).to include '222222222 &amp; 222222222'
+      end
+    end
+
+    context 'when revision statement fields contain escaped ampersand in the form of &amp;' do
+      let(:resource) do
+        create(:json_resource,
+          :publish => true,
+          :revision_statements => [
+            {
+              :date => 'date1&amp;date1',
+              :description => '111111111&amp;111111111',
+              :publish => true
+            },
+            {
+              :date => 'date2 &amp; date2',
+              :description => '222222222 &amp; 222222222',
+              :publish => true
+            }
+          ]
+        )
+      end
+
+      it "does not affect the &amp; for revsion statement" do
+        document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+        document_xml_string = document.to_xml
+
+        expect(document_xml_string).to_not include 'date1&amp;amp;date1'
+        expect(document_xml_string).to include 'date1&amp;date1'
+
+        expect(document_xml_string).to_not include '111111111&amp;amp;111111111'
+        expect(document_xml_string).to include '111111111&amp;111111111'
+
+        expect(document_xml_string).to_not include 'date2 &amp;amp; date2'
+        expect(document_xml_string).to include 'date2 &amp; date2'
+
+        expect(document_xml_string).to_not include '222222222 &amp;amp; 222222222'
+        expect(document_xml_string).to include '222222222 &amp; 222222222'
+      end
+    end
+
+    context 'when finding_aid_language_note contains an ampersand character' do
+      context 'when ampersand is not surrounded with spaces' do
+        let(:resource) do
+          create(:json_resource,
+            :publish => true,
+            :finding_aid_language_note => 'finding_aid_language_note&finding_aid_language_note'
+          )
+        end
+
+        it "replaces ampersand with &amp;" do
+          document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+          document_xml_string = document.to_xml
+
+          expect(document_xml_string).to include 'finding_aid_language_note&amp;finding_aid_language_note'
+          expect(document_xml_string).to_not include 'finding_aid_language_note&finding_aid_language_note'
+        end
+      end
+
+      context 'when ampersand is surrounded with spaces' do
+        let(:resource) do
+          create(:json_resource,
+            :publish => true,
+            :finding_aid_language_note => 'finding_aid_language_note & finding_aid_language_note'
+          )
+        end
+
+        it "replaces ampersand with &amp;" do
+          document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+          document_xml_string = document.to_xml
+
+          expect(document_xml_string).to include 'finding_aid_language_note &amp; finding_aid_language_note'
+          expect(document_xml_string).to_not include 'finding_aid_language_note & finding_aid_language_note'
+        end
+      end
+    end
+
+    context 'when finding_aid_language_note contains an escaped ampersand character in the form of &amp;' do
+      context 'when &amp; is not surrounded with spaces' do
+        let(:resource) do
+          create(:json_resource,
+            :publish => true,
+            :finding_aid_language_note => 'finding_aid_language_note&amp;finding_aid_language_note'
+          )
+        end
+
+        it "does not replace ampersand with &amp;" do
+          document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+          document_xml_string = document.to_xml
+
+          expect(document_xml_string).to include 'finding_aid_language_note&amp;finding_aid_language_note'
+          expect(document_xml_string).to_not include 'finding_aid_language_note&amp;amp;finding_aid_language_note'
+        end
+      end
+
+      context 'when ampersand is surrounded with spaces' do
+        let(:resource) do
+          create(:json_resource,
+            :publish => true,
+            :finding_aid_language_note => 'finding_aid_language_note &amp; finding_aid_language_note'
+          )
+        end
+
+        it "does not replace ampersand with &amp;" do
+          document = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{resource.id}.xml")
+          document_xml_string = document.to_xml
+
+          expect(document_xml_string).to include 'finding_aid_language_note &amp; finding_aid_language_note'
+          expect(document_xml_string).to_not include 'finding_aid_language_note &amp;amp; finding_aid_language_note'
+        end
+      end
+    end
   end
-
-
 
   describe "Test unpublished record EAD exports" do
 
     def get_xml_doc(include_unpublished = false)
       as_test_user("admin") do
         DB.open(true) do
-          doc_for_unpublished_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@unpublished_resource_jsonmodel.id}.xml?include_unpublished=#{include_unpublished}&include_daos=true", true)
+          doc_for_unpublished_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@unpublished_resource_jsonmodel.id}.xml?include_unpublished=#{include_unpublished}&include_daos=true&include_uris=true", true)
 
           doc_nsless_for_unpublished_resource = Nokogiri::XML::Document.parse(doc_for_unpublished_resource)
           doc_nsless_for_unpublished_resource.remove_namespaces!
@@ -1340,6 +1524,8 @@ describe "EAD export mappings" do
 
           unpublished_resource = create(:json_resource,
                                         :publish => false,
+                                        :finding_aid_status => 'in_progress',
+                                        :is_finding_aid_status_published => false,
                                         :linked_agents => [{
                                           :ref => @unpublished_agent.uri,
                                           :role => 'creator'
@@ -1387,6 +1573,9 @@ describe "EAD export mappings" do
       expect(@xml_including_unpublished.xpath('//c').length).to eq(2)
       expect(@xml_including_unpublished.xpath("//c[@id='aspace_#{@published_archival_object.ref_id}'][not(@audience='internal')]").length).to eq(1)
       expect(@xml_including_unpublished.xpath("//c[@id='aspace_#{@unpublished_archival_object.ref_id}'][@audience='internal']").length).to eq(1)
+
+      header = @xml_including_unpublished.xpath('//eadheader')
+      expect(header).to have_attribute('findaidstatus')
     end
 
     it "does not include unpublished items when include_unpublished option is false" do
@@ -1395,6 +1584,9 @@ describe "EAD export mappings" do
 
       item = items.first
       expect(item).not_to have_attribute('audience', 'internal')
+
+      header = @xml_not_including_unpublished.xpath('//eadheader')
+      expect(item).not_to have_attribute('findaidstatus')
     end
 
     it "include the unpublished agent with audience internal when include_unpublished is true" do
@@ -1444,7 +1636,7 @@ describe "EAD export mappings" do
     def get_xml_doc
       as_test_user("admin") do
         DB.open(true) do
-          doc_for_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource_jsonmodel.id}.xml?include_unpublished=true&include_daos=true", true)
+          doc_for_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource_jsonmodel.id}.xml?include_unpublished=true&include_daos=true&include_uris=true", true)
 
           doc_nsless_for_resource = Nokogiri::XML::Document.parse(doc_for_resource)
           doc_nsless_for_resource.remove_namespaces!
@@ -1523,7 +1715,7 @@ describe "EAD export mappings" do
     def get_xml_doc
       as_test_user("admin") do
         DB.open(true) do
-          doc_for_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_unpublished=true&include_daos=true", true)
+          doc_for_resource = get_xml("/repositories/#{$repo_id}/resource_descriptions/#{@resource.id}.xml?include_unpublished=true&include_daos=true&include_uris=true", true)
 
           doc_nsless_for_resource = Nokogiri::XML::Document.parse(doc_for_resource)
           doc_nsless_for_resource.remove_namespaces!

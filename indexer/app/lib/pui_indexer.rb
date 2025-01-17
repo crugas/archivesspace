@@ -104,9 +104,19 @@ class PUIIndexer < PeriodicIndexer
             end
           end
         end
-        doc['fullrecord'] = IndexerCommon.build_fullrecord(record)
+        build_fullrecord(doc, record)
       end
     }
+  end
+
+  def build_fullrecord(doc, record)
+    doc['fullrecord_published'] = IndexerCommon.extract_string_values(record['record'], :published_only)
+  end
+
+  def add_notes(doc, record)
+    if record['record']['notes']
+      doc['notes_published'] = IndexerCommon.extract_string_values(record['record']['notes'], :published_only)
+    end
   end
 
   def add_infscroll_docs(resource_uris, batch)
@@ -150,6 +160,7 @@ class PUIIndexer < PeriodicIndexer
 
     start = Time.now
     checkpoints = []
+    update_mtimes = false
 
     tree_uris = []
 
@@ -190,6 +201,7 @@ class PUIIndexer < PeriodicIndexer
 
       index_batch(batch, nil, :parent_id_field => 'pui_parent_id')
       send_commit
+      update_mtimes = true
     end
 
     if tree_indexer.deletes.length > 0
@@ -205,7 +217,7 @@ class PUIIndexer < PeriodicIndexer
     @unpublished_records.clear()
 
     checkpoints.each do |repository, type, start|
-      @state.set_last_mtime(repository.id, type, start)
+      @state.set_last_mtime(repository.id, type, start) if update_mtimes
     end
 
   end
@@ -213,4 +225,29 @@ class PUIIndexer < PeriodicIndexer
   def stage_unpublished_for_deletion(doc_id)
     @unpublished_records.add(doc_id) if doc_id =~ /#pui$/
   end
+
+  def repositories_updated_action(updated_repositories)
+
+    updated_repositories.each do |repository|
+
+      if !repository['record']['publish']
+
+        # Delete PUI-only Solr documents in case this is the first index run after the repository has been unpublished
+        req = Net::HTTP::Post.new("#{solr_url.path}/update")
+        req['Content-Type'] = 'application/json'
+        delete_request = {:delete => {'query' => "repository:\"#{repository['uri']}\" AND types:pui_only"}}
+        req.body = delete_request.to_json
+        response = do_http_request(solr_url, req)
+        if response.code == '200'
+          Log.info "Deleted PUI-only documents in private repository #{repository['record']['repo_code']}: #{response}"
+        else
+          Log.error "SolrIndexerError when deleting PUI-only records in private repository #{repository['record']['repo_code']}: #{response.body}"
+        end
+
+      end
+
+    end
+
+  end
+  
 end

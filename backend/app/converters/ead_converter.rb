@@ -75,6 +75,20 @@ class EADConverter < Converter
     theleftovers
   end
 
+  def verify_date_type(date_type)
+    date_types = EnumerationValue.filter(
+      :enumeration_id => Enumeration.find(:name => 'date_type').values[:id],
+      :suppressed => 0,
+    ).order(:position).to_a
+    .map { |entry| entry.values[:value] }
+    .reject { |value| value == 'range' }
+
+    unless date_types.include? date_type
+      error_message = "Invalid date type provided: #{date_type}; must be one of: #{date_types}."
+
+      raise EADConverterInvalidDateTypeError, error_message
+    end
+  end
 
   def self.configure
     with 'ead' do |*|
@@ -83,6 +97,13 @@ class EADConverter < Converter
         :finding_aid_language => 'und',
         :finding_aid_script => 'Zyyy'
       }
+
+      @namespace_mappings ||= {}
+      @node.attributes.select {|a| a =~ /^xmlns:/}.each do |k, v|
+        if v == 'http://www.w3.org/1999/xlink'
+          @namespace_mappings[:xlink] = k.sub("xmlns:", "")
+        end
+      end
     end
 
     ignore "titlepage"
@@ -189,13 +210,14 @@ class EADConverter < Converter
 
 
     with 'unitdate' do |node|
-
       norm_dates = (att('normal') || "").sub(/^\s/, '').sub(/\s$/, '').split('/')
       # why were the next 3 lines added?  removed for now, since single dates can stand on their own.
       #if norm_dates.length == 1
       #  norm_dates[1] = norm_dates[0]
       #end
       norm_dates.map! {|d| d =~ /^([0-9]{4}(\-(1[0-2]|0[1-9])(\-(0[1-9]|[12][0-9]|3[01]))?)?)$/ ? d : nil}
+
+      verify_date_type(att('type')) unless att('type').nil?
 
       make :date, {
         :date_type => att('type') || ( norm_dates[1] ? 'inclusive' : 'single' ),
@@ -955,17 +977,16 @@ class EADConverter < Converter
         set ancestor(:resource, :archival_object), :instances, instance
       end
 
-
       make :digital_object, {
              :digital_object_id => SecureRandom.uuid,
              :publish => att('audience') != 'internal',
-             :title => att('title')
+             :title => att('title', :xlink)
            } do |obj|
         obj.file_versions << {
-          :use_statement => att('role'),
-          :file_uri => att('href'),
-          :xlink_actuate_attribute => att('actuate'),
-          :xlink_show_attribute => att('show'),
+          :use_statement => att('role', :xlink),
+          :file_uri => att('href', :xlink),
+          :xlink_actuate_attribute => att('actuate', :xlink),
+          :xlink_show_attribute => att('show', :xlink),
           :publish => att('audience') != 'internal',
         }
         set ancestor(:instance), :digital_object, obj
@@ -1104,3 +1125,5 @@ class EADConverter < Converter
     end
   end
 end
+
+class EADConverterInvalidDateTypeError < StandardError; end;

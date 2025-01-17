@@ -43,7 +43,10 @@ module ASpaceExport
         results = []
         linked = self.linked_agents || []
         linked.each_with_index do |link, i|
-          next if link['role'] == 'creator' || (link['_resolved']['publish'] == false && !include_unpublished)
+          if link['role'] == 'creator' || (link['_resolved']['publish'] == false && !include_unpublished)
+            results << {}
+            next
+          end
           role = link['relator'] ? link['relator'] : (link['role'] == 'source' ? 'fmo' : nil)
 
           agent = link['_resolved'].dup
@@ -91,7 +94,7 @@ module ASpaceExport
 
           node_name = case subject['terms'][0]['term_type']
                       when 'function'; 'function'
-                      when 'genre_form', 'style_period';  'genreform'
+                      when 'genre_form', 'style_period'; 'genreform'
                       when 'geographic', 'cultural_context'; 'geogname'
                       when 'occupation'; 'occupation'
                       when 'topical'; 'subject'
@@ -152,6 +155,21 @@ module ASpaceExport
       end
 
       @archdesc_dates
+    end
+
+    def instances_with_digital_objects
+      instances = self.instances.select { |inst| inst['digital_object']}.compact
+      instances.each do |inst|
+        inst['digital_object']['_resolved']['_is_in_representative_instance'] = inst['is_representative']
+      end
+    end
+
+    def digital_objects
+      self.instances_with_digital_objects.map { |instance| instance['digital_object']['_resolved'] }
+    end
+
+    def instances_with_sub_containers
+      self.instances.select {|inst| inst['sub_container']}.compact
     end
   end
 

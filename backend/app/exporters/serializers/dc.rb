@@ -22,7 +22,7 @@ class DCSerializer < ASpaceExport::Serializer
   private
 
   def _root(dc, xml)
-    schema_locations = "http://purl.org/dc/elements/1.1/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd http://purl.org/dc/terms/ http://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd"
+    schema_locations = "http://purl.org/dc/elements/1.1/ https://dublincore.org/schemas/xmls/qdc/2006/01/06/dc.xsd http://purl.org/dc/terms/ https://dublincore.org/schemas/xmls/qdc/2006/01/06/dcterms.xsd"
 
     dc_root = xml.dc(
                  'xmlns' => 'http://purl.org/dc/elements/1.1/',

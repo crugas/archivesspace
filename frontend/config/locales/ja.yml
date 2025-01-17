@@ -23,6 +23,9 @@ ja:
     date_picker: オープン日付ピッカー
     date_picker_toggle: 日付ピッカーを切り替えます
     defaults: デフォルト値
+    duplicate_resource: 重複したリソース
+    duplicate_resource_confirm_message: このリソースとそのすべてのアーカイブ オブジェクトを複製するジョブが作成されます。
+      レコードの量によっては時間がかかる場合があります。
     edit: 編集
     edit_oai: OAI設定を編集する
     edit_batch: バッチの編集
@@ -39,6 +42,7 @@ ja:
     transfer_record: 転送
     more: もっと
     link_to: リンク先
+    link_to_record: レコードへのリンク
     add_prefix: 追加
     merge_replace: 置換
     merge_add: 追加
@@ -50,12 +54,12 @@ ja:
       [エージェントの比較]ボタンをクリックすると、各レコードからどのフィールドとサブレコードを保持するかを選択するための画面が表示されます。
     merge_agent_from_browse_confirm_message: "選択された最初のエージェントには、後で選択されたレコードがマージされます。その後選択されたすべてのレコードは削除され、リンクされたレコードは選択された最初のエージェントに再リンクされます."
     merge_resource_confirm_message: リソース '%{source}'には、選択したレコードがマージされます。選択したすべてのレコードが削除され、リンクされたレコードはすべてこのリソースに再リンクされます。
-    merge_container_profile_confirm_message: "The container profile '%{target}' will\
-      \ have the selected records merged into it. All selected records will be deleted\
-      \ and any linked records will be re-linked to this resource."
-    batch_merge: "Select the record into which all of the other listed record(s) will\
-      \ merge. Any linked records will be re-linked to this record and all information\
-      \ for the other record(s) will be deleted."
+    merge_container_profile_confirm_message: "The container profile '%{merge_destination}'
+      will have the selected records merged into it. All selected records will be
+      deleted and any linked records will be re-linked to this resource."
+    batch_merge: "Select the record into which all of the other listed record(s) will
+      merge. Any linked records will be re-linked to this record and all information
+      for the other record(s) will be deleted."
     merge_n_records: "Merge %{n} records"
     move: 移動
     move_up_a_level: レベルアップ
@@ -74,6 +78,7 @@ ja:
     suppress: 抑止
     suppress_confirm_title: このレコードを抑止しますか？
     suppress_confirm_message: 抑制されたレコードはデータベースに残っていますが、ほとんどのユーザーには表示されなくなり、ほとんどの機能では使用できなくなります。
+    toggle_dropdown_menu: ドロップダウンメニューを切り替える
     transfer: 転送
     transfer_confirm_title: このレコードを転送しますか？
     transfer_confirm_message: レコード '%{target}'は選択したリポジトリに転送されます
@@ -89,17 +94,17 @@ ja:
     move_ordering_problem_message: レコード移動発注の問題
     delete: 削除
     delete_confirm_title: このレコードを削除しますか？ %{title}
-    delete_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。 </p><p>このアクションは、レコードをデータベースから削除します。これには、他のレコードに対する参照も含まれます。\
-      \ </p>"
+    delete_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。 </p><p>このアクションは、レコードをデータベースから削除します。これには、他のレコードに対する参照も含まれます。
+      </p>"
     delete_repository_confirm_title: このリポジトリを削除しますか？ %{name}
-    delete_repository_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。\
-      \ </p><p>このアクションは、 <strong>リポジトリ</strong>および関連するすべてのレコードをデータベースから削除し<strong>ます</strong>\
-      \ 。これには、他のレコードへの参照も含まれます。 </p><p>続行するには、下記の '%{repository}'を入力してください： </p><p><input\
-      \ id='deleteRepoConfim' data-confirm-answer='%{repository}'></input></p>"
+    delete_repository_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。
+      </p><p>このアクションは、 <strong>リポジトリ</strong>および関連するすべてのレコードをデータベースから削除し<strong>ます</strong>
+      。これには、他のレコードへの参照も含まれます。 </p><p>続行するには、下記の '%{repository}'を入力してください： </p><p><input
+      id='deleteRepoConfim' data-confirm-answer='%{repository}'></input></p>"
     delete_multiple: レコードの削除
     delete_multiple_confirm_title: レコードを削除しますか？
-    delete_multiple_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。\
-      \ </p><p>このアクションは、他のレコードに対する参照を含めて、これらのレコードをデータベースから削除します。 </p>"
+    delete_multiple_confirm_message: "<p> <strong>この操作を元に戻すことはできませんので</strong>ご注意ください。
+      </p><p>このアクションは、他のレコードに対する参照を含めて、これらのレコードをデータベースから削除します。 </p>"
     reset: デフォルトにリセット
     reset_confirm_title: "％{preftype}をアプリケーションのデフォルトにリセットしますか？"
     reset_confirm_message: "<p><strong>この操作を元に戻すことはできません</strong>。</p><p>このアクションにより、設定がアプリケーションのデフォルトにリセットされます。</p>"
@@ -118,23 +123,23 @@ ja:
     finish_editing: レコードを閉じる
     merge: 行きます
     form_changes_message: "<small><span class='muted'>保存していない変更があります</span></small>"
-    toolbar_disabled_message: "<small><span class='muted'>変更を保存していない - 保存または元に戻してツールバーとレコードツリーにアクセスする</span></small>"
+    toolbar_disabled_message: 未保存の変更があります - ツールバーとレコード ツリーにアクセスするには、保存するか元に戻してください
     publish: すべてを公開
     publish_confirm_title: 公開しますか？
-    publish_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層内のすべてのコンポーネントが公開されます。\
-      \ </p>"
+    publish_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層内のすべてのコンポーネントが公開されます。
+      </p>"
     unpublish: すべてを非公開
     unpublish_confirm_title: 非公開にしますか？
-    unpublish_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層内のすべてのコンポーネントが非公開されます。\
-      \ </p>"
+    unpublish_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層内のすべてのコンポーネントが非公開されます。
+      </p>"
     publish_archival_object: すべてを公開
     publish_archival_object_confirm_title: 公開しますか？
-    publish_archival_object_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層の下位すべてのコンポーネントが公開されます。\
-      \ </p>"
+    publish_archival_object_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層の下位すべてのコンポーネントが公開されます。
+      </p>"
     unpublish_archival_object: すべてを非公開
     unpublish_archival_object_confirm_title: 非公開にしますか？
-    unpublish_archival_object_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層の下位すべてのコンポーネントが非公開されます。\
-      \ </p>"
+    unpublish_archival_object_confirm_message: "<p>このアクションを実行すると、このレコード、サブレコード（外部文書、注釈など）および階層の下位すべてのコンポーネントが非公開されます。
+      </p>"
     view_search_results: 検索結果に移動
     view_published: ビューの公開
     print_to_pdf: PDFを生成
@@ -151,12 +156,14 @@ ja:
     add_event_event_type: タイプ
     transfer_failed_top_containers_in_use: 次の最上位コンテナは、このリポジトリ内の他の最上位レコードにリンクされており、これらのリンクが切断されるまで転送できません。
     container_template: コンテナテンプレートのダウンロード
+    digital_object_template: デジタル オブジェクト テンプレートをダウンロード
     run: 実行
     check_all: すべてチェック
     uncheck_all: すべてチェックを外します
+    download: ダウンロード
   database_warning:
-    message: "<p> <strong>データベース警告：</strong>現在組み込みデータベース（Apache Derby）を使用しています。組込みデータベースは、テスト/デモ目的のみのものです。実稼働環境に移行する予定のテストインスタンス内のデータを含む、実稼働用の任意のデータにMySQLを使用する必要があります。\
-      \ </p>"
+    message: "<p> <strong>データベース警告：</strong>現在組み込みデータベース（Apache Derby）を使用しています。組込みデータベースは、テスト/デモ目的のみのものです。実稼働環境に移行する予定のテストインスタンス内のデータを含む、実稼働用の任意のデータにMySQLを使用する必要があります。
+      </p>"
 
   states:
     auto_generated: 保存時にシステムが生成される
@@ -164,8 +171,8 @@ ja:
   export_options:
     include_unpublished: 未発表を含める
     include_daos: "&lt;dao&gt;タグを含める"
+    include_uris: URIを含める
     numbered_cs: 番号付きの&lt;c&gt;タグを使用する
-    print_pdf: PDFへの印刷
     ead3: EAD3スキーマ
     use_mods: MODSを使用する
     use_dc: ダブリンコアを使用する
@@ -622,6 +629,8 @@ ja:
     no_results: 一致する結果はありません。 「ブラウズ」を試みてください。
     searching: 検索中...
     delete: "×"
+    components:
+      browse: コンポーネントを参照する
 
   mixed_content:
     wrap_prefix: ラップ：
@@ -691,24 +700,25 @@ ja:
     error_404_message: アクセスしようとしたレコードが存在しなくなったり、アクセス権を持っていない可能性があります。
     error_tree_pane_ajax: このフォームの読み込み中にエラーが発生しました。
     merge_conflict: エージェントをマージできませんでした： %{message}
-    merge_too_many_victims: 詳細なマージのために選択できるエージェントは1つだけです.
+    merge_too_many_merge_candidates: 詳細なマージのために選択できるエージェントは1つだけです.
     merge_different_types: 詳細なマージのために選択されたエージェントは、同じタイプでなければなりません.
     linked_to_assessment: レコードは評価にリンクされているため削除できません
-
+    linked_to_user: レコードはユーザーにリンクされているため削除できません
     cannot_delete_repository_agent: このエージェントはリポジトリにリンクされているため、削除できません。
     merge_denied_relationship: これらのエージェントには関係があります。マージを続行する前に、関係を削除してください。
   accession:
     _frontend:
       messages:
-        created: アクセッション<strong>%{accession.display_string}</strong>作成されました
-        unsuppressed: アクセシビリティ<strong>%{accession.display_string}</strong>抑制されていません
-        updated: アクセス権<strong>%{accession.display_string}</strong>更新されました
-        suppressed: アクセシビリティ<strong>%{accession.display_string}</strong>抑制されました
+        created: アクセッション<strong>%{accession_display_string}</strong>作成されました
+        unsuppressed: アクセシビリティ<strong>%{accession_display_string}</strong>抑制されていません
+        updated: アクセス権<strong>%{accession_display_string}</strong>更新されました
+        suppressed: アクセシビリティ<strong>%{accession_display_string}</strong>抑制されました
         suppressed_info: アクセッションは抑制され、編集できません
-        deleted: アクセッション<strong>%{accession.display_string}</strong>削除されました
+        deleted: アクセッション<strong>%{accession_display_string}</strong>削除されました
         transfer_description: このアクセス権を以下に転送します...
         transfer_target: 移行するリポジトリを選択する
-        spawned: このアクセッションはAccession <strong>%{accession.display_string}</strong>から生成されました<strong>%{accession.display_string}</strong>
+        spawned: このアクセッションはAccession 
+          <strong>%{accession_display_string}</strong>から生成されました<strong>%{accession_display_string}</strong>
         delete_conflict: アクセッションを削除できませんでした： <pre> %{error} </pre>
       section:
         basic_information: 基本情報
@@ -722,7 +732,7 @@ ja:
         created: 作成されたエージェント
         updated: エージェントが保存されました
         deleted: エージェントが削除されました
-        published: 「エージェント<strong>％{agent.title}</strong>、そのサブレコードとコンポーネントが公開されました」
+        published: 「エージェント<strong>％{agent_title}</strong>、そのサブレコードとコンポーネントが公開されました」
         delete_conflict: エージェントを削除できませんでした： <pre> %{error} </pre>
         merge_description: マージするエージェントを選択する
         merged: エージェントが結合されました
@@ -741,8 +751,8 @@ ja:
         contacts: 連絡先の詳細
         search_embedded: リンクされたレコード
         linked_via_rights_statement: 権利声明によるリンクされたレコード
-        target_record: このレコードは更新されます
-        victim_record: このレコードは削除されます
+        merge_destination_record: このレコードは更新されます
+        merge_candidate_record: このレコードは削除されます
       action:
         create: エージェントを作成する
         preview: マージプレビュー
@@ -785,19 +795,25 @@ ja:
     external_ark_url_tooltip: External ARK URL Tooltip
     _frontend:
       messages:
-        created: リソース<strong>%{resource.title}</strong>アーカイブオブジェクト<strong>%{archival_object.display_string}</strong>が作成されました
-        created_with_parent: リソース<strong>%{resource.title}</strong>上の<strong>%{parent.display_string}</strong>子として作成されたアーカイブオブジェクト<strong>%{archival_object.display_string}</strong>
-          <strong>%{resource.title}</strong>
-        updated: アーカイブオブジェクト<strong>%{archival_object.display_string}</strong>更新されました
-        updated_with_parent: アーカイブオブジェクト<strong>%{archival_object.display_string}</strong>更新されました
+        created: 
+          リソース<strong>%{resource_title}</strong>アーカイブオブジェクト<strong>%{archival_object_display_string}</strong>が作成されました
+        duplicated: アーカイブ オブジェクトが <strong>%{archival_object_display_string}</strong>
+          から複製されました
+        created_with_parent: 
+          リソース<strong>%{resource_title}</strong>上の<strong>%{parent.display_string}</strong>子として作成されたアーカイブオブジェクト<strong>%{archival_object_display_string}</strong>
+          <strong>%{resource_title}</strong>
+        updated: アーカイブオブジェクト<strong>%{archival_object_display_string}</strong>更新されました
+        updated_with_parent: アーカイブオブジェクト<strong>%{archival_object_display_string}</strong>更新されました
         please_select_a_resource_for_transfer: リソースを選択してください
-        transfer_success: アーカイブオブジェクト<strong>%{archival_object.display_string}</strong>をリソース<strong>%{resource.title}</strong>転送しました<strong>%{resource.title}</strong>
+        transfer_success: 
+          アーカイブオブジェクト<strong>%{archival_object_display_string}</strong>をリソース<strong>%{resource_title}</strong>転送しました<strong>%{resource_title}</strong>
         transfer_error: エラーまたは競合のためアーカイブオブジェクトを転送できません： <pre> %{exception} </pre>
-        deleted: アーカイブオブジェクト<strong>%{archival_object.display_string}</strong>削除されました
+        deleted: アーカイブオブジェクト<strong>%{archival_object_display_string}</strong>削除されました
         published: アーカイブオブジェクト<strong>%{archival_object.title}</strong> 、そのサブレコードとコンポーネントが公開されました
         unpublished: アーカイブオブジェクト<strong>%{archival_object.title}</strong> 、そのサブレコードとコンポーネントが非公開されました
         unsuppressed: アーカイブオブジェクト<strong>%{archival_object.title}</strong>抑制されていません
-        suppressed: アーカイブオブジェクト<strong>%{archival_object.title}</strong>され<strong>%{archival_object.title}</strong>
+        suppressed: 
+          アーカイブオブジェクト<strong>%{archival_object.title}</strong>され<strong>%{archival_object.title}</strong>
         suppressed_info: アーカイブオブジェクトは抑制されており、編集できません
         has_unpublished_ancestor: このレコードには未発表の祖先があることにご注意ください。
         delete_conflict: アーカイブオブジェクトを削除できませんでした： <pre> %{error} </pre>
@@ -806,17 +822,19 @@ ja:
       action:
         add_child: 子を追加
         add_sibling: 兄弟を追加
+        add_duplicate: 重複を追加
         save: アーカイブオブジェクトを保存する
         bulk_import: スプレッドシートを介して負荷
       tree:
         new_record_title: 新しいアーカイブオブジェクト
+        duplicated_record_title: 重複したアーカイブ オブジェクトの作成
 
   classification:
     _frontend:
       messages:
-        created: 分類<strong>%{classification.title}</strong>作成されました
-        updated: 分類<strong>%{classification.title}</strong>更新されました
-        deleted: 分類<strong>%{classification.title}</strong>削除されました
+        created: 分類<strong>%{classification_title}</strong>作成されました
+        updated: 分類<strong>%{classification_title}</strong>更新されました
+        deleted: 分類<strong>%{classification_title}</strong>削除されました
       section:
         basic_information: 基本情報
         search_embedded: リンクされたレコード
@@ -881,17 +899,18 @@ ja:
   digital_object:
     _frontend:
       messages:
-        created: デジタルオブジェクト<strong>%{digital_object.title}</strong>作成
-        updated: デジタルオブジェクト<strong>%{digital_object.title}</strong>更新
-        deleted: デジタルオブジェクト<strong>%{digital_object.title}</strong>削除されました
-        published: デジタルオブジェクト<strong>%{digital_object.title}</strong> 、そのサブレコードとコンポーネントが公開されました
+        created: デジタルオブジェクト<strong>%{digital_object_title}</strong>作成
+        updated: デジタルオブジェクト<strong>%{digital_object_title}</strong>更新
+        deleted: デジタルオブジェクト<strong>%{digital_object_title}</strong>削除されました
+        published: デジタルオブジェクト<strong>%{digital_object_title}</strong> 、そのサブレコードとコンポーネントが公開されました
         merge_description: 以下のデジタルオブジェクトを選択してマージする
         please_select_a_digital_object_to_merge: デジタルオブジェクトを選択してください
         merged: デジタルオブジェクトが結合されました
         transfer_description: このリソースを転送する...
         transfer_target: 移行するリポジトリを選択する
-        unsuppressed: デジタルオブジェクト<strong>%{digital_object.title}</strong>抑制されていません
-        suppressed: デジタルオブジェクト<strong>%{digital_object.title}</strong>され<strong>%{digital_object.title}</strong>
+        unsuppressed: デジタルオブジェクト<strong>%{digital_object_title}</strong>抑制されていません
+        suppressed: 
+          デジタルオブジェクト<strong>%{digital_object_title}</strong>され<strong>%{digital_object_title}</strong>
         suppressed_info: デジタルオブジェクトが抑制され、編集できない
         delete_conflict: デジタルオブジェクトを削除できませんでした： <pre> %{error} </pre>
       section:
@@ -904,14 +923,21 @@ ja:
   digital_object_component:
     _frontend:
       messages:
-        created_with_parent: デジタルオブジェクト<strong>%{digital_object_component.display_string}</strong>の<strong>%{parent.display_string}</strong>子として作成されたデジタルオブジェクトコンポーネント<strong>%{digital_object.title}</strong>
-        created: デジタルオブジェクト<strong>%{digital_object_component.display_string}</strong>作成されたデジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>
-          <strong>%{digital_object.title}</strong>
-        updated_with_parent: デジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>更新されました
-        updated: デジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>更新されました
-        deleted: デジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>削除されました
-        unsuppressed: デジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>抑制されていません
-        suppressed: デジタルオブジェクトコンポーネント<strong>%{digital_object_component.display_string}</strong>抑制されました
+        created_with_parent: 
+          デジタルオブジェクト<strong>%{digital_object_component_display_string}</strong>の<strong>%{parent.display_string}</strong>子として作成されたデジタルオブジェクトコンポーネント<strong>%{digital_object_title}</strong>
+        created: 
+          デジタルオブジェクト<strong>%{digital_object_component_display_string}</strong>作成されたデジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>
+          <strong>%{digital_object_title}</strong>
+        updated_with_parent: 
+          デジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>更新されました
+        updated: 
+          デジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>更新されました
+        deleted: 
+          デジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>削除されました
+        unsuppressed: 
+          デジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>抑制されていません
+        suppressed: 
+          デジタルオブジェクトコンポーネント<strong>%{digital_object_component_display_string}</strong>抑制されました
         suppressed_info: デジタルオブジェクトコンポーネントは非表示で編集できません
         has_unpublished_ancestor: このレコードには未発表の祖先があることにご注意ください。
       section:
@@ -999,9 +1025,14 @@ ja:
     _plural: 言語
 
   linked_agent:
+    is_primary: 主要な
     _frontend:
       action:
         add: エージェントリンクを追加
+        make_primary: プライマリにする
+        make_primary_tooltip: |
+          <p>レコードにリンクされているエージェントがプライマリ エージェントであることを示すために使用します。 リンクされたエージェントは 1 つだけプライマリとして指定できます。</p>
+          <p>MARCXML エクスポートでは、プライマリ エージェントは 1XX 値になります。</p>
 
   linked_record:
     _frontend:
@@ -1025,8 +1056,8 @@ ja:
         batch_edit: バッチ場所の編集
         save: 位置を保存
         single: 単一の場所
-        delete_confirm_message: "<p> <strong>この操作を元に戻す</strong>こと<strong>はできませんので</strong>ご注意ください<strong>。</strong>\
-          \ 。 </p><p>この場所が現在1つ以上のインスタンスにリンクされている場合、削除することはできません。 </p>"
+        delete_confirm_message: "<p> <strong>この操作を元に戻す</strong>こと<strong>はできませんので</strong>ご注意ください<strong>。</strong>
+          。 </p><p>この場所が現在1つ以上のインスタンスにリンクされている場合、削除することはできません。 </p>"
         show_space_calculator: スペース計算機で探す
 
   location_batch:
@@ -1039,7 +1070,8 @@ ja:
         updated: "<strong>%{number_created}場所が</strong>更新されました"
         location_batch_info: 下の<strong>座標範囲</strong>から生成されたすべての場所に適用される基準値を定義します。
         location_batch_update_info: 適用する値を入力してください。
-        ranges_info: 上記の<strong>ベースロケーションに</strong>入力された座標フィールドは、以下の範囲で生成された値に置き換えられます。最大%{max_range}場所が作成されます。
+        ranges_info: 
+          上記の<strong>ベースロケーションに</strong>入力された座標フィールドは、以下の範囲で生成された値に置き換えられます。最大%{max_range}場所が作成されます。
         number_to_create: 場所の数
         warning: 範囲のサイズによっては、このプロセスが完了するまでに数分かかる場合があります。
       action:
@@ -1059,7 +1091,6 @@ ja:
         add: 名前フォームを追加
         make_authorized: 権限のある名前を作る
         make_display_name: 表示名を作る
-        make_primary: プライマリにする
 
   note:
     _frontend:
@@ -1125,16 +1156,16 @@ ja:
         deleted: リポジトリが削除されました
         selected: リポジトリは現在選択されています
         selected_short: 選択された
-        changed: リポジトリ<strong>%{repository.repo_code}</strong>がアクティブになりました
+        changed: リポジトリ<strong>%{repository_repo_code}</strong>がアクティブになりました
         create_first_repository: 最初のリポジトリを作成するには、上記の「 <strong>システム」</strong>メニューをクリックしてから、「リポジトリの管理」をクリック<strong>します</strong>
           。
-        no_access_to_repositories: "<p>リポジトリにアクセスすることはできません。 </p><p>システム管理者に連絡してアクセスをリクエストしてください。\
-          \ </p>"
+        no_access_to_repositories: "<p>リポジトリにアクセスすることはできません。 </p><p>システム管理者に連絡してアクセスをリクエストしてください。
+          </p>"
         continue_with_transfer: 転送を続行しますか？
         transfer_failed: 次のエラーが原因で転送が完了できませんでした
         transfer_target: 移行するリポジトリを選択する
-        transfer_warning: "<strong>警告：</strong>このリポジトリを転送すると、 <strong>すべて</strong>のレコードが選択したリポジトリに移動<strong>し</strong>ます。\
-          \ <strong>この操作は元に戻すことはできません</strong>"
+        transfer_warning: "<strong>警告：</strong>このリポジトリを転送すると、 <strong>すべて</strong>のレコードが選択したリポジトリに移動<strong>し</strong>ます。
+          <strong>この操作は元に戻すことはできません</strong>"
         cannot_delete_nonempty: 削除できません - リポジトリは空ではありません
       section:
         all_fields: リポジトリフィールド
@@ -1152,19 +1183,20 @@ ja:
   resource:
     _frontend:
       messages:
-        created: リソース<strong>%{resource.title}</strong>作成されました
-        updated: リソース<strong>%{resource.title}</strong>更新されました
-        spawned: アクセシビリティ<strong>%{accession.display_string}</strong>から新しいリソースが生成されました<strong>%{accession.display_string}</strong>
-        deleted: リソース<strong>%{resource.title}</strong>削除されました
-        published: リソース<strong>%{resource.title}</strong> 、そのサブレコードとコンポーネントが公開されました
-        unpublished: リソース<strong>%{resource.title}</strong> 、そのサブレコードとコンポーネントが非公開されました
+        created: リソース<strong>%{resource_title}</strong>作成されました
+        updated: リソース<strong>%{resource_title}</strong>更新されました
+        spawned: 
+          アクセシビリティ<strong>%{accession_display_string}</strong>から新しいリソースが生成されました<strong>%{accession_display_string}</strong>
+        deleted: リソース<strong>%{resource_title}</strong>削除されました
+        published: リソース<strong>%{resource_title}</strong> 、そのサブレコードとコンポーネントが公開されました
+        unpublished: リソース<strong>%{resource_title}</strong> 、そのサブレコードとコンポーネントが非公開されました
         merge_description: 以下のリソースを選択してマージする
         please_select_a_resource_to_merge: リソースを選択してください
         merged: 結合されたリソース
         transfer_description: このリソースを転送する...
         transfer_target: 移行するリポジトリを選択する
-        unsuppressed: リソース<strong>%{resource.title}</strong>抑制されていません
-        suppressed: リソース<strong>%{resource.title}</strong>されません
+        unsuppressed: リソース<strong>%{resource_title}</strong>抑制されていません
+        suppressed: リソース<strong>%{resource_title}</strong>されません
         suppressed_info: リソースは抑制され、編集できません
         delete_conflict: リソースを削除できませんでした： <pre> %{error} </pre>
       section:
@@ -1330,26 +1362,27 @@ ja:
         <small><span class="span3">セルからセルへジャンプ：</span> SHIFT +矢印キー</small> </div><div
         class="row"> <small><span class="span3">最後の行から新しい行を作成する：</span> SHIFT + Return</small>
         </div>
-      sticky_columns: "<div> <strong>スティッキー列</strong> </div><div> <small>強調表示された列はスティッキーで、新しい行が追加されるとレプリケートされます。対応する表の見出しをクリックして、「スティッキー」を切り替えます。</small>\
-        \ </div><div> <small>[ <strong>Add Row</strong> ] <strong>を</strong>クリックすると、最後の行から値がコピーされます。行の<strong>+</strong>ボタンは、現在フォーカスされている行の値をコピーします。</small>\
-        \ </div>"
-      fill_column: "<div> <strong>行の塗りつぶし - 基本</strong> </div><div> <small>単一の値を持つ列を埋めるために、\
-        \ <strong>列を塗りつぶし</strong>クリックし、[ <strong>基本</strong>設定]タブの下で、ターゲット<strong>列を</strong>選択し、目的の<strong>フィル値を</strong>入力して、\
-        \ <strong>塗りつぶしを適用</strong> ] <strong>を</strong>クリックします。</small> </div><br/><div>\
-        \ <strong>行の塗りつぶし - シーケンス</strong> </div><div> <small>シーケンスを列に適用するには、[ <strong>列</strong>を<strong>塗りつぶす</strong>\
-        \ ]をクリックし、[ <strong>シーケンス</strong> ]タブで目的の<strong>列</strong>を選択し、[ <strong>塗りつぶし値]</strong>フィールドを入力して目的のシーケンスを生成します。生成されたシーケンスがフォームの行数を満たさない場合、警告が表示されます。</small>\
-        \ </div>"
-      resize_and_reorder_columns: "<div> <strong>列の並べ替え</strong> </div><div> <small>[\
-        \ <strong>列の並べ替え]を</strong>クリックして、 <strong>並べ替え</strong>たい行を選択し、上下の矢印ボタンを使用してリスト内の位置を変更します。新しいオーダーに満足したら、「\
-        \ <strong>オーダーの適用</strong> 」をクリックします</small> </div>"
-      reset: "<div> <strong>フォームをリセット</strong> </div><div> <small>[ <strong>リセット]</strong>をクリックしてフォームを消去し、カラムのスティッキー、表示および順序をデフォルト値に戻します。</small>\
-        \ </div>"
+      sticky_columns: "<div> <strong>スティッキー列</strong> </div><div> <small>強調表示された列はスティッキーで、新しい行が追加されるとレプリケートされます。対応する表の見出しをクリックして、「スティッキー」を切り替えます。</small>
+        </div><div> <small>[ <strong>Add Row</strong> ] <strong>を</strong>クリックすると、最後の行から値がコピーされます。行の<strong>+</strong>ボタンは、現在フォーカスされている行の値をコピーします。</small>
+        </div>"
+      fill_column: "<div> <strong>行の塗りつぶし - 基本</strong> </div><div> <small>単一の値を持つ列を埋めるために、
+        <strong>列を塗りつぶし</strong>クリックし、[ <strong>基本</strong>設定]タブの下で、ターゲット<strong>列を</strong>選択し、目的の<strong>フィル値を</strong>入力して、
+        <strong>塗りつぶしを適用</strong> ] <strong>を</strong>クリックします。</small> </div><br/><div>
+        <strong>行の塗りつぶし - シーケンス</strong> </div><div> <small>シーケンスを列に適用するには、[ <strong>列</strong>を<strong>塗りつぶす</strong>
+        ]をクリックし、[ <strong>シーケンス</strong> ]タブで目的の<strong>列</strong>を選択し、[ <strong>塗りつぶし値]</strong>フィールドを入力して目的のシーケンスを生成します。生成されたシーケンスがフォームの行数を満たさない場合、警告が表示されます。</small>
+        </div>"
+      resize_and_reorder_columns: "<div> <strong>列の並べ替え</strong> </div><div> <small>[
+        <strong>列の並べ替え]を</strong>クリックして、 <strong>並べ替え</strong>たい行を選択し、上下の矢印ボタンを使用してリスト内の位置を変更します。新しいオーダーに満足したら、「
+        <strong>オーダーの適用</strong> 」をクリックします</small> </div>"
+      reset: "<div> <strong>フォームをリセット</strong> </div><div> <small>[ <strong>リセット]</strong>をクリックしてフォームを消去し、カラムのスティッキー、表示および順序をデフォルト値に戻します。</small>
+        </div>"
 
   update_monitor:
     save_failed: "<strong>変更を保存できませんでした</strong>"
     stale_record: このレコードは別のユーザーによって更新されました。最新バージョンにアクセスするには、ページを更新してください。
     other_editors: このレコードは現在、別のユーザーによって編集中です。競合が発生しないように、次のユーザーにご連絡ください： <strong>%{user_ids}</strong>
-    repository_changed: アクティブなリポジトリが変更されたため、このレコードを保存することはできません。このレコードを保存するには、別のウィンドウを開き、アクティブなリポジトリをリセットします。
+    repository_changed: 
+      アクティブなリポジトリが変更されたため、このレコードを保存することはできません。このレコードを保存するには、別のウィンドウを開き、アクティブなリポジトリをリセットします。
 
   job:
     _frontend:
@@ -1382,12 +1415,15 @@ ja:
         queue_position_next: このジョブは次のキューにあります。
         queue_position: このジョブはキュー内の%{position}です。
         drag_and_drop_hint: ここにファイルをドラッグ＆ドロップする
-        find_and_replace_warning: 検索と置換ジョブは、データベースに大きな変更を加えることができます。先に進む前に、データベースをバックアップし、テストインスタンスでジョブを実行することを<strong>強く</strong>お勧めします。
+        find_and_replace_warning: 
+          検索と置換ジョブは、データベースに大きな変更を加えることができます。先に進む前に、データベースをバックアップし、テストインスタンスでジョブを実行することを<strong>強く</strong>お勧めします。
           「取り消し」はありません。
-        find_and_replace_instructions: この検索および置換操作の範囲を指定するベースレコードを選択します。ターゲットとなるレコードタイプとそのタイプのプロパティを選択します。操作は、ベースレコードのツリー内のすべてのターゲットレコード、またはターゲットタイプが「リソース」の場合はベースレコード自体で実行されます。
+        find_and_replace_instructions: 
+          この検索および置換操作の範囲を指定するベースレコードを選択します。ターゲットとなるレコードタイプとそのタイプのプロパティを選択します。操作は、ベースレコードのツリー内のすべてのターゲットレコード、またはターゲットタイプが「リソース」の場合はベースレコード自体で実行されます。
         report_instructions: 選択ボタンを使用して実行するレポートを<b>選択し</b>ます。
         slug_lost_warning: <b>警告！ </b>自動生成されたスラグはすべて再生されます。このジョブは、すべてのリポジトリにまたがるすべてのレコードに適用されます。
-        slug_generation: このジョブはスラッグを生成し、すべての<b>リソース</b>、<b>アーカイブオブジェクト</b>、<b>デジタルオブジェクト</b>、<b>デジタルオブジェクトコンポーネントのスラッグ自動生成ボックスをオンにします。
+        slug_generation: 
+          このジョブはスラッグを生成し、すべての<b>リソース</b>、<b>アーカイブオブジェクト</b>、<b>デジタルオブジェクト</b>、<b>デジタルオブジェクトコンポーネントのスラッグ自動生成ボックスをオンにします。
           </b>、<b>登録</b>、<b>分類</b>、<b>エージェント</b>、<b>サブジェクト</b>、<b> <b>リポジトリ</b> それはまだナメクジを持っていません。
           <br /> <em>手動で追加されたスラグは、自動生成ボックスをオンにして置き換える必要があることをそれらのレコードに示さない限り、変更されません。
         slug_config_msg: <b> config.rbの設定に基づきます。</b>
@@ -1414,23 +1450,23 @@ ja:
 
   sub_container:
     top_container: トップコンテナ
-    top_container_tooltip: "<p>必要なフィールド。記載された材料が収容されている最高レベルの容器。 </p><p>先行タイプまたは参照機能を使用して既存のトップコンテナのリストから選択するか、または作成機能を使用して作成することができます。\
-      \ </p>"
+    top_container_tooltip: "<p>必要なフィールド。記載された材料が収容されている最高レベルの容器。 </p><p>先行タイプまたは参照機能を使用して既存のトップコンテナのリストから選択するか、または作成機能を使用して作成することができます。
+      </p>"
     type_2: 子供のタイプ
-    type_2_tooltip: "<p>記載された材料が格納されている第2レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。\
-      \ </p>"
+    type_2_tooltip: "<p>記載された材料が格納されている第2レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。
+      </p>"
     indicator_2: 子指標
-    indicator_2_tooltip: "<p>第2レベルコンテナのIDを示すための英数字式。コンテナのシーケンス内の第2レベルコンテナの位置を示すこともあります。第2レベルコンテナのバルク範囲も許容されます（たとえば、フォルダ1〜16）。\
-      \ </p>"
+    indicator_2_tooltip: "<p>第2レベルコンテナのIDを示すための英数字式。コンテナのシーケンス内の第2レベルコンテナの位置を示すこともあります。第2レベルコンテナのバルク範囲も許容されます（たとえば、フォルダ1〜16）。
+      </p>"
     barcode_2: 子供コンテナバーコード
     barcode_2_tooltip: |
       "<p>説明材料が収容された第二のレベルのコンテナを識別するためのバーコード</p>"
     type_3: 孫型
-    type_3_tooltip: "<p>記載された材料が格納されている第3レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。\
-      \ </p>"
+    type_3_tooltip: "<p>記載された材料が格納されている第3レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。
+      </p>"
     indicator_3: 孫のインジケータ
-    indicator_3_tooltip: "<p>第3レベルのコンテナのIDを示すための英数字式。このコンテナのシーケンス内の第2レベルのコンテナの位置も示すことができます。第3レベルコンテナのバルク範囲も許容されます（例：フォルダ1〜16）。\
-      \ </p>"
+    indicator_3_tooltip: "<p>第3レベルのコンテナのIDを示すための英数字式。このコンテナのシーケンス内の第2レベルのコンテナの位置も示すことができます。第3レベルコンテナのバルク範囲も許容されます（例：フォルダ1〜16）。
+      </p>"
     _singular: サブコンテナ
     _plural: サブコンテナ
     _frontend:
@@ -1441,8 +1477,8 @@ ja:
     container_profile: コンテナプロファイル
     container_profile_tooltip: "<p>次元を含む特定の種類のコンテナのさまざまな特性の説明。 </p>"
     indicator: インジケータ
-    indicator_tooltip: "<p>必要なフィールド。最高レベルのコンテナの場所を示す英数字式。コンテナのシーケンス内のコンテナの位置でもあります。\
-      \ </p>"
+    indicator_tooltip: "<p>必要なフィールド。最高レベルのコンテナの場所を示す英数字式。コンテナのシーケンス内のコンテナの位置でもあります。
+      </p>"
     barcode: バーコード
     barcode_tooltip: "<p>最高レベルのコンテナを一意に識別するバーコードを記録するために使用されます。 </p>"
     type: コンテナタイプ
@@ -1458,17 +1494,17 @@ ja:
     has_location: 場所がある
 
     managed_container_2_type: 子コンテナタイプ
-    managed_container_2_type_tooltip: "<p>記載された材料が格納されている第2レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。\
-      \ </p>"
+    managed_container_2_type_tooltip: "<p>記載された材料が格納されている第2レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。
+      </p>"
     managed_container_2_indicator: 子コンテナインジケータ
-    managed_container_2_indicator_tooltip: "<p>第2レベルコンテナのIDを示すための英数字式。コンテナのシーケンス内の第2レベルコンテナの位置を示すこともあります。第2レベルコンテナのバルク範囲も許容されます（たとえば、フォルダ1〜16）。\
-      \ </p>"
+    managed_container_2_indicator_tooltip: "<p>第2レベルコンテナのIDを示すための英数字式。コンテナのシーケンス内の第2レベルコンテナの位置を示すこともあります。第2レベルコンテナのバルク範囲も許容されます（たとえば、フォルダ1〜16）。
+      </p>"
     managed_container_3_type: お孫さんコンテナタイプ
-    managed_container_3_type_tooltip: "<p>記載された材料が格納されている第3レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。\
-      \ </p>"
+    managed_container_3_type_tooltip: "<p>記載された材料が格納されている第3レベルコンテナのタイプ。 </p><p>この管理された値リストの値は変更することができます。
+      </p>"
     managed_container_3_indicator: 孫のコンテナインジケータ
-    managed_container_3_indicator_tooltip: "<p>第3レベルのコンテナのIDを示すための英数字式。このコンテナのシーケンス内の第2レベルのコンテナの位置も示すことができます。第3レベルコンテナのバルク範囲も許容されます（例：フォルダ1〜16）。\
-      \ </p>"
+    managed_container_3_indicator_tooltip: "<p>第3レベルのコンテナのIDを示すための英数字式。このコンテナのシーケンス内の第2レベルのコンテナの位置も示すことができます。第3レベルコンテナのバルク範囲も許容されます（例：フォルダ1〜16）。
+      </p>"
     barcode_length_for_this_repository: このリポジトリのバーコード長：
     characters: 文字
     batch_delete:
@@ -1534,12 +1570,12 @@ ja:
         batch_merge_confirm_question: 以下にリストされているように、最上位のコンテナーをマージしてもよろしいですか？ このアクションは元に戻せません。
         batch_merge_container_profile_too_many_warning: これらのトップコンテナが別のコンテナプロファイルを有します。これらのコンテナプロファイルはいずれも、ターゲットコンテナにマージしません。
         batch_merge_container_profile_mismatch_warning: これらのトップコンテナは、ターゲットトップ容器とは異なるコンテナプロファイルを持っています。コンテナプロファイルは、ターゲットコンテナにマージしません。
-        batch_merge_confirm_victims: "次の上位コンテナをマージします:"
-        batch_merge_confirm_target: "この一番上のコンテナに:"
+        batch_merge_confirm_merge_candidates: "次の上位コンテナをマージします:"
+        batch_merge_confirm_merge_destination: "この一番上のコンテナに:"
         batch_delete: トップコンテナの削除
         batch_delete_help: 選択したすべてのコンテナを削除します。
         update_n_records: "%{n}レコードを更新する"
-        select_merge_target: マージターゲットを選択
+        select_merge_destination: マージターゲットを選択
         merge_n_records: "%{n} 件記録"
         delete_n_records: "%{n}レコードを削除する"
         update_locations_current_location: 現在位置
@@ -1565,21 +1601,21 @@ ja:
       bulk_operations:
         merge: コンテナプロファイルのマージ
         merge_instructions: リストされている他のすべてのコンテナプロファイルがマージされるコンテナプロファイルを選択します。 リンクされたレコードはすべてこのプロファイルに再リンクされ、他のコンテナプロファイルのすべての情報が削除されます。
-        merge_select_target: マージターゲットを選択
+        merge_select_merge_destination: マージターゲットを選択
         confirm_merge: マージコンテナプロファイルの確認
         confirm_merge_question: 以下にリストされているように、コンテナープロファイルをマージしてもよろしいですか？ このアクションは元に戻せません。
-        confirm_merge_victims: "次のコンテナプロファイルをマージします:"
-        confirm_merge_target: "このコンテナプロファイルに:"
+        confirm_merge_candidates: "次のコンテナプロファイルをマージします:"
+        confirm_merge_destination: "このコンテナプロファイルに:"
     name: 名
-    name_tooltip: "<p>必要なフィールド。コンテナプロファイルの名前。ジェネリックまたは特定のものがあります。 </p><p>例： </p><ul><li>ドキュメントボックス</li><li>ページ15\
-      \ </li><li>小さなカードのファイルボックス</li></ul>"
+    name_tooltip: "<p>必要なフィールド。コンテナプロファイルの名前。ジェネリックまたは特定のものがあります。 </p><p>例： </p><ul><li>ドキュメントボックス</li><li>ページ15
+      </li><li>小さなカードのファイルボックス</li></ul>"
     url: URL
     url_tooltip: "<p>コンテナの外部説明のハイパーリンク。 </p>"
     dimension_units: 寸法単位
     dimension_units_tooltip: "<p>寸法の測定単位。 </p><p>この管理された値リストの値は変更することができます。 </p>"
     extent_dimension: エクステントディメンション
-    extent_dimension_tooltip: "<p>コンテナ内のマテリアルのエクステント次元を計算および記述するために使用されるディメンション。これは、エクステント計算機によって測定される次元を決定するのに役立ちます。\
-      \ </p>"
+    extent_dimension_tooltip: "<p>コンテナ内のマテリアルのエクステント次元を計算および記述するために使用されるディメンション。これは、エクステント計算機によって測定される次元を決定するのに役立ちます。
+      </p>"
     extent_dimension_depth: 深さ
     extent_dimension_depth_tooltip: "<p>コンテナの深さ（前後の寸法）の数値。 </p>"
     extent_dimension_height: 高さ
@@ -1593,20 +1629,20 @@ ja:
     width: 幅
     width_tooltip: "<p>コンテナの幅（左右の寸法）の数値。 </p>"
     stacking_limit: スタッキング限界
-    stacking_limit_tooltip: "<p>互いに積み重ねられるこれらの容器の数。制限がない場合は空白のままにします。正の整数でなければなりません。\
-      \ </p>"
+    stacking_limit_tooltip: "<p>互いに積み重ねられるこれらの容器の数。制限がない場合は空白のままにします。正の整数でなければなりません。
+      </p>"
 
   rights_restriction:
     begin: 制限開始
-    begin_tooltip: "<p>時間制限の場合は、アクセス制限の開始日。 YYYY-MM-DDの形式で単一の日付である必要があります。期限切れになったら容器から切り離されます。メモのテキストを使用して、精度の低い日付または日付スパンを指定します。\
-      \ </p>"
+    begin_tooltip: "<p>時間制限の場合は、アクセス制限の開始日。 YYYY-MM-DDの形式で単一の日付である必要があります。期限切れになったら容器から切り離されます。メモのテキストを使用して、精度の低い日付または日付スパンを指定します。
+      </p>"
     end: 制限終了
-    end_tooltip: "<p>時間制限の制限の場合、アクセス制限の終了日。 YYYY-MM-DDの形式で単一の日付である必要があります。期限切れになったら容器から切り離されます。メモのテキストを使用して、精度の低い日付または日付スパンを指定します。\
-      \ </p>"
+    end_tooltip: "<p>時間制限の制限の場合、アクセス制限の終了日。 YYYY-MM-DDの形式で単一の日付である必要があります。期限切れになったら容器から切り離されます。メモのテキストを使用して、精度の低い日付または日付スパンを指定します。
+      </p>"
     local_access_restriction_type: ローカルアクセス制限タイプ
     local_access_restriction_type_inline_help: CTRL（Windows）/ Command（Mac）を押しながら複数のオプションを選択するか、オプションを選択解除する
-    local_access_restriction_type_tooltip: "<p>時間制限のない制限については、制限の理由を示します。 </p><p>この管理された値リストの値は変更することができます。\
-      \ </p>"
+    local_access_restriction_type_tooltip: "<p>時間制限のない制限については、制限の理由を示します。 </p><p>この管理された値リストの値は変更することができます。
+      </p>"
     linked_records: リンクされたレコード
     restriction_note_type: ノートタイプ
 
@@ -1624,6 +1660,7 @@ ja:
     calculate_extent: エクステントの計算
     create_extent_record_message: エクステント電卓を編集モードで実行すると、レポートに基づいてエクステント・レコードを作成するオプションがあります。
     waiting_for_report_message: エクステントの計算...
+    required_fields_alert_message: 必須のフィールドを入力してください
     container_summary_type:
       _singular: コンテナ
       _plural: コンテナ
@@ -1694,6 +1731,23 @@ ja:
     _frontend:
       action:
         add: 法を追加する
+
+  bulk_archival_object_update_spreadsheet:
+    title: 一括アーカイブオブジェクトスプレッドシートを生成する
+    description: 以下のフォームを使用して、一括更新するアーカイブ オブジェクトを選択します。
+    selected_records: 選択されたレコード
+    selected: 選択済み
+    record_title: レコードタイトル
+    column_types_to_include_in_spreadsheet: スプレッドシートに含める列の種類
+    note_types: ノートの種類
+    minimum_subrecords: 最小サブレコード
+    minimum_subrecords_description: 含める各タイプの既存のサブレコードの最小数。
+    extra_subrecords: 追加のサブレコード
+    extra_subrecords_description: 選択したレコードのいずれかにすでに存在するサブレコードの最大数に加えて含める新しいサブレコードの数。
+    minimum_notes: 最低限の注意
+    minimum_notes_description: 含める各タイプの既存のメモ サブレコードの最小数。
+    download_spreadsheet: スプレッドシートをダウンロード
+    download_spreadsheet_modal_message: このスプレッドシートの生成には数分かかる場合があります。
 
   assessment:
     _frontend:
@@ -1960,7 +2014,7 @@ ja:
     language: 言語
     script: 脚本
     language_note: 言語ノート
-  agent_record_control_merge_target:
+  agent_record_control_merge_destination:
     _plural: 記録情報
     _singular: 記録情報
     _frontend:
@@ -1981,7 +2035,7 @@ ja:
     language: 言語
     script: 脚本
     language_note: 言語ノート
-  agent_record_control_merge_victim:
+  agent_record_control_merge_candidate:
     _plural: 記録情報
     _singular: 記録情報
     _frontend:
@@ -2029,7 +2083,7 @@ ja:
     gender: 性別
     note: 注意
     dates: 日付
-  agent_gender_merge_target:
+  agent_gender_merge_destination:
     _plural: 性別
     _singular: 性別
     _frontend:
@@ -2038,7 +2092,7 @@ ja:
     gender: 性別
     note: 注意
     dates: 日付
-  agent_gender_merge_victim:
+  agent_gender_merge_candidate:
     _plural: 性別
     _singular: 性別
     _frontend:
@@ -2071,7 +2125,7 @@ ja:
         add: 言語を追加する
     language: 言語
     script: 脚本
-  used_language_merge_victim:
+  used_language_merge_candidate:
     _plural: 使用される言語
     _singular: 使用言語
     _frontend:
@@ -2079,7 +2133,7 @@ ja:
         add: 言語を追加する
     language: 言語
     script: 脚本
-  used_language_merge_target:
+  used_language_merge_destination:
     _plural: 使用される言語
     _singular: 使用言語
     _frontend:
@@ -2111,7 +2165,7 @@ ja:
         add: エンティティIDを追加します
     identifier_type: 識別子の種類
     entity_identifier: エンティティID
-  agent_identifier_merge_target:
+  agent_identifier_merge_destination:
     _plural: エンティティID
     _singular: 識別子
     _frontend:
@@ -2119,7 +2173,7 @@ ja:
         add: エンティティIDを追加します
     identifier_type: 識別子の種類
     entity_identifier: エンティティID
-  agent_identifier_merge_victim:
+  agent_identifier_merge_candidate:
     _plural: エンティティID
     _singular: 識別子
     _frontend:
@@ -2166,7 +2220,7 @@ ja:
     dates: 日付
     subjects: 場所
     publish: 公開済み
-  agent_place_merge_target:
+  agent_place_merge_destination:
     _frontend:
       action:
         add: 場所を追加
@@ -2179,7 +2233,7 @@ ja:
     dates: 日付
     subjects: 場所
     publish: 公開済み
-  agent_place_merge_victim:
+  agent_place_merge_candidate:
     _frontend:
       action:
         add: 場所を追加
@@ -2231,7 +2285,7 @@ ja:
     subjects: 職業
     places: 場所
     publish: 公開済み
-  agent_occupation_merge_target:
+  agent_occupation_merge_destination:
     _frontend:
       action:
         add: 職業を追加する
@@ -2244,7 +2298,7 @@ ja:
     subjects: 職業
     places: 場所
     publish: 公開済み
-  agent_occupation_merge_victim:
+  agent_occupation_merge_candidate:
     _frontend:
       action:
         add: 職業を追加する
@@ -2296,7 +2350,7 @@ ja:
     subjects: 機能
     places: 場所
     publish: 公開済み
-  agent_function_merge_target:
+  agent_function_merge_destination:
     _frontend:
       action:
         add: 機能の追加
@@ -2309,7 +2363,7 @@ ja:
     subjects: 機能
     places: 場所
     publish: 公開済み
-  agent_function_merge_victim:
+  agent_function_merge_candidate:
     _frontend:
       action:
         add: 機能の追加
@@ -2361,7 +2415,7 @@ ja:
     subjects: トピック
     places: 場所
     publish: 公開済み
-  agent_topic_merge_target:
+  agent_topic_merge_destination:
     _frontend:
       action:
         add: トピックを追加
@@ -2374,7 +2428,7 @@ ja:
     subjects: トピック
     places: 場所
     publish: 公開済み
-  agent_topic_merge_victim:
+  agent_topic_merge_candidate:
     _frontend:
       action:
         add: トピックを追加
@@ -2437,7 +2491,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_alternate_set_merge_target:
+  agent_alternate_set_merge_destination:
     _plural: 代替セット
     _singular: 代替セット
     _frontend:
@@ -2452,7 +2506,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_alternate_set_merge_victim:
+  agent_alternate_set_merge_candidate:
     _plural: 代替セット
     _singular: 代替セット
     _frontend:
@@ -2515,7 +2569,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_conventions_declaration_merge_target:
+  agent_conventions_declaration_merge_destination:
     _plural: 条約宣言
     _singular: 条約宣言
     _frontend:
@@ -2531,7 +2585,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_conventions_declaration_merge_victim:
+  agent_conventions_declaration_merge_candidate:
     _plural: 条約宣言
     _singular: 条約宣言
     _frontend:
@@ -2571,7 +2625,7 @@ ja:
         add: 代理店コードを追加
     agency_code_type: レコード管理機関のコードタイプ
     maintenance_agency: 整備庁
-  agent_other_agency_code_merge_target:
+  agent_other_agency_code_merge_destination:
     _plural: その他の機関コード
     _singular: その他の機関コード
     _frontend:
@@ -2579,7 +2633,7 @@ ja:
         add: 代理店コードを追加
     agency_code_type: レコード管理機関のコードタイプ
     maintenance_agency: 整備庁
-  agent_other_agency_code_merge_victim:
+  agent_other_agency_code_merge_candidate:
     _plural: その他の機関コード
     _singular: その他の機関コード
     _frontend:
@@ -2620,7 +2674,7 @@ ja:
     agent: エージェント
     descriptive_note: 注釈
     event_date: 開催日
-  agent_maintenance_history_merge_target:
+  agent_maintenance_history_merge_destination:
     _plural: メンテナンス履歴
     _singular: エージェントのメンテナンス履歴
     _frontend:
@@ -2631,7 +2685,7 @@ ja:
     agent: エージェント
     descriptive_note: 注釈
     event_date: 開催日
-  agent_maintenance_history_merge_victim:
+  agent_maintenance_history_merge_candidate:
     _plural: メンテナンス履歴
     _singular: エージェントのメンテナンス履歴
     _frontend:
@@ -2675,7 +2729,7 @@ ja:
     primary_identifier: 一次識別子はありますか？
     primary: プライマリ
     record_identifier: レコード識別子
-  agent_record_identifier_merge_target:
+  agent_record_identifier_merge_destination:
     _plural: レコードID
     _singular: レコードID
     _frontend:
@@ -2686,7 +2740,7 @@ ja:
     primary_identifier: 一次識別子はありますか？
     primary: プライマリ
     record_identifier: レコード識別子
-  agent_record_identifier_merge_victim:
+  agent_record_identifier_merge_candidate:
     _plural: レコードID
     _singular: レコードID
     _frontend:
@@ -2742,7 +2796,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_source_merge_target:
+  agent_source_merge_destination:
     _plural: ソース
     _singular: エージェントソース
     _frontend:
@@ -2757,7 +2811,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_source_merge_victim:
+  agent_source_merge_candidate:
     _plural: ソース
     _singular: エージェントソース
     _frontend:
@@ -2843,7 +2897,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_resource_merge_victim:
+  agent_resource_merge_candidate:
     _frontend:
       action:
         add: 関連する外部リソースを追加する
@@ -2865,7 +2919,7 @@ ja:
     file_version_xlink_actuate_attribute: XlinkActuate属性
     file_version_xlink_show_attribute: Xlinkの属性を表示
     last_verified_date: 最終確認日
-  agent_resource_merge_target:
+  agent_resource_merge_destination:
     _frontend:
       action:
         add: 関連する外部リソースを追加する
@@ -2896,6 +2950,9 @@ ja:
     identity_information_tooltip: "<p>このセクションは、エージェント自身に関するコア情報です。名前フォームは、エージェントレコードで必要な唯一のサブレコードです。</p>"
     description_information_tooltip: "<p>このセクションは、エージェント自身に関するコア情報です。名前フォームは、エージェントレコードで必要な唯一のサブレコードです。</p>"
     relation_information_tooltip: "<p>このセクションは、ArchivesSpaceの内外の他のエージェントまたは資料との関係を示すために使用されます。</p>"
+  bulk_archival_object_updater_job:
+    _singular: スプレッドシートの一括アーカイブ オブジェクト更新ジョブ
+    create_missing_top_containers: 不足しているトップコンテナを作成する
   note_contact_note:
     contact_notes_tooltip: "<p>連絡先とのやり取りに関する詳細</p>"
     date_of_contact_tooltip: "<p>インタラクションの特定の日付または時間枠を記録するために使用されます</p>"
@@ -2921,141 +2978,8 @@ ja:
   metadata_rights_declaration_required:
     <<: *metadata_rights_declaration_attributes
 
-  metadata_rights_declaration_merge_target:
+  metadata_rights_declaration_merge_destination:
     <<: *metadata_rights_declaration_attributes
 
-  metadata_rights_declaration_merge_victim:
+  metadata_rights_declaration_merge_candidate:
     <<: *metadata_rights_declaration_attributes
-
-  reports:
-    digital_object_list_table_report:
-      title: デジタルオブジェクトテーブル
-      description: デジタルオブジェクトを表形式で表示します。 レポートには、タイトル、デジタルオブジェクト識別子、オブジェクトタイプ、日付、およびリンクされたリソースのタイトルと識別子が含まれます。
-
-    digital_object_file_versions_report:
-      title: ファイルバージョンリスト
-      description: 選択したデジタルオブジェクトに関連付けられているファイルバージョンを表示します。
-
-    accession_inventory_report:
-      title: 在庫のあるアクセッション
-      description: インベントリを持つアクセッションレコードのみを表示します。 レポートには、アクセッション番号、リンクされたリソース、タイトル、エクステント、アクセッション日、コンテナの概要、およびインベントリが含まれます。
-      number_with_inventories: 在庫のあるアクセッション
-      identifier_prefix: アクセッション
-
-    accession_receipt_report:
-      title: アクセッションレシートレポート
-      description: 資料の受入を示す領収書を表示します。 レポートには、アクセッション番号、タイトル、エクステント、アクセッション日、およびリポジトリが含まれます。
-      identifier_prefix: アクセッション
-
-    created_accessions_report:
-      title: 作成されたアクセッション
-      description: 日付範囲内に作成されたアクセッションに関するレポート
-      identifier_prefix: アクセッション
-
-    accession_subjects_names_classifications_list_report:
-      title: アクセッションとリンクされた主題、名前と分類
-      description: アクセッションとそれらにリンクされた名前、サブジェクト、および分類を表示します。 レポートには、アクセッション番号、リンクされたリソース、アクセッション日、タイトル、範囲、リンクされた名前、およびリンクされた件名が含まれます。
-      identifier_prefix: アクセッション
-
-    accession_report:
-      title: アクセッションレポート
-      description: 特定のリポジトリのすべてのアクセッションを表示します。 レポートには、各アクセッションの基本情報フィールドに入力されたデータが含まれます。
-      identifier_prefix: アクセッション
-
-    accession_classifications_subreport:
-      test_value: test value
-
-    accession_unprocessed_report:
-      title: 未処理のアクセッション
-      description: 処理されていないアクセッションのみを表示します。 レポートには、アクセッション番号、リンクされたリソース、タイトル、エクステント、カタログ、処理日、処理日で選択されたレコード数のカウント、および完了日処理フィールドがないレコードのエクステント総数が含まれます。
-      total_count: アクセッション数
-      identifier_prefix: アクセッション
-      total_extent: 未処理の合計範囲
-
-    accession_deaccessions_list_report:
-      title: アクセッション取得およびリンクされたアクセス解除レコード
-      description: アクセッションレコードとリンクされたデアクセッションレコードのリストを表示します。 レポートには、アクセッション番号、タイトル、エクステント、アクセッション日、コンテナの概要、カタログ化、処理日、譲渡された権利、リンクされたアクセス解除、およびすべてのアクセス解除の合計範囲が含まれます。
-      total_extent: アクセッションの合計範囲
-      identifier_prefix: アクセッション
-
-    accession_rights_transferred_report:
-      title: 権利が譲渡されたアクセッション
-      description: 権利が譲渡されたアクセッションのみを表示します。 レポートには、アクセッション番号、リンクされたリソース、タイトル、範囲、カタログ、処理日、アクセス制限、使用制限、譲渡された権利、および譲渡された権利で選択されたレコード数のカウントが含まれます。
-      identifier_prefix: アクセッション
-
-    user_groups_report:
-      title:  ユーザーグループレポート
-      description: ユーザーとリポジトリアクセスグループを表示します。
-      name: 名
-      department: 部門
-      user_title: タイトル
-      groups: グループ
-      email: Eメール
-      telephone: 電話
-
-    resource_deaccessions_list_report:
-      title: リソースとアクセス解除
-      description: リソースとリンクされたアクセス解除レコードを表示します。 レポートには、タイトル、リソースID、レベル、日付範囲、リンクされたアクセス解除、作成者名、および物理エクステントの合計が含まれます.
-      total_extent: リソースの総量
-      identifier_prefix: 資源
-
-    resource_instances_list_report:
-      title: リソースとインスタンスのリスト
-      description: リソースと指定されたすべての場所情報を表示します。 レポートには、タイトル、リソースID、レベル、日付範囲、および割り当てられたコンテナーが含まれます。
-      total_extent: リソースの総量
-      identifier_prefix: 資源
-
-    resource_locations_list_report:
-      title: リソースと場所のリスト
-      description: リソースと指定されたすべての場所情報を表示します。 レポートには、タイトル、リソースID、レベル、日付範囲、および割り当てられた場所が含まれます。
-      total_extent: リソースの総量
-      identifier_prefix: 資源
-
-    resources_list_report:
-      title: リソースリストレポート
-      description: リソースリストレポートには、リソースレコードの基本情報、日付、および範囲が含まれています。
-
-    resource_restrictions_list_report:
-      title: Resources Restrictions List
-      description: Displays resources with restrictions and location information. Report contains title, resource identifier, level, date range, and assigned locations.
-      total_count: Total Resources with Restrictions
-      total_extent: Total Extent of Resources with Restrictions
-      identifier_prefix: Resource
-
-    assessment_rating_report:
-      title: 評価評価レポート
-      description: 指定された範囲の指定された評価を持つ評価の情報を表示します。 少なくとも1つの値を選択する必要があります。 すべてのレコードを表示するには、すべての値を選択します。
-      identifier_prefix: 評価
-
-    assessment_list_report:
-      description: 作成されたすべての評価レコード
-      title: 評価記録リスト
-      identifier_prefix: 評価
-
-    agent_list_report:
-      title: 名前レコードリスト
-      description: 選択した名前レコードを表示します。 レポートには、名前、名前の種類、および名前のソースが一覧表示されます。
-
-    location_report:
-      title: Location Report
-      description: Displays a list of locations, indicating any accessions or resources assigned to defined locations.
-      total_count: Number of Locations
-
-    location_holdings_report:
-      title: ロケーションホールディングス
-      identifier_prefix: ロケーション
-      description: 1つ以上の場所で棚上げされたコンテナに関するレポート
-      repository_report_type: リポジトリ
-      building_report_type: 建物
-      single_location_report_type: 単一の場所
-      location_range_report_type: 場所の範囲
-      start_range: 最初の場所
-      end_range: 最後の場所
-
-    shelflist_report:
-      title: Shelflist Report
-      description: The Shelflist Report includes a list of all locations and their associated top containers.
-      
-    subject_list_report:
-      title: 件名レコードリスト
-      description: 選択したサブジェクトレコードを表示します。 レポートには、主題用語、主題用語タイプ、および主題ソースが一覧表示されます.

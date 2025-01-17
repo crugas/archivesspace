@@ -153,6 +153,9 @@ FactoryBot.define do
   sequence(:date_type) { sample(JSONModel(:date).schema['properties']['date_type']) }
   sequence(:date_label) { sample(JSONModel(:date).schema['properties']['label']) }
 
+  # Digital Object Component
+  sequence(:digital_object_component_id) { |n| "component_#{n}" }
+
   # Event
   sequence(:agent_role) { sample(JSONModel(:event).schema['properties']['linked_agents']['items']['properties']['role']) }
   sequence(:record_role) { sample(JSONModel(:event).schema['properties']['linked_records']['items']['properties']['role']) }
@@ -572,6 +575,10 @@ FactoryBot.define do
     only_validate { generate(:alphanumstr) }
   end
 
+  factory :json_bulk_archival_object_updater_job, class: JSONModel(:bulk_archival_object_updater_job) do
+    create_missing_top_containers { false }
+  end
+
   factory :json_classification_term, class: JSONModel(:classification_term) do
     identifier { generate(:alphanumstr) }
     title { "Classification #{generate(:generic_title)}" }
@@ -674,11 +681,11 @@ FactoryBot.define do
   end
 
   factory :json_digital_object_component, class: JSONModel(:digital_object_component) do
-    component_id { generate(:alphanumstr) }
+    component_id { generate(:digital_object_component_id) }
     title { "Digital Object Component #{generate(:generic_title)}" }
     digital_object { {'ref' => create(:json_digital_object).uri} }
     position { generate(:integer) }
-    has_unpublished_ancestor { rand(2) == 0 }
+    has_unpublished_ancestor { false }
   end
 
   factory :json_digital_object_tree, class: JSONModel(:digital_object_tree) do
@@ -851,14 +858,14 @@ FactoryBot.define do
   end
 
   factory :json_merge_request_detail, class: JSONModel(:merge_request_detail) do
-    target { {'ref' => create(:json_agent_person).uri} }
-    victims { [ {'ref' => create(:json_agent_person).uri}, {'ref' => create(:json_agent_person).uri} ] }
+    merge_destination { {'ref' => create(:json_agent_person).uri} }
+    merge_candidates { [ {'ref' => create(:json_agent_person).uri}, {'ref' => create(:json_agent_person).uri} ] }
     selections {}
   end
 
   factory :json_merge_request, class: JSONModel(:merge_request) do
-    target { {'ref' => create(:json_subject).uri} }
-    victims { [ {'ref' => create(:json_subject).uri}, {'ref' => create(:json_subject).uri} ] }
+    merge_destination { {'ref' => create(:json_subject).uri} }
+    merge_candidates { [ {'ref' => create(:json_subject).uri}, {'ref' => create(:json_subject).uri} ] }
   end
 
   factory :json_metadata_rights_declaration, class: JSONModel(:metadata_rights_declaration) do
@@ -1280,6 +1287,10 @@ FactoryBot.define do
     vocabulary { create(:json_vocabulary).uri }
   end
 
+  factory :json_resource_duplicate_job, class: JSONModel(:resource_duplicate_job) do
+    source { generate(:alphanumstr) }
+  end
+
   factory :json_top_container_linker_job, class: JSONModel(:top_container_linker_job) do
     resource_id { generate(:alphanumstr) }
     filename { generate(:alphanumstr) }
@@ -1374,7 +1385,7 @@ FactoryBot.define do
     used_languages { [build(:json_used_language)] }
   end
 
-  factory :json_agent_person_merge_target, class: JSONModel(:agent_person) do
+  factory :json_agent_person_merge_destination, class: JSONModel(:agent_person) do
     agent_type { 'agent_person' }
     names { [build(:json_name_person)] }
     dates_of_existence { [build(:json_structured_date_label)] }
@@ -1382,7 +1393,7 @@ FactoryBot.define do
     agent_record_controls { [build(:agent_record_control)] }
   end
 
-  factory :json_agent_person_merge_victim, class: JSONModel(:agent_person) do
+  factory :json_agent_person_merge_candidate, class: JSONModel(:agent_person) do
     agent_type { 'agent_person' }
     names { [build(:json_name_person)] }
     dates_of_existence { [build(:json_structured_date_label)] }

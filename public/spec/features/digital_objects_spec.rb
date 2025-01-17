@@ -3,8 +3,7 @@ require 'rails_helper'
 
 describe 'Digital Objects', js: true do
   def visit_digital_object_page(title)
-    visit '/'
-    click_link 'Digital Materials'
+    visit("/search?utf8=✓&op[]=&q[]='#{title}'&limit=digital_object&field[]=&from_year[]=&to_year[]=")
     click_link title
   end
 
@@ -33,6 +32,54 @@ describe 'Digital Objects', js: true do
 
     it 'should show linked classification details for digital objects' do
       expect(page).to have_content('Record Groups')
+    end
+  end
+
+  it 'does not highlight repository uri' do
+    visit('/')
+
+    click_on 'Repositories'
+    click_on 'Test Repo 1'
+    find('#whats-in-container form .btn.btn-default.digital_object').click
+
+    expect(page).to_not have_text Pathname.new(current_path).parent.to_s
+  end
+
+  describe "breadcrumbs with mixed content" do
+    before(:each) do
+      @repo = create(:repo, repo_code: "collection_organization_test_#{Time.now.to_i}")
+      set_repo(@repo)
+      @resource = create(:resource,
+        title: 'This is <emph render="italic">a mixed content</emph> title',
+        publish: true
+      )
+
+      @do = create(:digital_object, publish: true)
+      @doc = create(:digital_object_component,
+        publish: true,
+        digital_object: { ref: @do.uri }
+      )
+
+
+      @ao = create(:archival_object,
+        publish: true,
+        title: 'This is <emph render="italic">another mixed content</emph> title',
+        resource: {'ref' => @resource.uri},
+        instances: [build(:instance_digital,
+          digital_object: { ref: @do.uri },
+          is_representative: true
+        )]
+      )
+      run_indexers
+    end
+
+    it 'displays breadcrumbs when mixed content is included' do
+      visit @do.uri
+
+      within('#linked_instances_list') do
+        expect(page).to have_css('span.emph.render-italic', text: 'This is a mixed content title')
+        expect(page).to have_css('span.emph.render-italic', text: 'This is another mixed content title')
+      end
     end
   end
 

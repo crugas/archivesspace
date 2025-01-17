@@ -20,24 +20,23 @@
 @import 'archivesspace/colors';
 @import 'archivesspace/variables';
 
-// "bootstrap-sprockets" must be imported before "bootstrap" and "bootstrap/variables"
-@import 'bootstrap-sprockets';
-@import 'bootstrap';
+@import 'bootstrap/scss/bootstrap.scss';
+@import 'archivesspace/bootstrap-overrides';
 
-// font-awesome
-@import 'font-awesome-sprockets';
-@import 'font-awesome';
-// @import "bootstrap-sass/_glyphicons.scss";
-// @import "load-awesome/line-spin-clockwise-fade.css";
+@import 'font-awesome/scss/font-awesome.scss';
+
 /* stylelint-disable-next-line scss/at-import-no-partial-leading-underscore */
 @import 'foundation/_functions.scss';
 @import 'archivesspace/aspace';
 @import 'archivesspace/record-type-badge';
 @import 'archivesspace/result-linked-instances';
+@import 'archivesspace/result-representative-file-version';
 
-@import 'archivesspace/infinite-scroll';
+@import 'archivesspace/infinite-records';
+@import 'archivesspace/infinite-tree';
 @import 'archivesspace/largetree';
 @import 'archivesspace/mixed-content';
+@import 'archivesspace/read-more-notes';
 
 @import 'archivesspace/helpers.scss';
 

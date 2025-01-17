@@ -481,7 +481,11 @@ describe 'MARCXML Bib converter' do
          --Time/Date of Action: $c--Action interval: $d--Contingency for Action: $e--Authorization: $f--Jurisdiction: $h
          --Method of action: $j--Site of Action: $j--Action agent: $k--Status: $l--Extent: $n--Type of unit: $o--URI: $u
          --Non-public note: $x--Public note: $z--Materials specified: $3--Institution: $5.'" do
-        expect(@notes).to include('Action: Resource-Appraisal-AT.')
+        expect(@notes[27]).to eq("Action: condition reviewed--Action Identification: classification--Time/Date of Action: 19980207\
+--Action interval: quinquennial--Contingency for Action: at conclusion of court case--Authorization: Title IIC project--Jurisdiction: Joe Smith\
+--Method of action: microfilm--Site of Action: Museum of Fine Arts--Action agent: AFD--Status: pages missing--Extent: 2\
+--Type of unit: Linear Feet--URI: http://www.uflib.ufl.edu/pres/repro/db--Non-public note: from secret FRD to confidential NSI--Public note: subfield z\
+--Materials specified: student case files--Institution: DLC")
       end
 
       it "maps datafield[@tag='584'] to resource.notes[] using template 'Accumulation: $a--Frequency of use: $b--Materials specified: $3--Institution: $5'" do
@@ -510,6 +514,11 @@ describe 'MARCXML Bib converter' do
         end
 
         expect(has_qualifier).to eq(5)
+      end
+
+      it "maps creator (1xx) as the primary agent link" do
+        primary = @resource['linked_agents'].select {|a| a['is_primary'] == true }
+        expect(primary.length).to eq(1)
       end
     end
 
@@ -551,13 +560,13 @@ describe 'MARCXML Bib converter' do
 
   describe "300 tag with $a and $f defined, $a not numeric" do
     it "fails with error message when $a is not numeric" do
-      expect { convert_test_file("at-tracer-marc-3.xml") }.to raise_error(StandardError, "No numeric value found in field 300, subfield a")
+      expect { convert_test_file("at-tracer-marc-3.xml") }.to raise_error(StandardError, "No numeric value found in field 300, subfield a (5.0 linear feet)")
     end
   end
 
   describe "300 tag with $a and $f defined, $f not in controlled vocabulary" do
     it "fails with error message when $f is not in controlled vocabulary" do
-      expect { convert_test_file("at-tracer-marc-4.xml") }.to raise_error(StandardError, "Extent type in field 300, subfield f is not found in the extent type controlled vocabulary.")
+      expect { convert_test_file("at-tracer-marc-4.xml") }.to raise_error(StandardError, "Extent type in field 300, subfield f (5.0 Linear feet) is not found in the extent type controlled vocabulary.")
     end
   end
 
@@ -1024,4 +1033,36 @@ describe 'MARCXML Bib converter' do
 
     end
   end
+
+  describe "inner workings" do
+
+    class Subnode
+      def initialize(xpath)
+        @xpath = xpath
+      end
+
+      def inner_text
+        @xpath.gsub(/[\[\]@\']/, '_')
+      end
+    end
+
+    class Node
+      def xpath(xpath)
+        [Subnode.new(xpath)]
+      end
+    end
+
+    it "can pass a nokogiri node through a template" do
+      template = %q|{Action: $a}{--Action Identification: $b}{--Time/Date of Action: $c}{--Action interval: $d}
+                    {--Action interval: $d}{--Contingency for Action: $e}{--Authorization: $f}{--Jurisdiction: $h}
+                    {--Method of action: $i}{--Site of Action: $j}{--Action agent: $k}{--Status: $l}{--Extent: $n}
+                    {--Type of unit: $o}{--URI: $u}{--Non-public note: $x}{--Public note: $z}{--Materials specified: $3}
+                    {--Institution: $5}.|
+
+      node = Node.new
+      result = my_converter.subfield_template(template, node)
+      expect(result).to eq "Action: subfield__code=_a__--Action Identification: subfield__code=_b__--Time/Date of Action: subfield__code=_c__--Action interval: subfield__code=_d__ --Action interval: subfield__code=_d__--Contingency for Action: subfield__code=_e__--Authorization: subfield__code=_f__--Jurisdiction: subfield__code=_h__ --Method of action: subfield__code=_i__--Site of Action: subfield__code=_j__--Action agent: subfield__code=_k__--Status: subfield__code=_l__--Extent: subfield__code=_n__ --Type of unit: subfield__code=_o__--URI: subfield__code=_u__--Non-public note: subfield__code=_x__--Public note: subfield__code=_z__--Materials specified: subfield__code=_3__ --Institution: subfield__code=_5__."
+    end
+  end
+
 end

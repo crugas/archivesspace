@@ -1,6 +1,7 @@
 .DS_Store
 _site
 bin
+build/.local/
 build/*.jar
 build/solr_backups/*
 *.war
@@ -60,3 +61,4 @@ plugins/*/Gemfile.lock
 plugins/*/gems/*
 docker-compose.override.yml
 launcher/lib/*
+*~undo-tree~

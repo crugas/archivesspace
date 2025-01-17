@@ -48,7 +48,7 @@ class TopContainersController < ApplicationController
         csv_response(
           "/repositories/#{session[:repo_id]}/search",
           prepare_search.merge('facet[]' => SearchResultData.TOP_CONTAINER_FACETS),
-          "#{I18n.t('top_container._plural').downcase}."
+          "#{t('top_container._plural').downcase}."
         )
       }
     end
@@ -80,7 +80,7 @@ class TopContainersController < ApplicationController
                     @top_container.refetch
                     render :json => @top_container.to_hash if inline?
                   else
-                    flash[:success] = I18n.t('top_container._frontend.messages.created')
+                    flash[:success] = t('top_container._frontend.messages.created')
                     redirect_to :controller => :top_containers, :action => :show, :id => id
                   end
                 })
@@ -110,18 +110,18 @@ class TopContainersController < ApplicationController
                   return render action: 'edit'
                 },
                 :on_valid => ->(id) {
-                  flash[:success] = I18n.t('top_container._frontend.messages.updated')
+                  flash[:success] = t('top_container._frontend.messages.updated')
                   redirect_to :controller => :top_containers, :action => :show, :id => id
                 })
   end
 
 
   def batch_merge
-    merge_list = params[:victims]
-    target = params[:target]
-    victims = merge_list - target
-    handle_merge(victims,
-                  target[0],
+    merge_list = params[:merge_candidates]
+    merge_destination = params[:merge_destination]
+    merge_candidates = merge_list - merge_destination
+    handle_merge(merge_candidates,
+                  merge_destination[0],
                   'top_container')
   end
 
@@ -139,11 +139,11 @@ class TopContainersController < ApplicationController
                                          )
 
     if response.code === '200'
-      flash[:success] = I18n.t('top_container.batch_delete.success')
+      flash[:success] = t('top_container.batch_delete.success')
       deleted_uri_param = params[:record_uris].map {|uri| "deleted_uri[]=#{uri}"}.join('&')
       redirect_to "#{request.referrer}?#{deleted_uri_param}"
     else
-      flash[:error] = "#{I18n.t("top_container.batch_delete.error")}<br/> #{ASUtils.json_parse(response.body)["error"]["failures"].map {|err| "#{err["response"]} [#{err["uri"]}]"}.join("<br/>")}".html_safe
+      flash[:error] = "#{t("top_container.batch_delete.error")}<br/> #{ASUtils.json_parse(response.body)["error"]["failures"].map {|err| "#{err["response"]} [#{err["uri"]}]"}.join("<br/>")}".html_safe
       redirect_to request.referrer
     end
   end
@@ -209,9 +209,10 @@ class TopContainersController < ApplicationController
     begin
       results = perform_search
     rescue MissingFilterException
-      return render :plain => I18n.t('top_container._frontend.messages.filter_required'), :status => 500
+      return render :plain => t('top_container._frontend.messages.filter_required'), :status => 500
     end
 
+    get_browse_col_prefs
     render_aspace_partial :partial => 'top_containers/bulk_operations/results', :locals => {:results => results}
   end
 
@@ -222,10 +223,19 @@ class TopContainersController < ApplicationController
     begin
       results = perform_search if params.has_key?('q')
     rescue MissingFilterException
-      flash[:error] = I18n.t('top_container._frontend.messages.filter_required')
+      flash[:error] = t('top_container._frontend.messages.filter_required')
     end
 
+    get_browse_col_prefs
     render_aspace_partial :partial => 'top_containers/bulk_operations/browse', :locals => {:results => results}
+  end
+
+
+  def get_browse_col_prefs
+    # this sets things up to make the sortable table on this view work with the standard column prefs
+    @pref_cols = browse_columns.select {|k, v| k.include? "top_container_mgmt_browse_column" }.values
+    @default_sort_col = @pref_cols.find_index(browse_columns['top_container_mgmt_sort_column'])
+    @default_sort_dir = browse_columns['top_container_mgmt_sort_direction'] == 'asc' ? 0 : 1
   end
 
 
@@ -361,7 +371,7 @@ class TopContainersController < ApplicationController
 
 
   def perform_search
-    JSONModel::HTTP::get_json("#{JSONModel(:top_container).uri_for("")}/search", prepare_search)
+    JSONModel::HTTP::get_json("#{JSONModel(:top_container).uri_for("")}search", prepare_search)
   end
 
   # Gather all parameters, used for HTML and CSV responses

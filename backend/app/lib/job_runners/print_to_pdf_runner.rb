@@ -16,7 +16,7 @@ class PrintToPDFRunner < JobRunner
         @job.write_output("Generating PDF for #{resource_jsonmodel["title"]}  ")
 
         obj = URIResolver.resolve_references(resource_jsonmodel,
-                                             [ "repository", "linked_agents", "subjects", "digital_objects", 'top_container', 'top_container::container_profile'])
+                                             [ "repository", "linked_agents", "subjects", "digital_object", 'top_container', 'top_container::container_profile'])
         opts = {
           :include_unpublished => @json.job["include_unpublished"] || false,
           :include_daos => true,
@@ -37,6 +37,7 @@ class PrintToPDFRunner < JobRunner
           @job.write_output("-" * 50)
         end
 
+        opts[:pdf_export] = true
         ead = ASpaceExport.model(:ead).from_resource(record, resource.tree(:all, mode = :sparse), opts)
         xml = ""
         ASpaceExport.stream(ead).each { |x| xml << x }

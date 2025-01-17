@@ -49,7 +49,8 @@ module PluginHelper
 
       result << render_aspace_partial(:partial => "shared/subrecord_form",
                        :locals => {:form => context, :name => parent['name'],
-                         :cardinality => parent['cardinality'].intern, :plugin => true})
+                         :cardinality => parent['cardinality'].intern, :plugin => true,
+                                   :section_id => "#{jsonmodel_type}_#{parent['name']}_"})
 
     end
 
@@ -66,7 +67,7 @@ module PluginHelper
     ASUtils.find_local_directories("frontend/views/_#{name}.html.erb").each do |partial|
       next unless File.exist?(partial)
 
-      result << render(:file => partial, :locals => locals)
+      result << render(:inline => File.read(partial), :locals => locals)
     end
 
     result.html_safe

@@ -1,7 +1,9 @@
 //= require jquery.tokeninput
 
 $(function () {
-  let resource_edit_path_regex = /^\/resources\/\d+\/edit$/;
+  let resource_edit_path_regex = new RegExp(
+    '^' + APP_PATH + 'resources/\\d+/edit$'
+  );
   let on_resource_edit_path = window.location.pathname.match(
     resource_edit_path_regex
   );
@@ -56,7 +58,7 @@ $(function () {
 
         var initCreateForm = function (formEl) {
           $('.linker-container', $modal).html(formEl);
-          $('#createAndLinkButton', $modal).removeAttr('disabled');
+          $('#createAndLinkButton', $modal).attr('disabled', null);
           $('form', $modal).ajaxForm({
             data: {
               inline: true,
@@ -82,7 +84,7 @@ $(function () {
               }
             },
             error: function (obj, errorText, errorDesc) {
-              $('#createAndLinkButton', $modal).removeAttr('disabled');
+              $('#createAndLinkButton', $modal).attr('disabled', null);
             },
           });
 
@@ -109,7 +111,7 @@ $(function () {
           config.modal_id,
           config.label_create,
           AS.renderTemplate('linker_createmodal_template', config),
-          'large',
+          'xl',
           {},
           this
         );
@@ -264,7 +266,7 @@ $(function () {
           config.modal_id,
           config.label_browse,
           AS.renderTemplate('linker_browsemodal_template', config),
-          'large',
+          'xl',
           {},
           this
         );
@@ -590,7 +592,7 @@ $(function () {
           // containers modal when opened from the edit resource or archival object pages.
           // If this setTimeout is for the last linker in the modal, only then is it safe to execute the search
           let lastLinker = $('.modal-dialog').find('.linker').last();
-          let isLastLinker = lastLinker.attr('id') === $this.context.id;
+          let isLastLinker = lastLinker.attr('id') === $this.attr('id');
           let onResource = $('.label.label-info').text() === 'Resource';
           let onArchivalObject =
             $('.label.label-info').text() === 'Archival Object';

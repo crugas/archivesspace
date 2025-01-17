@@ -13,7 +13,7 @@ de:
     cite: Zitierung
     cite_item: Element zitieren
     cite_item_description: Element-Beschreibung zitieren
-    print: Drucken
+    print: PDF herunterladen
     print-generating: Erstellen
     collection_overview: Sammlungs-Übersicht
     hierarch: Gliederung der Sammlung
@@ -30,6 +30,9 @@ de:
     refine_search: Suche verfeinern
     backup_abbr: Zurück gehen
     search_remove_row: Die Zeile unten entfernen
+    next: Nächste
+    previous: Vorherige
+    digitized: Digitale Inhalte ansehen
   request:
     required: erforderlich
     user_name: Ihr Name
@@ -63,6 +66,18 @@ de:
     agent: Urheber des Inhalts
   searched-field: '%{field} suchen'
   search_results:
+    highlighting:
+      found_in: Gefunden in
+      four_part_id: Kennung
+      dates: Termine
+      subjects_text: Fächer
+      published_agents: Agentinnen
+      creators_text: Schöpfer
+      role_enum_s: Rollen
+      linked_agent_roles: Verknüpfte Agentenrollen
+      notes_published: Anmerkungen
+      finding_aid_title: Titel des Findmittels
+      finding_aid_filing_title: Findmittel Ablagetitel
     result: Ergebnis
     results: Ergebnisse
     search_for: Suche %{type} wobei %{conditions}
@@ -116,8 +131,10 @@ de:
       langcode: Sprache
       type_enum_s: Typ
       published_series_title_u_sstr: Serie
+      digital_object_type_enum_s: Typ
+      extent_type_enum_s: Umfang
     creators_text_contain: der <strong>Urheber</strong> enthält <span class='searchterm'>%{kw}</span>
-    fewer_facets: weniger
+    fewer_facets: Weniger
     op:
       OR: oder
       AND: und
@@ -127,7 +144,7 @@ de:
     page_title: '%{count} Ergebnisse gefunden'
     results_head: 'Zeige %{type}: %{start} - %{end} von %{total}'
     in_repository: ' in <strong>%{name}</strong>'
-    more_facets: mehr
+    more_facets: Mehr
     remove_filter: Diesen Filter entfernen
   page_actions: Seiten-Aktionen
   search-button:
@@ -165,6 +182,7 @@ de:
     backend_down: Konnte nicht mit der Datenbank verbinden
     unexpected_error: Ihre Anfrage konnte wegen einem unerwartetem Fehler nicht abgeschlossen werden
     error_404: '%{type} Aufzeichnung nicht gefunden'
+    invalid_search_params: Ungültiger Suchparameter '%{value}' für Feld '%{field}'
   boolean:
     "true": Ja
     "false": Nein
@@ -175,6 +193,7 @@ de:
   navigation:
     hierarchical: hierarchische Navigation
     top_level: oberste Navigationsebene
+    mobile_menu: Navigationsmenü für kleinere Geräte
   advanced_search:
     operator_label: Verknüpfer
     operator:
@@ -215,6 +234,7 @@ de:
         deaccessions: Abgegangenes Archivgut
         forms_part_of: Teil-Verwandtschaft
         sibling_of: Geschwister-Verwandtschaft
+        has_part: Teil-Verwandtschaft
     _singular: Unbearbeitetes Archivgut
   repository:
     _plural: Aufbewahrungsorte
@@ -226,6 +246,8 @@ de:
     _public:
       identifier: Signatur
       extent: Umfang
+      extent_full: Vollständiger Umfang
+      extent_partial: Teiler Umfang
       dates: Daten
       lang: Sprache des Archivguts
       script: Schrift
@@ -233,6 +255,11 @@ de:
       physdesc: Physische Beschreibung
       additional: Zusätzliche Beschreibung
       storage: Behältnis-Information
+      uri: ID [aspace_uri]
+      ark_link_name: Archival Resource Key
+      lang_pdf: Sprache des Archivguts
+      identifier_pdf: ID
+      identifier_ark: ID [ark]
       finding_aid:
         head: Findmittel & Administrative Informationen
         title: Titel
@@ -253,6 +280,15 @@ de:
       related_accessions:
         accessions: Eingangs-Aufzeichnung
         deaccessions: Abgangs-Aufzeichnung
+    load_records:
+      alert: "Diese Sammlung enthält eine große Anzahl von Datensätzen"
+      showing: "Anzeigen"
+      percent_convention: " %"
+      load: "Datensätze laden"
+      load_all: "Alle Datensätze laden"
+      scroll: "Beim Scrollen"
+      all: "Alles auf einmal"
+      loading: Lädt
     _plural: Sammlungen
     identifier_separator: ':'
     _singular: Sammlung
@@ -288,13 +324,19 @@ de:
   top_container:
     _plural: Behältnisse
     _singular: Behältnis
+    restricted: Eingeschränkt
   digital_object:
     _singular: Digitale Aufzeichnung
     _public:
-      thumbnail: Vorschaubild
+      thumbnail: Vorschau
       link: Verweis zu digitalem Objekt
       badge_label: Digital %{level}
       go: Gehen Sie zur Datei
+      additional: Weitere Dateiversionen
+      browse_number_digital_objects_in_collection:
+        one: Durchsuchen Sie %{num} digitale Objekt in der Sammlung
+        other: Durchsuchen Sie %{num} digitale Objekte in der Sammlung
+      url_encoded_data: URL-kodierte Daten
     _plural: Digitales Archivgut
   subject:
     _singular: Thema
@@ -373,6 +415,10 @@ de:
     your_finding_aid_pdf: Ihr Findmittel PDF für "%{title}"
     your_finding_aid_is_attached: Das angeforderte Findmittel ist angehängt.
     administrative_information: Administrative Informationen
+    accessrestrict: Bedingungen für den Zugang
+    userestrict: Bedingungen für die Nutzung
+    accruals: Erwerbungen
+    acqinfo: Direkte Quelle der Beschaffung
   readmore:
     see_more: Mehr anzeigen
     see_less: Weniger anzeigen
@@ -464,3 +510,5 @@ de:
     fr: Französisch
     de: Deutsch
     ja: Japanisch
+  pdf_error:
+    title: Die Erzeugung der PDF Datei ist fehlgeschlagen.

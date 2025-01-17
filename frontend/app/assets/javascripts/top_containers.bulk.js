@@ -64,7 +64,10 @@ BulkContainerSearch.prototype.setup_form = function () {
 BulkContainerSearch.prototype.perform_search = function (data) {
   var self = this;
 
-  self.$results_container.closest('.row').show();
+  self.$results_container
+    .closest('[data-results-wrapper]')
+    .removeClass('d-none')
+    .addClass('d-flex');
   self.$results_container.html(
     AS.renderTemplate('template_bulk_operation_loading')
   );
@@ -142,7 +145,7 @@ BulkContainerSearch.prototype.update_button_state = function () {
     delete_btn.data('form-data', {
       record_uris: selected_records,
     });
-    delete_btn.removeClass('disabled').removeAttr('disabled');
+    delete_btn.removeClass('disabled').attr('disabled', null);
   } else {
     delete_btn.data('form-data', {});
     delete_btn.addClass('disabled').attr('disabled', 'disabled');
@@ -229,11 +232,12 @@ BulkContainerSearch.prototype.setup_table_sorter = function () {
     // Get the most recent sort, if it exists
     currentSort = sessionStorage.getItem('top_container_sort');
     if (currentSort == null || currentSort == undefined) {
-      // default sort: Collection, Series, Indicator
+      // use default sort (the +1 to the column index is to account for the checkbox column)
       currentSort = [
-        [1, 0],
-        [2, 0],
-        [4, 0],
+        [
+          parseInt($('#default_sort_col')[0]['value']) + 1,
+          parseInt($('#default_sort_dir')[0]['value']),
+        ],
       ];
     } else {
       currentSort = JSON.parse(currentSort);
@@ -280,7 +284,7 @@ BulkContainerSearch.prototype.setup_table_sorter = function () {
     .bind('sortEnd', function (e) {
       //Store the sort in the session storage so it resorts the same way
       //when navigating and refreshing.
-      currentSort = e.target.config.sortList;
+      currentSort = e.mergeDestination.config.sortList;
       sessionStorage.setItem('top_container_sort', JSON.stringify(currentSort));
     });
 };
@@ -361,7 +365,7 @@ BulkActionIlsHoldingUpdate.prototype.show = function () {
   });
 
   var $modal = AS.openCustomModal(
-    'bulkUpdateModal',
+    'bulkArchivalObjectUpdaterModal',
     this.$menuItem[0].text,
     dialog_content,
     'full'
@@ -438,7 +442,7 @@ BulkActionContainerProfileUpdate.prototype.show = function () {
   );
 
   var $modal = AS.openCustomModal(
-    'bulkUpdateModal',
+    'bulkArchivalObjectUpdaterModal',
     this.$menuItem[0].text,
     dialog_content,
     'full'
@@ -507,7 +511,7 @@ BulkActionLocationUpdate.prototype.show = function () {
   });
 
   var $modal = AS.openCustomModal(
-    'bulkUpdateModal',
+    'bulkArchivalObjectUpdaterModal',
     this.$menuItem[0].text,
     dialog_content,
     'full'
@@ -557,7 +561,7 @@ BulkActionMultipleLocationUpdate.prototype.setup_update_form = function (
           .addClass('form-group')
           .addClass('error');
       }
-      $form.find(':submit').removeClass('disabled').removeAttr('disabled');
+      $form.find(':submit').removeClass('disabled').attr('disabled', null);
     },
   });
 };
@@ -581,7 +585,7 @@ BulkActionMultipleLocationUpdate.prototype.show = function () {
   );
 
   var $modal = AS.openCustomModal(
-    'bulkUpdateModal',
+    'bulkArchivalObjectUpdaterModal',
     this.$menuItem[0].text,
     dialog_content,
     'full'
@@ -680,7 +684,7 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function (
           .addClass('form-group')
           .addClass('error');
       }
-      $form.find(':submit').removeClass('disabled').removeAttr('disabled');
+      $form.find(':submit').removeClass('disabled').attr('disabled', null);
     },
   });
 };
@@ -775,7 +779,7 @@ BulkActionIndicatorRapidEntry.prototype.setup_form_submission = function (
           .addClass('form-group')
           .addClass('error');
       }
-      $form.find(':submit').removeClass('disabled').removeAttr('disabled');
+      $form.find(':submit').removeClass('disabled').attr('disabled', null);
     },
   });
 };
@@ -786,9 +790,9 @@ BulkActionIndicatorRapidEntry.prototype.setup_form_submission = function (
  */
 
 function activateBtn(event) {
-  var merge_btn = document.getElementsByClassName('merge-button')[0];
+  var merge_btn = $('.merge-button');
   if ($('input:checked').length > 0) {
-    merge_btn.removeAttribute('disabled');
+    merge_btn.attr('disabled', null);
   } else {
     merge_btn.attr('disabled', 'disabled');
   }
@@ -818,7 +822,7 @@ function BulkActionMerge(bulkContainerSearch) {
       e.preventDefault();
 
       // Set up data for form submission
-      const victims = self.bulkContainerSearch
+      const mergeCandidates = self.bulkContainerSearch
         .get_selection()
         .map(function (container) {
           return {
@@ -828,32 +832,38 @@ function BulkActionMerge(bulkContainerSearch) {
           };
         });
 
-      const targetEl = document.querySelector('input[name="target[]"]:checked');
+      const mergeDestinationEl = document.querySelector(
+        'input[name="merge_destination[]"]:checked'
+      );
 
-      const target = {
-        display_string: targetEl.getAttribute('aria-label'),
-        uri: targetEl.getAttribute('value'),
-        container_profile_uri: targetEl.getAttribute('container_profile_uri'),
+      const mergeDestination = {
+        display_string: mergeDestinationEl.getAttribute('aria-label'),
+        uri: mergeDestinationEl.getAttribute('value'),
+        container_profile_uri: mergeDestinationEl.getAttribute(
+          'container_profile_uri'
+        ),
       };
 
-      var victimsWithCPs = victims.filter(
-        victim =>
-          victim.container_profile_uri &&
-          victim.container_profile_uri != target.container_profile_uri
+      var mergeCandidatesWithCPs = mergeCandidates.filter(
+        mergeCandidate =>
+          mergeCandidate.container_profile_uri &&
+          mergeCandidate.container_profile_uri !=
+            mergeDestination.container_profile_uri
       );
-      var victimContainerProfiles = victimsWithCPs
+      var mergeCandidateContainerProfiles = mergeCandidatesWithCPs
         .map(function (cp) {
           return cp.container_profile_uri;
         })
         .filter((v, i, a) => a.indexOf(v) === i);
       var mergeWarn =
-        victimContainerProfiles.length === 0 ||
-        (victimContainerProfiles.length === 1 && !target.container_profile_uri)
+        mergeCandidateContainerProfiles.length === 0 ||
+        (mergeCandidateContainerProfiles.length === 1 &&
+          !mergeDestination.container_profile_uri)
           ? false
           : true;
       var warning_type =
         mergeWarn == true
-          ? victimContainerProfiles.length > 1
+          ? mergeCandidateContainerProfiles.length > 1
             ? 'too_many'
             : 'mismatch'
           : null;
@@ -867,23 +877,27 @@ function BulkActionMerge(bulkContainerSearch) {
         mismatchHidden: warning_type == 'mismatch' ? 'false' : 'true',
       };
 
-      // compute victims list for template rendering
-      const victimsNoTarget = victims.reduce(function (acc, victim) {
-        if (victim.display_string !== target.display_string) {
-          acc.push(victim.display_string);
+      // compute mergeCandidates list for template rendering
+      const mergeCandidatesNoTarget = mergeCandidates.reduce(function (
+        acc,
+        mergeCandidate
+      ) {
+        if (mergeCandidate.display_string !== mergeDestination.display_string) {
+          acc.push(mergeCandidate.display_string);
         }
         return acc;
-      }, []);
+      },
+      []);
 
       // Init modal2
       AS.openCustomModal(
         'bulkMergeConfirmModal',
         'Confirm Merge Top Containers',
         AS.renderTemplate('bulk_action_merge_confirm', {
-          victims,
-          victimsNoTarget,
+          mergeCandidates,
+          mergeCandidatesNoTarget,
           mergeWarning,
-          target,
+          mergeDestination,
         }),
         false
       );

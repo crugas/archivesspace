@@ -161,17 +161,18 @@ class PeriodicIndexer < IndexerCommon
       }
     }
 
-    # indexing repos is usually easy, since its unlikely there will be lots of
-    # them.
+    # Indexing repos is usually easy, since its unlikely there will be lots of
+    # them. Also, in case a repository has just been unpublished, delete PUI-only records
     if !updated_repositories.empty?
       index_records(updated_repositories)
+      repositories_updated_action(updated_repositories)
       send_commit
+      @state.set_last_mtime('repositories', 'repositories', start)
     end
-
-    @state.set_last_mtime('repositories', 'repositories', start)
 
     # And any records in any repositories
     repositories.each_with_index do |repository, i|
+      next if !repository.publish and self.instance_of?(PUIIndexer)
       JSONModel.set_repository(repository.id)
 
       checkpoints = []
@@ -250,6 +251,11 @@ class PeriodicIndexer < IndexerCommon
     # Give subclasses a place to hang custom behavior.
   end
 
+  def repositories_updated_action(updated_repositories)
+    # Give subclasses a place to hang custom behavior.
+  end
+
+
   def handle_deletes(opts = {})
     start = Time.now
     last_mtime = @state.get_last_mtime('_deletes', 'deletes')
@@ -272,9 +278,8 @@ class PeriodicIndexer < IndexerCommon
 
     if did_something
       send_commit
+      @state.set_last_mtime('_deletes', 'deletes', start)
     end
-
-    @state.set_last_mtime('_deletes', 'deletes', start)
   end
 
   def run

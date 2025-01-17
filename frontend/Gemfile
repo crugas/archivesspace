@@ -2,63 +2,68 @@
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2'
+gem 'rails', '6.1.6'
 
-gem 'i18n', '0.9.1'
-gem 'loofah', '>= 2.2.3'
-gem 'sprockets-rails', '2.3.3'
+gem 'i18n'
+gem 'loofah'
+gem 'sprockets-rails'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
-# Gems used only for assets and not required
-# in production environments by default.
-gem 'coffee-rails', '4.2.2'
-gem 'coffee-script'
-gem 'coffee-script-source'
-gem 'sass-rails', '~> 5.0', '>= 5.0.6'
-gem 'therubyrhino'
-gem 'uglifier'
-
-gem 'less-rails-bootstrap'
+# Gems used only for assets and not required in production environments by default.
+# Assets group was deprecated with Rails 4, but we still need it as we need to avoid using gems that include
+# native extensions in production
+group :assets do
+  gem 'coffee-rails'
+  gem 'coffee-script'
+  gem 'coffee-script-source'
+  gem 'sassc-rails'
+  gem 'execjs'
+end
 
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
-gem 'json', '2.3.0'
+gem 'json'
 gem 'json-schema', '1.0.10'
 
 gem 'atomic', '= 1.0.1'
-gem 'jruby-jars', '= 9.2.20.1'
+gem 'jruby-jars', '= 9.4.8.0'
 
 group :test do
   gem 'rails-controller-testing'
   gem 'axe-core-rspec'
-  gem 'dumb_delegator', '~> 0.8'
-  gem 'rspec', '~> 3.6.0'
+  gem 'dumb_delegator'
+  gem 'rspec'
   # For performance testing
   gem 'rspec-benchmark'
   gem 'rspec-rails'
-  gem 'simplecov', '0.7.1'
+  gem 'simplecov'
 
   # selenium stuff
-  gem 'factory_bot_rails', '~> 4.11', '>= 4.11.1'
+  gem 'factory_bot', '= 6.2.1'
+  gem 'factory_bot_rails'
   gem 'mechanize'
-  gem 'parallel_tests', '~> 2.14.0'
+  gem 'parallel_tests'
   gem 'rspec-retry'
-  gem 'selenium-webdriver', '~> 3.142', '>= 3.142.3'
+  gem 'selenium-webdriver'
 
-  gem 'capybara', '3.15.1'
+  gem 'capybara'
+  gem 'capybara-screenshot'
   # need access to ActiveSupport for helpers
-  gem 'activesupport', '5.2.5'
+  gem 'activesupport'
   # if the indexer requires it, our test suite requires it
   gem 'fog-aws', '2.0.0', require: false
+
+  gem 'rubyzip', '< 1.4'
 end
 
 group :development, :test do
   gem 'pry-debugger-jruby', '>= 1.2.2'
   gem 'pry-nav'
   gem 'pry-rails'
-  gem 'mizuno-aspace'
+  gem 'puma'
+  gem 'rubyXL', '~> 3.4', '>= 3.4.9'
 end
 
 group :development do
@@ -66,15 +71,14 @@ group :development do
 end
 
 gem 'multi_json', '~> 1.15.0'
-gem 'multipart-post', '1.2.0'
+gem 'multipart-post', '~> 2.4'
 gem 'net-http-persistent', '>= 4.0.1'
 
-gem 'rubyzip', '>= 1.3.0'
-gem 'zip-zip', '0.3'
-
-gem 'nokogiri', '>= 1.10.8'
+gem 'nokogiri'
 
 require 'asutils'
 
 # Allow plugins to provide their own Gemfiles too.
 ASUtils.load_plugin_gems(self)
+
+gem "zxcvbn-ruby", "~> 1.2"

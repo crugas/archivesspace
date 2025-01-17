@@ -78,10 +78,10 @@ class ImportArchivalObjects < BulkImportParser
     if err_arr.empty? || @validate_only
       @row_hash.each do |k, v|
         @row_hash[k] = v.strip if !v.nil?
-        if k == "publish" || k == "restrictions_flag"
-          @row_hash[k] = (v == "1")
-        end
       end
+
+      normalize_boolean_column(@row_hash, 'publish')
+      normalize_boolean_column(@row_hash, 'restrictions_flag')
     end
     err_arr.join("; ")
   end
@@ -212,12 +212,28 @@ class ImportArchivalObjects < BulkImportParser
 
     ao.instances = create_top_container_instances
     dig_instance = nil
-    unless [@row_hash["digital_object_title"], @row_hash["thumbnail"], @row_hash["digital_object_link"], @row_hash["digital_object_id"]].reject(&:nil?).empty?
+    unless [@row_hash["digital_object_title"], @row_hash["rep_file_uri"], @row_hash["nonrep_file_uri"],
+            @row_hash["digital_object_id"]].reject(&:nil?).empty?
+
       begin
-        normalize_publish_column(@row_hash, 'digital_object_link_publish')
-        normalize_publish_column(@row_hash, 'thumbnail_publish')
-        normalize_publish_column(@row_hash, 'digital_object_publish')
-        dig_instance = @doh.create(@row_hash["digital_object_title"], @row_hash["thumbnail"], @row_hash["digital_object_link"], @row_hash["digital_object_id"], @row_hash["digital_object_publish"], ao, @report, @row_hash['digital_object_link_publish'], @row_hash['thumbnail_publish'])
+        normalize_boolean_column(@row_hash, 'digital_object_publish')
+        normalize_boolean_column(@row_hash, 'nonrep_publish')
+        dig_instance = @doh.create(
+          @row_hash["digital_object_title"],
+          @row_hash["digital_object_id"],
+          @row_hash["digital_object_publish"],
+          nil, # level
+          nil, # digital_object_type
+          nil, # restrictions
+          [],  # dates
+          [],  # notes
+          [],  # extents
+          [],  # subjects
+          [],  # linked_agents
+          ao,
+          @report,
+          representative_file_version,
+          non_representative_file_version)
       rescue Exception => e
         @report.add_errors(e.message)
       end
@@ -227,7 +243,7 @@ class ImportArchivalObjects < BulkImportParser
       elsif @validate_only
         @report.add_errors(I18n.t("bulk_import.object_not_created_be", :what => I18n.t("bulk_import.dig")))
       else
-        @report.add_errors(I18n.t("bulk_import.error.dig_validation", :err => ""))
+        @report.add_errors(I18n.t("bulk_import.object_not_created_be", :what => I18n.t("bulk_import.dig")))
       end
     end
     subjs = process_subjects
@@ -357,12 +373,13 @@ class ImportArchivalObjects < BulkImportParser
     cntr = 1
     substr = ""
     until @row_hash["l_lang#{substr}"].nil? && @row_hash["l_langscript#{substr}"].nil? && @row_hash["n_langmaterial#{substr}"].nil?
+      normalize_boolean_column(@row_hash, "p_langmaterial#{substr}")
+
       pubnote = @row_hash["p_langmaterial#{substr}"]
-      if pubnote.nil?
-        pubnote = publish
-      else
-        pubnote = (pubnote == "1")
-      end
+
+      # ΝΟΤE: Publish is inherited from the archival object if not provided
+      pubnote = publish if pubnote.nil?
+
       lang = @lh.create_language(@row_hash["l_lang#{substr}"], @row_hash["l_langscript#{substr}"], @row_hash["n_langmaterial#{substr}"], pubnote, @report)
       langs.concat(lang) if !lang.empty?
       @row_hash["n_langmaterial#{substr}"] = nil

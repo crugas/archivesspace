@@ -208,9 +208,30 @@ module BulkImportMixins
   end
 
   def value_check(cvlist, value, errs)
+    # reload cvlist in case it has been modified by processing a previous row
+    cvlist_reloaded = CvList.new(cvlist.which, @current_user)
+    list_name = cvlist_reloaded.which.to_s
+
     ret_val = nil
+
     begin
-      ret_val = cvlist.value(value)
+      ret_val = cvlist_reloaded.value(value)
+
+      # ANW-1296: for instance_instance_type enums, add value to list if it's not present
+      if CvList::CREATE_NEW_VALUES_FOR.include?(list_name)
+        if ret_val.nil?
+          enum = Enumeration.find(:name => cvlist_reloaded.which)
+
+          if enum.editable === 1 || enum.editable == true
+            unless @validate_only
+              new_position = enum.enumeration_value.length + 1
+              enum.add_enumeration_value(:value => value, :position => new_position)
+            end
+
+            ret_val = value
+          end
+        end
+      end
     rescue Exception => ex
       errs << ex.message
     end
@@ -282,12 +303,14 @@ module BulkImportMixins
             e_date = hash['e_accessrestrict']
             local_restriction = hash['t_accessrestrict']
           end
+
+          normalize_boolean_column(hash, "p_#{type}")
+
           pubnote = hash["p_#{type}"]
-          if pubnote.nil?
-            pubnote = publish
-          else
-            pubnote = (pubnote == "1")
-          end
+
+          # ΝΟΤE: Publish is inherited from the archival object if not provided
+          pubnote = publish if pubnote.nil?
+
           note_label = hash["l_#{type}"]
           begin
             note = @nh.create_note(type, note_label, content, pubnote, dig_obj, b_date, e_date, local_restriction)
@@ -311,6 +334,50 @@ module BulkImportMixins
       raise e
     end
     ret_val
+  end
+
+  def representative_file_version
+    if @row_hash['rep_file_uri'].present?
+      {
+        is_representative: true,
+        file_uri: @row_hash['rep_file_uri'],
+        xlink_actuate_attribute: @row_hash['rep_xlink_actuate_attribute'],
+        xlink_show_attribute: @row_hash['rep_xlink_show_attribute'],
+        publish: true,
+        use_statement: @row_hash['rep_use_statement'],
+        file_format_name: @row_hash['rep_file_format'],
+        file_format_version: @row_hash['rep_file_format_version'],
+        file_size_bytes: @row_hash['rep_file_size'].to_i,
+        checksum: @row_hash['rep_checksum'],
+        checksum_method: @row_hash['rep_checksum_method'],
+        caption: @row_hash['rep_caption']
+      }
+    end
+  end
+
+  def non_representative_file_version
+    if @row_hash['nonrep_file_uri'].present?
+      {
+        is_representative: false,
+        file_uri: @row_hash['nonrep_file_uri'],
+        xlink_actuate_attribute: @row_hash['nonrep_xlink_actuate_attribute'],
+        xlink_show_attribute: @row_hash['nonrep_xlink_show_attribute'],
+        publish: @row_hash['nonrep_publish'],
+        use_statement: @row_hash['nonrep_use_statement'],
+        file_format_name: @row_hash['nonrep_file_format'],
+        file_format_version: @row_hash['nonrep_file_format_version'],
+        file_size_bytes: @row_hash['nonrep_file_size'].to_i,
+        checksum: @row_hash['nonrep_checksum'],
+        checksum_method: @row_hash['nonrep_checksum_method'],
+        caption: @row_hash['nonrep_caption']
+      }
+    end
+  end
+
+  def normalize_boolean_column(row_hash, column)
+    return if row_hash[column].nil?
+    return if [TrueClass, FalseClass].include? row_hash[column].class
+    row_hash[column] = ['t', '1', 'true'].include? row_hash[column].to_s.strip.downcase
   end
 end
 
