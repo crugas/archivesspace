@@ -225,11 +225,12 @@ class PeriodicIndexer < IndexerCommon
         }
 
         # Commit if anything was added to Solr
+        commit_start_time = Time.now
         unless worker_statuses.all? {|status| status == WORKER_STATUS_NOTHING_INDEXED}
           send_commit
         end
 
-        log("Indexed #{id_set.length} records in #{Time.now.to_i - start.to_i} seconds")
+        log("Indexed #{id_set.length} records in #{Time.now.to_i - start.to_i} seconds (commit time: #{sprintf('%.2f', Time.now.to_f - commit_start_time.to_f)} seconds)")
 
         if worker_statuses.include?(WORKER_STATUS_INDEX_ERROR)
           Log.info("Skipping update of indexer state for record type #{type} in repository #{repository.id} due to previous failures")          
