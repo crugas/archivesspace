@@ -253,7 +253,7 @@ describe 'Search', js: true do
       )
     end
 
-    let(:result_title) { find('.recordrow > h2', text: searched_record.title) }
+    let(:result_title) { find('.recordrow .record-title', text: searched_record.title) }
     let(:result_highlights) { all(:xpath, "//div[contains(@class, 'recordrow')][h2[contains(., '#{searched_record.title}')]]//div[contains(@class, 'highlighting')]") }
 
     before :each do

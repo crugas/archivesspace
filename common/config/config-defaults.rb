@@ -848,3 +848,5 @@ AppConfig[:bulk_archival_object_updater_create_missing_top_containers] = false
 # Default search scope setting
 # Options: 'all_record_types', 'collections_only'
 AppConfig[:search_default_scope] = 'all_record_types'
+
+AppConfig[:thumbnail_file_format_names] = ['png', 'jpg', 'jpeg']

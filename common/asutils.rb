@@ -3,6 +3,7 @@ require 'tmpdir'
 require 'tempfile'
 require 'config/config-distribution'
 require 'asconstants'
+require 'json'
 
 # Some basic helpers that are used in all parts of the application, both
 # development and packaged.

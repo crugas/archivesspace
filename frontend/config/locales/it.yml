@@ -225,7 +225,6 @@ it:
       processors: Processori
       user_mtime: Modificato
       uri: URI
-      representative_file_version: Immagine thumbnail
       use_restrictions: Restrizioni d'uso
     resource:
       score: Rilevanza
@@ -237,7 +236,6 @@ it:
       dates: Date
       processors: Processori
       desc: Discendente
-      representative_file_version: Immagine thumbnail
       uri: URI
       level: Livello
       identifier: Identificatore
@@ -264,7 +262,6 @@ it:
       desc: Discendente
       uri: URI
       title: Titolo
-      representative_file_version: Immagine thumbnail
     subject:
       score: Rilevanza
       asc: Ascendente
@@ -292,7 +289,6 @@ it:
       asc: Ascendente
       subjects: Soggetto
       uri: URI
-      representative_file_version: Immagine thumbnail
     digital_object_component:
       publish: Pubblicato
       context: Trovato in
@@ -306,7 +302,6 @@ it:
       user_mtime: Modificato
       create_time: Creato
       asc: Ascendente
-      representative_file_version: Immagine thumbnail
     agent:
       score: Rilevanza
       title: Nome
@@ -408,7 +403,6 @@ it:
     multi:
       score: Rilevanza
       relevance: Rilevanza
-      representative_file_version: Immagine thumbnail
       audit_info: Informazioni sull'audit
       asc: Ascendente
       desc: Discendente

@@ -45,7 +45,7 @@ end
     heading_level = props.fetch(:full, false) ? 1 : 2
   end
 
-  h_open = heading_level == 1 ? '<h1>' : "<h#{heading_level} class='h3 mb-0'>"
+  h_open = heading_level == 1 ? '<h1 class="record-heading">' : "<h#{heading_level} class='record-heading h3 mb-0'>"
   h_close = "</h#{heading_level}>"
 
   raw_title = props.fetch(:infinite_item, false) ? result.parse_full_title(true) : result.display_string
