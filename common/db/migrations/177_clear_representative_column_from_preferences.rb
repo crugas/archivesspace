@@ -1,11 +1,11 @@
-require_relative 'utils'
+require 'json'
 
 Sequel.migration do
   up do
     self[:preference]
       .select(:id, :defaults)
       .each do |row|
-      preference_data = ASUtils.json_parse(row[:defaults])
+      preference_data = JSON.parse(row[:defaults])
       keys_to_delete = []
       preference_data.each do |key, value|
         if key =~ /_column_[0-9]+$/ and value == 'representative_file_version'
@@ -20,7 +20,7 @@ Sequel.migration do
 
         self[:preference]
           .filter(:id => row[:id])
-          .update(:defaults => ASUtils.to_json(preference_data))
+          .update(:defaults => JSON.dump(preference_data))
       end
     end
   end

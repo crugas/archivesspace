@@ -120,7 +120,7 @@ module Thumbnails
       preferred_candidate ||= blessed_candidates.detect{|candidate| candidate.file_version_use_statement == 'image-thumbnail'}
 
       # If none, prefer a representative file version if it is an allowed image type.
-      preferred_candidate ||= blessed_candidates.detect{|candidate| is_candidate_as_image?(candidate)}
+      preferred_candidate ||= blessed_candidates.detect{|candidate| is_candidate_an_image?(candidate)}
 
       # If none, fall back to the first available file version.
       # FIXME Nah?
@@ -147,6 +147,9 @@ module Thumbnails
         else
           thumbnail_candidates
         end
+
+      # Got to be a link
+      blessed_candidates = blessed_candidates.select{|candidate| is_candidate_a_link?(candidate)}
 
       # Prefer the representative file version
       best_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_representative}
@@ -215,10 +218,10 @@ module Thumbnails
       caption_text
     end
 
-    def is_candidate_as_image?(candidate)
+    def is_candidate_a_link?(candidate)
       begin
         uri = URI(candidate.file_version_file_uri)
-        if AppConfig[:thumbnail_file_format_names].include?(candidate.file_version_file_format_name) && ['http', 'https'].include?(uri.scheme)
+        if ['http', 'https'].include?(uri.scheme)
           true
         else
           false
@@ -226,6 +229,11 @@ module Thumbnails
       rescue
         false
       end
+    end
+
+    def is_candidate_an_image?(candidate)
+      AppConfig[:thumbnail_file_format_names].include?(candidate.file_version_file_format_name) &&
+        is_candidate_a_link?(candidate)
     end
 
     def find_a_thumbnail(record_json, thumbnail_candidates)
