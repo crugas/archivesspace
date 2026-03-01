@@ -17,19 +17,13 @@
       <% if (image_url = result.thumbnail.fetch('image_url', nil)) %>
         <%= image_tag image_url, :alt => strip_mixed_content(result.thumbnail.fetch('caption')) %>
       <% else %>
-        <% if show_spacer %>
-          <div class="pui-thumbnail-spacer"></div>
-        <% else %>
-          <%= content_tag(:i, nil, {:title => strip_mixed_content(result.thumbnail.fetch('caption')), :class => 'pui-thumbnail-icon fa fa-th'}) %>
-        <% end %>
+        <%= content_tag(:i, nil, {:title => strip_mixed_content(result.thumbnail.fetch('caption')), :class => 'pui-thumbnail-icon fa fa-th'}) %>
       <% end %>
     <% end %>
     <% if result.thumbnail.fetch('caption') %>
       <div class="pui-thumbnail-caption"><%== result.thumbnail.fetch('caption') %></div>
     <% end %>
   </div>
-<% else %>
-  <% if show_spacer %>
-    <div class="pui-thumbnail-spacer"></div>
-  <% end %>
+<% elsif show_spacer %>
+  <div class="pui-thumbnail-spacer"></div>
 <% end %>
