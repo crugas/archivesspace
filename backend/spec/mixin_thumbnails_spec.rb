@@ -322,6 +322,19 @@ describe 'Thumbnails mixin' do
       generate(:alphanumstr)
     )
   }
+  let(:not_a_http_url_candidate) {
+    Thumbnails::ThumbnailCandidate.new(
+      true,
+      generate(:alphanumstr),
+      'data:ABC123',
+      'image-master',
+      'jpeg',
+      nil,
+      true,
+      false,
+      generate(:alphanumstr)
+    )
+  }
   let(:instance_representative_thumbnail_candidate) {
     Thumbnails::ThumbnailCandidate.new(
       true,
@@ -478,6 +491,16 @@ describe 'Thumbnails mixin' do
 
       expect(result).to eq(master_candidate.file_version_file_uri)
     end
+
+    it "ignores non http URLs" do
+      result = Resource.calculate_image_url([
+                                              not_a_http_url_candidate,
+                                              not_a_http_url_candidate,
+                                              not_a_http_url_candidate,
+                                            ])
+
+      expect(result).to be_nil
+    end
   end
 
   describe "calculate_link_url" do
@@ -568,6 +591,16 @@ describe 'Thumbnails mixin' do
 
       expect(result).to be_nil
     end
+
+    it "ignores non http URLs" do
+      result = Resource.calculate_link_url([
+                                             not_a_http_url_candidate,
+                                             not_a_http_url_candidate,
+                                             not_a_http_url_candidate,
+                                           ])
+
+      expect(result).to be_nil
+    end
   end
 
   describe "calculate_caption" do
@@ -636,7 +669,7 @@ describe 'Thumbnails mixin' do
         master_candidate,
       ])
 
-      expect(result).to eq(thumbnail_no_caption_candidate.file_version_caption)
+      expect(result).to eq(thumbnail_no_caption_candidate.digital_object_title)
     end
   end
 end
