@@ -232,185 +232,185 @@ describe 'Thumbnails mixin' do
   end
 
   let(:thumbnail_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-thumbnail',
-      'jpeg',
-      'embed',
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-thumbnail',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => 'embed',
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:master_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:master_thumbnail_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      false,
-      true,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => true,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:thumbnail_no_caption_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-thumbnail',
-      'jpeg',
-      'embed',
-      false,
-      false,
-      nil
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-thumbnail',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => 'embed',
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => nil
     )
   }
   let(:something_else_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'video-streaming',
-      'avi',
-      nil,
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'video-streaming',
+      :file_version_file_format_name => 'avi',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:display_thumbnail_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      false,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      false,
-      true,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => true,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:representative_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      true,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => true,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:not_a_http_url_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      'data:ABC123',
-      'image-master',
-      'jpeg',
-      nil,
-      true,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => 'data:ABC123',
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => true,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_thumbnail_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-thumbnail',
-      'jpeg',
-      'embed',
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-thumbnail',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => 'embed',
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_master_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_display_thumbnail_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      false,
-      true,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => true,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_something_else_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'video-streaming',
-      'avi',
-      nil,
-      false,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'video-streaming',
+      :file_version_file_format_name => 'avi',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => false,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      true,
-      false,
-      generate(:alphanumstr)
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => true,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => generate(:alphanumstr)
     )
   }
   let(:instance_representative_no_caption_representative_candidate) {
-    Thumbnails::ThumbnailCandidate.new(
-      true,
-      generate(:alphanumstr),
-      generate(:url),
-      'image-master',
-      'jpeg',
-      nil,
-      true,
-      false,
-      nil
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => true,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => 'image-master',
+      :file_version_file_format_name => 'jpeg',
+      :file_version_xlink_show_attribute => nil,
+      :file_version_is_representative => true,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => nil
     )
   }
 
@@ -424,6 +424,10 @@ describe 'Thumbnails mixin' do
                                               instance_representative_master_candidate,
                                             ])
 
+      # instance_representative_thumbnail_candidate and
+      # instance_representative_master_candidate are both representative, but
+      # instance_representative_thumbnail_candidate has a use statement of
+      # 'image-thumbnail' and wins.
       expect(result).to eq(instance_representative_thumbnail_candidate.file_version_file_uri)
     end
 
@@ -437,6 +441,7 @@ describe 'Thumbnails mixin' do
                                               instance_representative_display_thumbnail_candidate,
                                             ])
 
+      # instance_representative_display_thumbnail_candidate has `is_display_thumbnail` and wins.
       expect(result).to eq(instance_representative_display_thumbnail_candidate.file_version_file_uri)
     end
 
@@ -448,6 +453,7 @@ describe 'Thumbnails mixin' do
                                               instance_representative_master_candidate,
                                             ])
 
+      # instance_representative_master_candidate is both representative and an image, so it wins.
       expect(result).to eq(instance_representative_master_candidate.file_version_file_uri)
     end
 
@@ -457,6 +463,10 @@ describe 'Thumbnails mixin' do
                                               thumbnail_candidate,
                                             ])
 
+      # Since there was a representative instance, our pool of candidates
+      # excluded thumbnail_candidate, but
+      # instance_representative_something_else_candidate had no suitable
+      # thumbnail.  No results.
       expect(result).to be_nil
     end
 
@@ -466,7 +476,7 @@ describe 'Thumbnails mixin' do
                                               thumbnail_candidate,
                                               master_candidate,
                                             ])
-
+      # thumbnail_candidate has use statement of 'image-thumbnail' and wins.
       expect(result).to eq(thumbnail_candidate.file_version_file_uri)
     end
 
@@ -477,27 +487,22 @@ describe 'Thumbnails mixin' do
                                               thumbnail_candidate,
                                               master_candidate,
                                             ])
-
+      # display_thumbnail_candidate has `is_display_thumbnail` and wins.
       expect(result).to eq(display_thumbnail_candidate.file_version_file_uri)
     end
 
     it "picks display image candidate over others" do
       result = Resource.calculate_image_url([
                                               something_else_candidate,
-                                              something_else_candidate,
-                                              something_else_candidate,
                                               master_candidate,
                                             ])
 
+      # master candidate wins because its file_format_name is a jpeg
       expect(result).to eq(master_candidate.file_version_file_uri)
     end
 
     it "ignores non http URLs" do
-      result = Resource.calculate_image_url([
-                                              not_a_http_url_candidate,
-                                              not_a_http_url_candidate,
-                                              not_a_http_url_candidate,
-                                            ])
+      result = Resource.calculate_image_url([not_a_http_url_candidate])
 
       expect(result).to be_nil
     end
@@ -512,6 +517,9 @@ describe 'Thumbnails mixin' do
                                              instance_representative_master_candidate,
                                            ])
 
+      # instance_representative_master_candidate wins over the (also
+      # representative) instance_representative_thumbnail_candidate because we
+      # prefer non-thumbnail use statements for links.
       expect(result).to eq(instance_representative_master_candidate.file_version_file_uri)
     end
 
@@ -524,6 +532,7 @@ describe 'Thumbnails mixin' do
                                              instance_representative_master_candidate,
                                            ])
 
+      # instance_representative_candidate wins because it has file_version_is_representative.
       expect(result).to eq(instance_representative_candidate.file_version_file_uri)
     end
 
@@ -535,6 +544,9 @@ describe 'Thumbnails mixin' do
                                              instance_representative_display_thumbnail_candidate,
                                            ])
 
+      # instance_representative_display_thumbnail_candidate beats
+      # instance_representative_thumbnail_candidate because its
+      # is_display_thumbnail is true.
       expect(result).to eq(instance_representative_display_thumbnail_candidate.file_version_file_uri)
     end
 
@@ -593,11 +605,7 @@ describe 'Thumbnails mixin' do
     end
 
     it "ignores non http URLs" do
-      result = Resource.calculate_link_url([
-                                             not_a_http_url_candidate,
-                                             not_a_http_url_candidate,
-                                             not_a_http_url_candidate,
-                                           ])
+      result = Resource.calculate_link_url([not_a_http_url_candidate])
 
       expect(result).to be_nil
     end
@@ -613,6 +621,7 @@ describe 'Thumbnails mixin' do
         instance_representative_master_candidate,
       ])
 
+      # instance_representative_candidate wins with file_version_is_representative.
       expect(result).to eq(instance_representative_candidate.file_version_caption)
     end
 
@@ -625,6 +634,7 @@ describe 'Thumbnails mixin' do
         instance_representative_master_candidate,
       ])
 
+      # instance_representative_no_caption_representative_candidate wins with file_version_is_representative.
       expect(result).to eq(instance_representative_no_caption_representative_candidate.digital_object_title)
     end
 

@@ -12,7 +12,11 @@ module Thumbnails
                :file_version_xlink_show_attribute,
                :file_version_is_representative,
                :file_version_is_display_thumbnail,
-               :file_version_caption)
+               :file_version_caption) do
+    def self.from_hash(h)
+      new(*members.map {|m| h.fetch(m)})
+    end
+  end
 
   module ClassMethods
     def fetch_thumbnail_candidates(objs)
@@ -81,16 +85,17 @@ module Thumbnails
 
       candidate_query.each do |row|
         candidates[row[:record_id]] ||= []
-        candidates[row[:record_id]] << ThumbnailCandidate.new(
-          row[:instance_is_representative] == 1,
-          row[:digital_object_title],
-          row[:file_version_file_uri],
-          BackendEnumSource.value_for_id('file_version_use_statement', row[:file_version_use_statement_id]),
-          BackendEnumSource.value_for_id('file_version_file_format_name', row[:file_version_file_format_name_id]),
-          BackendEnumSource.value_for_id('file_version_xlink_show_attribute', row[:file_version_xlink_show_attribute_id]),
-          row[:file_version_is_representative] == 1,
-          row[:file_version_is_display_thumbnail] == 1,
-          row[:file_version_caption])
+        candidates[row[:record_id]] << ThumbnailCandidate.from_hash(
+          :instance_is_representative => row[:instance_is_representative] == 1,
+          :digital_object_title => row[:digital_object_title],
+          :file_version_file_uri => row[:file_version_file_uri],
+          :file_version_use_statement => BackendEnumSource.value_for_id('file_version_use_statement', row[:file_version_use_statement_id]),
+          :file_version_file_format_name => BackendEnumSource.value_for_id('file_version_file_format_name', row[:file_version_file_format_name_id]),
+          :file_version_xlink_show_attribute => BackendEnumSource.value_for_id('file_version_xlink_show_attribute', row[:file_version_xlink_show_attribute_id]),
+          :file_version_is_representative => row[:file_version_is_representative] == 1,
+          :file_version_is_display_thumbnail => row[:file_version_is_display_thumbnail] == 1,
+          :file_version_caption => row[:file_version_caption]
+        )
       end
 
       candidates
