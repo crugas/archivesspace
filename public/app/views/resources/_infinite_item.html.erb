@@ -2,19 +2,19 @@
   indent_level = @result.raw.fetch('ancestors', []).length
 %>
 <div class="infinite-item infinite-item-indent-<%= indent_level %>">
-  <%= render partial: 'shared/thumbnail', locals: {
-      result: @result,
-      show_spacer: false,
-      thumbnail_link: app_prefix(@result.uri)
-    }
-  %>
-
   <div class="information pt-3" style="overflow: hidden;">
       <%=
         render partial: 'shared/idbadge', locals: {
           :props => { :full => false, :infinite_item => true },
           :result => @result,
         }
+      %>
+
+      <%= render partial: 'shared/thumbnail', locals: {
+        result: @result,
+        show_spacer: false,
+        thumbnail_link: app_prefix(@result.uri)
+      }
       %>
   </div>
 
