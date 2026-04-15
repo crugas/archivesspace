@@ -127,10 +127,6 @@ module Thumbnails
       # If none, prefer a representative file version if it is an allowed image type.
       preferred_candidate ||= blessed_candidates.detect{|candidate| is_candidate_an_image?(candidate)}
 
-      # If none, fall back to the first available file version.
-      # FIXME Nah?
-      # preferred_candidate ||= blessed_candidates.detect{|candidate| is_candidate_as_image?(candidate)}
-
       preferred_candidate
     end
 
@@ -192,17 +188,17 @@ module Thumbnails
           representative_with_caption.file_version_caption
         end
 
-      # If absent, use the representative’s Digital Object title.
-      caption_text ||=
-        if (representative_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_representative})
-          representative_candidate.digital_object_title
-        end
-
       # If absent, use the thumbnail caption.
       thumbnail_candidate = find_preferred_thumbnail_candidate(thumbnail_candidates)
       caption_text ||=
         if thumbnail_candidate
           thumbnail_candidate.file_version_caption
+        end
+
+      # If absent, use the representative’s Digital Object title.
+      caption_text ||=
+        if (representative_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_representative})
+          representative_candidate.digital_object_title
         end
 
       # If absent, use the thumbnail’s Digital Object title.

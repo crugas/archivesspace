@@ -625,7 +625,7 @@ describe 'Thumbnails mixin' do
       expect(result).to eq(instance_representative_candidate.file_version_caption)
     end
 
-    it 'picks the instance representative representative digital object title over others' do
+    it 'picks the instance representative thumbnail digital object title over others' do
       result = Resource.calculate_caption(build(:resource), [
         thumbnail_candidate,
         master_candidate,
@@ -634,8 +634,7 @@ describe 'Thumbnails mixin' do
         instance_representative_master_candidate,
       ])
 
-      # instance_representative_no_caption_representative_candidate wins with file_version_is_representative.
-      expect(result).to eq(instance_representative_no_caption_representative_candidate.digital_object_title)
+      expect(result).to eq(instance_representative_thumbnail_candidate.file_version_caption)
     end
 
     it 'picks the instance representative thumbnail caption over others' do
