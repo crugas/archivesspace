@@ -215,6 +215,8 @@ module ASModel
 
       self.class.fire_update(json, self)
 
+      AuditEvent.new_event(RequestContext.get(:current_username), 'edit', 'update_from_json', [self.uri])
+
       self
     end
 
