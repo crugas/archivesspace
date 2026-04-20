@@ -5,7 +5,7 @@ Sequel.migration do
       DateTime :timestamp, :null => false
       String :actor, :null => false
       String :source_repo_uri
-      String :target_repo_uri, :null => false
+      String :target_repo_uri
       String :activity_type, :null => false
       String :change_method, :null => false
     end
