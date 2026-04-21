@@ -8,6 +8,10 @@
   margin-bottom: 5px;
   max-width: 420px;
 
+  > a {
+    display: inline-block;
+  }
+
   img {
     max-height: 120px;
     max-width: 240px;

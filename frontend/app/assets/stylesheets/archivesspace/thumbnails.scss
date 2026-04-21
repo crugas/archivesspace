@@ -7,6 +7,10 @@
   border-radius: 5px;
   margin: 0 0 10px;
 
+  > a {
+    display: inline-block;
+  }
+
   img {
     max-height: 120px;
     max-width: 240px;
