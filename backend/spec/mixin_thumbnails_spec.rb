@@ -462,12 +462,7 @@ describe 'Thumbnails mixin' do
                                               instance_representative_something_else_candidate,
                                               thumbnail_candidate,
                                             ])
-
-      # Since there was a representative instance, our pool of candidates
-      # excluded thumbnail_candidate, but
-      # instance_representative_something_else_candidate had no suitable
-      # thumbnail.  No results.
-      expect(result).to be_nil
+      expect(result).to eq(thumbnail_candidate.file_version_file_uri)
     end
 
     it "picks thumbnail candidate over others" do

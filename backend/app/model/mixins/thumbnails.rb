@@ -101,33 +101,40 @@ module Thumbnails
       candidates
     end
 
-    def find_representative_candidate(thumbnail_candidates)
-      thumbnail_candidates.detect{|candidate| candidate.file_version_is_representative}
-    end
-
-    def find_representative_instance_candidates(thumbnail_candidates)
-      thumbnail_candidates.filter{|candidate| candidate.instance_is_representative}
-    end
-
     def find_preferred_thumbnail_candidate(thumbnail_candidates)
-      # If an instance is marked as representative, prefer its file versions; otherwise, pool all linked DOs.
-      blessed_candidates =
-        if (representative_candidates = find_representative_instance_candidates(thumbnail_candidates)).length > 0
-          representative_candidates
-        else
-          thumbnail_candidates
-        end
+      scored_candidates =
+        thumbnail_candidates
+          .filter { |candidate| is_candidate_a_link?(candidate) }
+          .map { |candidate|
+            score =
+              if candidate.file_version_is_display_thumbnail
+                # If present, use `is_display_thumbnail` flag to explicitly designate a file version as the thumbnail.
+                500
+              elsif candidate.file_version_use_statement == 'image-thumbnail'
+                # If none, prefer a file with `use_statement=image-thumbnail`.
+                250
+              elsif is_candidate_an_image?(candidate)
+                # If none, prefer a representative file version if it is an allowed image type.
+                100
+              else
+                0
+              end
 
-      # If present, use `is_display_thumbnail` flag to explicitly designate a file version as the thumbnail.
-      preferred_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_display_thumbnail}
+            # If an instance is marked as representative, prefer its file versions; otherwise, pool all linked DOs.
+            if candidate.instance_is_representative && score > 0
+              score += 1000
+            end
 
-      # If none, prefer a file with `use_statement=image-thumbnail`.
-      preferred_candidate ||= blessed_candidates.detect{|candidate| candidate.file_version_use_statement == 'image-thumbnail'}
+            [candidate, score]
+          }.to_h
 
-      # If none, prefer a representative file version if it is an allowed image type.
-      preferred_candidate ||= blessed_candidates.detect{|candidate| is_candidate_an_image?(candidate)}
+      best_score = scored_candidates.values.max
 
-      preferred_candidate
+      scored_candidates
+        .keys
+        .filter { |candidate| scored_candidates[candidate] == best_score }
+        .filter { |candidate| scored_candidates[candidate] > 0 }
+        .first
     end
 
     def calculate_image_url(thumbnail_candidates)
@@ -140,83 +147,103 @@ module Thumbnails
       end
     end
 
-    def calculate_best_representation_candidate(thumbnail_candidates)
-      # If an instance is marked as representative, prefer its file versions; otherwise, pool all linked DOs.
-      blessed_candidates =
-        if (representative_candidates = find_representative_instance_candidates(thumbnail_candidates)).length > 0
-          representative_candidates
-        else
-          thumbnail_candidates
-        end
-
-      # Got to be a link
-      blessed_candidates = blessed_candidates.select{|candidate| is_candidate_a_link?(candidate)}
-
-      # Prefer the representative file version
-      best_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_representative}
-
-      # If none, prefer the first non-thumbnail/embed file version.
-      best_candidate ||= blessed_candidates.detect{|candidate| candidate.file_version_use_statement != 'image-thumbnail' && candidate.file_version_xlink_show_attribute != 'embed'}
-
-      # If none, fall back to is_display_thumbnail
-      best_candidate ||= blessed_candidates.detect{|candidate| candidate.file_version_is_display_thumbnail}
-
-      # If none, fall back to the first available.
-      best_candidate ||= blessed_candidates.first
-
-      best_candidate
-    end
-
     def calculate_link_url(thumbnail_candidates)
-      if (thumbnail_candidate = calculate_best_representation_candidate(thumbnail_candidates))
-        thumbnail_candidate.file_version_file_uri
+      scored_candidates =
+        thumbnail_candidates
+          .filter { |candidate| is_candidate_a_link?(candidate) }
+          .map { |candidate|
+            score =
+              if candidate.file_version_is_representative
+                # Prefer the representative file version
+                500
+              elsif candidate.file_version_use_statement != 'image-thumbnail' && candidate.file_version_xlink_show_attribute != 'embed'
+                # If none, prefer the first non-thumbnail/embed file version.
+                250
+              elsif candidate.file_version_is_display_thumbnail
+                # If none, prefer a representative file version if it is an allowed image type.
+                100
+              else
+                # If none, fall back to the first available.
+                10
+              end
+
+
+            # If an instance is marked as representative, prefer its file versions; otherwise, pool all linked DOs.
+            if candidate.instance_is_representative
+              score += 1000
+            end
+
+            [candidate, score]
+          }.to_h
+
+      best_score = scored_candidates.values.max
+
+      best_match =
+        scored_candidates
+          .keys
+          .filter { |candidate| scored_candidates[candidate] == best_score }
+          .filter { |candidate| scored_candidates[candidate] > 0 }
+          .first
+
+      if best_match
+        best_match.file_version_file_uri
       end
     end
 
+    ScoredCaption = Struct.new(:candidate, :caption)
     def calculate_caption(record_json, thumbnail_candidates)
+      scored_captions = {}
+
+      preferred_thumbnail = find_preferred_thumbnail_candidate(thumbnail_candidates)
+
+      thumbnail_candidates.each do |candidate|
+        # Prefer the representative’s caption.
+        if candidate.file_version_is_representative && candidate.file_version_caption
+          scored_captions[ScoredCaption.new(candidate, candidate.file_version_caption)] = 500
+        end
+
+        # If absent, use the thumbnail caption.
+        if candidate == preferred_thumbnail && candidate.file_version_caption
+          scored_captions[ScoredCaption.new(candidate, candidate.file_version_caption)] ||= 400
+        end
+
+        # If absent, use the representative’s Digital Object title
+        if candidate.file_version_is_representative
+          scored_captions[ScoredCaption.new(candidate, candidate.digital_object_title)] ||= 300
+        end
+
+        # If absent, use the thumbnail’s Digital Object title.
+        if candidate == preferred_thumbnail
+          scored_captions[ScoredCaption.new(candidate, candidate.digital_object_title)] ||= 200
+        end
+
+        # If absent, use the first DO’s title.
+        scored_captions[ScoredCaption.new(candidate, candidate.digital_object_title)] ||= 10
+      end
+
       # If an instance is marked as representative, prefer its file versions; otherwise, pool all linked DOs.
-      blessed_candidates =
-        if (representative_candidates = find_representative_instance_candidates(thumbnail_candidates)).length > 0
-          representative_candidates
-        else
-          thumbnail_candidates
+      # Bump the score of any representative instance candidates
+      scored_captions.keys.each do |scored_caption|
+        if scored_caption.candidate.instance_is_representative
+          scored_captions[scored_caption] += 1000
         end
+      end
 
-      # Prefer the representative’s caption.
-      caption_text =
-        if (representative_with_caption = blessed_candidates.detect{|candidate| candidate.file_version_is_representative && candidate.file_version_caption})
-          representative_with_caption.file_version_caption
-        end
+      best_score = scored_captions.values.max
 
-      # If absent, use the thumbnail caption.
-      thumbnail_candidate = find_preferred_thumbnail_candidate(thumbnail_candidates)
-      caption_text ||=
-        if thumbnail_candidate
-          thumbnail_candidate.file_version_caption
-        end
+      best_match =
+        scored_captions
+          .keys
+          .filter { |scored_caption| scored_captions[scored_caption] == best_score }
+          .filter { |scored_caption| scored_captions[scored_caption] > 0 }
+          .first
 
-      # If absent, use the representative’s Digital Object title.
-      caption_text ||=
-        if (representative_candidate = blessed_candidates.detect{|candidate| candidate.file_version_is_representative})
-          representative_candidate.digital_object_title
-        end
-
-      # If absent, use the thumbnail’s Digital Object title.
-      caption_text ||=
-        if thumbnail_candidate
-          thumbnail_candidate.digital_object_title
-        end
-
-      # If absent, use the first DO’s title.
-      caption_text ||=
-        if thumbnail_candidates.first
-          thumbnail_candidates.first.digital_object_title
-        end
+      if best_match
+        return best_match.caption
+      end
 
       # If absent, fall back to the record display string.
-      caption_text ||= record_json['display_string'] || record_json['title']
-
-      caption_text
+      record_json['display_string'] || record_json['title']
     end
 
     def is_candidate_a_link?(candidate)
