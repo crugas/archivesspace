@@ -13,7 +13,7 @@
   %>
   <div class="pui-thumbnail">
     <%= link_to thumbnail_link, :target => same_window ? '_self' : '_blank' do %>
-      <div class="pui-thumbnail-help-text">Click here to access online</div>
+      <div class="pui-thumbnail-help-text"><%= I18n.t('thumbnails.access_help_text') %></div>
       <% if (image_url = result.thumbnail.fetch('image_url', nil)) %>
         <%= image_tag image_url, :alt => strip_mixed_content(result.thumbnail.fetch('caption')) %>
       <% else %>
