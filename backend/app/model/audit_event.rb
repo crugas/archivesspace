@@ -28,10 +28,11 @@ class AuditEvent
 
   def self.render(event)
     {
+      '@context' => 'https://www.w3.org/ns/activitystreams',
       :uuid => event[:uuid],
-      :timestamp => event[:timestamp],
+      :timestamp => event[:timestamp].rfc3339,
       :actor => event[:actor],
-      :activity_type => event[:activity_type],
+      :type => event[:activity_type],
       :change_method => event[:change_method],
       :records => event[:records].split(',')
     }
