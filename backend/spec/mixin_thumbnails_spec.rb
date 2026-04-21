@@ -414,6 +414,20 @@ describe 'Thumbnails mixin' do
     )
   }
 
+  let(:not_an_embeddable) {
+    Thumbnails::ThumbnailCandidate.from_hash(
+      :instance_is_representative => false,
+      :digital_object_title => generate(:alphanumstr),
+      :file_version_file_uri => generate(:url),
+      :file_version_use_statement => nil,
+      :file_version_file_format_name => nil,
+      :file_version_xlink_show_attribute => 'new',
+      :file_version_is_representative => true,
+      :file_version_is_display_thumbnail => false,
+      :file_version_caption => nil,
+    )
+  }
+
   describe "calculate_image_url" do
     it "picks representative instance thumbnail candidate over others" do
       result = Resource.calculate_image_url([
@@ -498,6 +512,12 @@ describe 'Thumbnails mixin' do
 
     it "ignores non http URLs" do
       result = Resource.calculate_image_url([not_a_http_url_candidate])
+
+      expect(result).to be_nil
+    end
+
+    it "ignores non embeddable" do
+      result = Resource.calculate_image_url([not_an_embeddable])
 
       expect(result).to be_nil
     end

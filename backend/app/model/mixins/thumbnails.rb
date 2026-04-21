@@ -105,6 +105,7 @@ module Thumbnails
       scored_candidates =
         thumbnail_candidates
           .filter { |candidate| is_candidate_a_link?(candidate) }
+          .filter { |candidate| is_candidate_embeddable?(candidate) }
           .map { |candidate|
             score =
               if candidate.file_version_is_display_thumbnail
@@ -244,6 +245,10 @@ module Thumbnails
 
       # If absent, fall back to the record display string.
       record_json['display_string'] || record_json['title']
+    end
+
+    def is_candidate_embeddable?(candidate)
+      candidate.file_version_xlink_show_attribute != 'new'
     end
 
     def is_candidate_a_link?(candidate)
