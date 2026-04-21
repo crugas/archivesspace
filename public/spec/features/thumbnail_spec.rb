@@ -193,7 +193,7 @@ describe 'Thumbnails', js: true do
 
       within ".recordrow[data-uri='#{@dobj_with_repfv.uri}']" do
         expect(page.find(".pui-thumbnail img", visible: :all)[:src]).to eq @img_1
-        expect(page.find('.pui-thumbnail .pui-thumbnail-caption')).to have_content @caption_1
+        expect(page.find('.pui-thumbnail img')[:alt]).to eq @caption_1
       end
     end
 
@@ -204,7 +204,7 @@ describe 'Thumbnails', js: true do
 
       within ".recordrow[data-uri='#{@dobjc_with_repfv.uri}']" do
         expect(page.find(".pui-thumbnail img", visible: :all)[:src]).to eq @img_2
-        expect(page.find('.pui-thumbnail .pui-thumbnail-caption')).to have_content @caption_2
+        expect(page.find('.pui-thumbnail img')[:alt]).to eq @caption_2
       end
     end
 
@@ -215,7 +215,7 @@ describe 'Thumbnails', js: true do
 
       within ".recordrow[data-uri='#{@resource_with_repfv.uri}']" do
         expect(page.find(".pui-thumbnail img", visible: :all)[:src]).to eq @img_1
-        expect(page.find('.pui-thumbnail .pui-thumbnail-caption')).to have_content @caption_1
+        expect(page.find('.pui-thumbnail img')[:alt]).to eq @caption_1
       end
     end
 
@@ -226,7 +226,7 @@ describe 'Thumbnails', js: true do
 
       within ".recordrow[data-uri='#{@aobj_with_repfv.uri}']" do
         expect(page.find(".pui-thumbnail img", visible: :all)[:src]).to eq @img_1
-        expect(page.find('.pui-thumbnail .pui-thumbnail-caption')).to have_content @caption_1
+        expect(page.find('.pui-thumbnail img')[:alt]).to eq @caption_1
       end
     end
 
@@ -237,7 +237,7 @@ describe 'Thumbnails', js: true do
 
       within ".recordrow[data-uri='#{@accession_with_repfv.uri}']" do
         expect(page.find(".pui-thumbnail img", visible: :all)[:src]).to eq @img_1
-        expect(page.find('.pui-thumbnail .pui-thumbnail-caption')).to have_content @caption_1
+        expect(page.find('.pui-thumbnail img')[:alt]).to eq @caption_1
       end
     end
   end
