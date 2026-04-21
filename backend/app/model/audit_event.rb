@@ -4,32 +4,58 @@ class AuditEvent
 
   RECORD_TYPES = ['resource', 'archival_object']
 
-  def self.render(event, db)
+  def self.ds(db, since = 0, record_type = nil)
+    ds = db[:audit_event].left_join(:audit_record, :audit_record__audit_event_id => :audit_event__id)
+                         .group(:audit_event__id)
+                         .order(Sequel.desc(:audit_event__timestamp))
+
+    if since > 0
+      since_time = Time.at(since)
+      ds = ds.where { timestamp >= since_time }
+    end
+
+    if record_type
+      ds = ds.filter(:audit_record__record_type => record_type)
+    end
+
+    ds.select(:uuid,
+              :timestamp,
+              :actor,
+              :activity_type,
+              :change_method,
+              Sequel.function(:GROUP_CONCAT, :audit_record__target_uri).as(:records))
+  end
+
+  def self.render(event)
     {
       :uuid => event[:uuid],
       :timestamp => event[:timestamp],
       :actor => event[:actor],
       :activity_type => event[:activity_type],
       :change_method => event[:change_method],
-      :records => db[:audit_record].filter(:audit_event_id => event[:id]).select_map(:target_uri)
+      :records => event[:records].split(',')
     }
   end
 
   def self.events_since(since, record_type = nil)
-    since_time = Time.at(since)
-
     DB.open do |db|
-      db[:audit_event].where { timestamp >= since_time }
-        .order(Sequel.desc(:timestamp))
-        .map{|event| self.render(event, db)}
+      ds(db, since, record_type).map{|row| render(row)}
     end
   end
 
   def self.by_id(uuid)
     DB.open do |db|
-      self.render(db[:audit_event].filter(:uuid => uuid).first, db)
+      render(ds(db).filter(:uuid => uuid).first)
     end
   end
+
+  def self.by_type(record_type)
+    DB.open do |db|
+      ds(db, 0, record_type).map{|row| render(row)}
+    end
+  end
+
+
 
   def self.new_event(actor, activity_type, change_method, record_uris, opts = {})
     uris = record_uris.map{|uri|
