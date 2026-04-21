@@ -2,6 +2,7 @@ Sequel.migration do
   up do
     create_table(:audit_event) do
       primary_key :id
+      String :uuid, :null => false
       DateTime :timestamp, :null => false
       String :actor, :null => false
       String :source_repo_uri
