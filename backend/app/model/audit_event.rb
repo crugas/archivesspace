@@ -1,6 +1,19 @@
+require 'securerandom'
+
 class AuditEvent
 
   RECORD_TYPES = ['resource', 'archival_object']
+
+  def self.render(event, db)
+    {
+      :uuid => event[:uuid],
+      :timestamp => event[:timestamp],
+      :actor => event[:actor],
+      :activity_type => event[:activity_type],
+      :change_method => event[:change_method],
+      :records => db[:audit_record].filter(:audit_event_id => event[:id]).select_map(:target_uri)
+    }
+  end
 
   def self.events_since(since, record_type = nil)
     since_time = Time.at(since)
@@ -8,15 +21,13 @@ class AuditEvent
     DB.open do |db|
       db[:audit_event].where { timestamp >= since_time }
         .order(Sequel.desc(:timestamp))
-        .map do |event|
-        {
-          :timestamp => event[:timestamp],
-          :actor => event[:actor],
-          :activity_type => event[:activity_type],
-          :change_method => event[:change_method],
-          :records => db[:audit_record].filter(:audit_event_id => event[:id]).select_map(:target_uri)
-        }
-      end
+        .map{|event| self.render(event, db)}
+    end
+  end
+
+  def self.by_id(uuid)
+    DB.open do |db|
+      self.render(db[:audit_event].filter(:uuid => uuid).first, db)
     end
   end
 
@@ -37,7 +48,8 @@ class AuditEvent
 
     unless uris.empty?
       DB.open do |db|
-        event_id = db[:audit_event].insert(:timestamp => Time.now,
+        event_id = db[:audit_event].insert(:uuid => SecureRandom.uuid,
+                                           :timestamp => Time.now,
                                            :actor => actor,
                                            :source_repo_uri => opts.fetch('source_repo_uri', nil),
                                            :target_repo_uri => opts.fetch('target_repo_uri', nil),

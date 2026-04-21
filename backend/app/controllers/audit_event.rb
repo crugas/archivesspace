@@ -10,4 +10,13 @@ class ArchivesSpaceService < Sinatra::Base
   do
     json_response(AuditEvent.events_since(params[:since]))
   end
+
+  Endpoint.get('/activity-stream/:uuid')
+    .description("Get an audit event by id")
+    .permissions([])
+    .params(["uuid", String, "The UUID of the event to get"])
+    .returns([200, "an audit event"]) \
+  do
+    json_response(AuditEvent.by_id(params[:uuid]))
+  end
 end
