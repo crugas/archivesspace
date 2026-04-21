@@ -45,14 +45,14 @@ describe 'Thumbnails', js: true do
       file_versions: [
         {
           publish: true,
-          is_representative: true,
+          is_representative: false,
           file_uri: @img_1,
           use_statement: 'image-thumbnail',
           caption: @caption_1
         },
         {
           publish: true,
-          is_representative: false,
+          is_representative: true,
           file_uri: @img_3,
         }
       ]
@@ -82,14 +82,14 @@ describe 'Thumbnails', js: true do
                                   file_versions: [
                                     {
                                       publish: true,
-                                      is_representative: true,
+                                      is_representative: false,
                                       file_uri: @img_2,
                                       use_statement: 'image-thumbnail',
                                       caption: @caption_2
                                     },
                                     {
                                       publish: true,
-                                      is_representative: false,
+                                      is_representative: true,
                                       file_uri: @img_3,
                                     }
                                   ]
@@ -156,33 +156,46 @@ describe 'Thumbnails', js: true do
     run_indexers
   end
 
-  it 'links to its digital object record on Resource, Archival Object, and'\
-       ' Accession records' do
+  it 'on Resource' do
     visit @resource_with_repfv.uri
-    expect(page).to have_css ".pui-thumbnail a[href='#{@dobj_with_repfv.uri}']"
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_1}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_1}']"
 
+  end
+  it 'on Archival Object' do
     visit @aobj_with_repfv.uri
-    expect(page).to have_css ".pui-thumbnail > a[href='#{@dobj_with_repfv.uri}']"
-
-    visit @accession_with_repfv.uri
-    expect(page).to have_css ".pui-thumbnail > a[href='#{@dobj_with_repfv.uri}']"
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_1}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_1}']"
   end
 
-  it 'links to the file uri of the proceeding file version, if one exists and is published '\
-       'in the Digital Object or Digital Object Component, on DO/DOC/Resource/AO/Accession pages' do
-    link_css = ".pui-thumbnail > a[href='#{@img_3}']"
+  it 'on Accession records' do
+    visit @accession_with_repfv.uri
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_1}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_1}']"
+  end
 
+  it 'links to the non-thumbmail file version on DO' do
     visit @dobj_with_repfv_02.uri
-    expect(page).to have_css link_css
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_3}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_1}']"
+  end
 
+  it 'links to the file uri of the only published file version on DO' do
     visit @dobj_with_repfv_03.uri
-    expect(page).not_to have_css link_css
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_1}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_1}']"
+  end
 
+  it 'links to the non-thumbmail file version on DOC' do
     visit @dobjc_with_repfv_02.uri
-    expect(page).to have_css link_css
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_3}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_2}']"
+  end
 
+  it 'links to the file uri of the only published file version on DOC' do
     visit @dobjc_with_repfv_03.uri
-    expect(page).not_to have_css link_css
+    expect(page).to have_css ".pui-thumbnail a[href='#{@img_2}']"
+    expect(page).to have_css ".pui-thumbnail img[src='#{@img_2}']"
   end
 
   describe 'search result thumbnail' do
