@@ -2,10 +2,12 @@ require 'securerandom'
 
 class AuditEvent
 
-  RECORD_TYPES =
+  PAGE_SIZE = 2
+
+  OBJECT_TYPES =
     [
-     RECORD_TYPE_RESOURCE = 'resource',
-     RECORD_TYPE_ARCHIVAL_OBJECT = 'archival_object'
+     OBJECT_TYPE_RESOURCE = 'resource',
+     OBJECT_TYPE_ARCHIVAL_OBJECT = 'archival_object'
     ]
 
   # a subset of the types in the standard
@@ -119,6 +121,51 @@ class AuditEvent
     end
   end
 
+  def self.activity_stream(object_type = nil)
+    DB.open do |db|
+      total = ds(db).count
+      last_page = (total.to_f / PAGE_SIZE).ceil
+
+      {
+        '@context' => 'https://www.w3.org/ns/activitystreams',
+        :type => 'OrderedCollection',
+        :totalItems => total,
+        :first => "/activity-stream/page/1",
+        :last => "/activity-stream/page/#{last_page}",
+      }
+    end
+  end
+
+  def self.page(page, object_type = nil)
+    DB.open do |db|
+      uri = '/activity-stream'
+      if object_type
+        uri += "/#{object_type}"
+      end
+
+      out = {
+        '@context' => 'https://www.w3.org/ns/activitystreams',
+        :type => 'OrderedCollectionPage',
+        :id => "#{uri}/page/#{page}",
+        :partOf => {
+          :id => uri,
+          :type => 'OrderedCollection'
+        }
+      }
+
+      if page > 1
+        out[:prev] = {
+          :id => "#{uri}/page/#{page - 1}",
+          :type => 'OrderedCollectionPage',
+        }
+      end
+
+      out[:orderedItems] = ds(db).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
+
+      out
+    end
+  end
+
 
   def self.log_event(activity_type, change_method, object_uri, opts = {})
     log_events(activity_type, change_method, [object_uri], opts = opts)
@@ -148,8 +195,8 @@ class AuditEvent
           next
         end
 
-        unless AuditEvent::RECORD_TYPES.include?(parsed[:type])
-          Log.info("Failed to log Audit Event - unsupported Record Type: #{parsed[:type]}")
+        unless AuditEvent::OBJECT_TYPES.include?(parsed[:type])
+          Log.info("Failed to log Audit Event - unsupported Object Type: #{parsed[:type]}")
           next
         end
 
