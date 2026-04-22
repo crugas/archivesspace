@@ -124,15 +124,19 @@ class AuditEvent
 
   def self.activity_stream(object_type = nil)
     DB.open do |db|
-      total = ds(db).count
+      total = ds(db, 0, object_type).count
       last_page = (total.to_f / PAGE_SIZE).ceil
+      uri = '/activity-stream'
+      if object_type
+        uri += "/#{object_type}"
+      end
 
       {
         '@context' => W3C_URL,
         :type => 'OrderedCollection',
         :totalItems => total,
-        :first => "/activity-stream/page/1",
-        :last => "/activity-stream/page/#{last_page}",
+        :first => "#{uri}/page/1",
+        :last => "#{uri}/page/#{last_page}",
       }
     end
   end
@@ -161,7 +165,7 @@ class AuditEvent
         }
       end
 
-      out[:orderedItems] = ds(db).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
+      out[:orderedItems] = ds(db, 0, object_type).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
 
       out
     end
