@@ -1,6 +1,7 @@
 require 'securerandom'
 
 class AuditEvent
+  W3C_URL = 'https://www.w3.org/ns/activitystreams'
 
   PAGE_SIZE = 2
 
@@ -73,7 +74,7 @@ class AuditEvent
 
   def self.render(event)
     out = {
-      '@context' => 'https://www.w3.org/ns/activitystreams',
+      '@context' => W3C_URL,
       :id => "/activity-stream/event/#{event[:uuid]}",
       :endTime => event[:timestamp].rfc3339,
       :actor => {
@@ -127,7 +128,7 @@ class AuditEvent
       last_page = (total.to_f / PAGE_SIZE).ceil
 
       {
-        '@context' => 'https://www.w3.org/ns/activitystreams',
+        '@context' => W3C_URL,
         :type => 'OrderedCollection',
         :totalItems => total,
         :first => "/activity-stream/page/1",
@@ -144,7 +145,7 @@ class AuditEvent
       end
 
       out = {
-        '@context' => 'https://www.w3.org/ns/activitystreams',
+        '@context' => W3C_URL,
         :type => 'OrderedCollectionPage',
         :id => "#{uri}/page/#{page}",
         :partOf => {
