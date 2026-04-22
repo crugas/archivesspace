@@ -111,7 +111,11 @@ class AuditEvent
   end
 
 
-  def self.log_event(actor, activity_type, change_method, object_uris, opts = {})
+  def self.log_event(actor, activity_type, change_method, object_uri, opts = {})
+    log_events(actor, activity_type, change_method, [object_uri], opts = opts)
+  end
+
+  def self.log_events(actor, activity_type, change_method, object_uris, opts = {})
     unless ACTIVITY_TYPES.include?(activity_type)
       Log.info("Failed to log Audit Event - unsupported Activity Type: #{activity_type}")
       return
