@@ -11,13 +11,31 @@ class ArchivesSpaceService < Sinatra::Base
     json_response(AuditEvent.events_since(params[:since]))
   end
 
-  Endpoint.get('/activity-stream')
-    .description("Get a list of supported record types")
+  Endpoint.get('/activity-stream/object_types')
+    .description("Get a list of supported object types")
     .permissions([])
     .params()
-    .returns([200, "a list of supported record types"]) \
+    .returns([200, "a list of supported object types"]) \
   do
-    json_response(AuditEvent::RECORD_TYPES)
+    json_response(AuditEvent::OBJECT_TYPES)
+  end
+
+  Endpoint.get('/activity-stream')
+    .description("Get an OrderedCollection of events for all object types")
+    .permissions([])
+    .params()
+    .returns([200, "an OrderedCollection"]) \
+  do
+    json_response(AuditEvent.activity_stream)
+  end
+
+  Endpoint.get('/activity-stream/page/:page')
+    .description("Get a page of the activity stream")
+    .permissions([])
+    .params(["page", Integer, "The page to get"])
+    .returns([200, "an OrderedCollectionPage"]) \
+  do
+    json_response(AuditEvent.page(params[:page]))
   end
 
   Endpoint.get('/activity-stream/event/:uuid')
@@ -29,12 +47,12 @@ class ArchivesSpaceService < Sinatra::Base
     json_response(AuditEvent.by_id(params[:uuid]))
   end
 
-  Endpoint.get('/activity-stream/:record_type')
-    .description("Get a list of events for record type")
+  Endpoint.get('/activity-stream/:object_type')
+    .description("Get a list of events for object type")
     .permissions([])
-    .params(["record_type", String, "The type of record to events for"])
+    .params(["object_type", String, "The type of object to events for"])
     .returns([200, "a list of events"]) \
   do
-    json_response(AuditEvent.by_type(params[:record_type]))
+    json_response(AuditEvent.by_type(params[:object_type]))
   end
 end
