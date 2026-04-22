@@ -48,11 +48,21 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
   Endpoint.get('/activity-stream/:object_type')
-    .description("Get a list of events for object type")
+    .description("Get an OrderedCollection of events for object type")
     .permissions([])
     .params(["object_type", String, "The type of object to events for"])
-    .returns([200, "a list of events"]) \
+    .returns([200, "an OrderedCollection"]) \
   do
-    json_response(AuditEvent.by_type(params[:object_type]))
+    json_response(AuditEvent.activity_stream(params[:object_type]))
+  end
+
+  Endpoint.get('/activity-stream/:object_type/page/:page')
+    .description("Get a page of the activity stream for object type")
+    .permissions([])
+    .params(["object_type", String, "The type of object to events for"],
+            ["page", Integer, "The page to get"])
+    .returns([200, "an OrderedCollectionPage"]) \
+  do
+    json_response(AuditEvent.page(params[:page], params[:object_type]))
   end
 end
