@@ -27,6 +27,15 @@ class AuditEvent
 
   ACTIVITY_TYPES = (SUPPORTED_ACTIVITY_TYPES + EXTENSION_ACTIVITY_TYPES).sort
 
+  # FIXME: these are the examples given in the scope statement - needs thought
+  # this field is not in the standard
+  CHANGE_METHODS =
+    [
+     CHANGE_METHOD_API = 'API',
+     CHANGE_METHOD_BULK = 'Bulk Spreadsheet',
+     CHANGE_METHOD_RAPID = 'Rapid Data Entry'
+    ]
+
   AGENT_TYPES =
     [
      AGENT_TYPE_APPLICATION = 'Application',
