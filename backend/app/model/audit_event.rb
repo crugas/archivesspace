@@ -111,14 +111,23 @@ class AuditEvent
   end
 
 
-  def self.log_event(actor, activity_type, change_method, object_uri, opts = {})
-    log_events(actor, activity_type, change_method, [object_uri], opts = opts)
+  def self.log_event(activity_type, change_method, object_uri, opts = {})
+    log_events(activity_type, change_method, [object_uri], opts = opts)
   end
 
-  def self.log_events(actor, activity_type, change_method, object_uris, opts = {})
+  def self.log_events(activity_type, change_method, object_uris, opts = {})
     unless ACTIVITY_TYPES.include?(activity_type)
       Log.info("Failed to log Audit Event - unsupported Activity Type: #{activity_type}")
       return
+    end
+
+    unless opts[:actor]
+      if username = RequestContext.get(:current_username)
+        opts[:actor] = username
+      else
+        Log.info("Failed to log Audit Event - no Actor provided and no current username")
+        return
+      end
     end
 
     DB.open do |db|
@@ -137,12 +146,12 @@ class AuditEvent
 
         db[:audit_event].insert(:uuid => SecureRandom.uuid,
                                 :timestamp => Time.now,
-                                :actor_name => actor,
-                                :actor_type => opts.fetch(:actor_type, nil),
+                                :actor_name => opts[:actor],
+                                :actor_type => opts[:actor_type],
                                 :object_uri => uri,
                                 :object_type => parsed[:type],
-                                :origin_uri => opts.fetch(:origin_uri, nil),
-                                :target_uri => opts.fetch(:target_uri, nil),
+                                :origin_uri => opts[:origin_uri],
+                                :target_uri => opts[:target_uri],
                                 :activity_type => activity_type,
                                 :change_method => change_method)
       end
