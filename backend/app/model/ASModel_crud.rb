@@ -216,7 +216,7 @@ module ASModel
       self.class.fire_update(json, self)
 
       AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
-                           'update_from_json',
+                           AuditEvent::CHANGE_METHOD_API,
                            self.uri)
 
       self
