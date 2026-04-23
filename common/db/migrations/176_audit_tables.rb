@@ -4,12 +4,12 @@ Sequel.migration do
       primary_key :id
       String :uuid, :null => false
       DateTime :timestamp, :null => false
-      Integer :activity_type, :null => false, :size => :tinyint
-      Integer :change_method, :null => false, :size => :tinyint
+      column :activity_type, :tinyint, :unsigned => true, :null => false
+      column :change_method, :tinyint, :unsigned => true, :null => false
       String :actor_name, :null => false
-      Integer :actor_type, :null => false, :size => :tinyint
+      column :actor_type, :tinyint, :unsigned => true, :null => false
       String :object_uri, :null => false
-      Integer :object_type, :null => false, :size => :tinyint
+      column :object_type, :tinyint, :unsigned => true, :null => false
       String :origin_uri
       String :target_uri
     end
