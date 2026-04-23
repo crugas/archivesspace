@@ -5,46 +5,79 @@ class AuditEvent
 
   PAGE_SIZE = 2
 
+  # FIXME: which object types do we want?
   OBJECT_TYPES =
     [
-     OBJECT_TYPE_RESOURCE = 'resource',
-     OBJECT_TYPE_ARCHIVAL_OBJECT = 'archival_object'
+     OBJECT_TYPE_RESOURCE = 1,
+     OBJECT_TYPE_ARCHIVAL_OBJECT = 2
     ]
+
+  OBJECT_TYPE_CODE_TABLE =
+    {
+     OBJECT_TYPE_RESOURCE => 'resource',
+     OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object'
+    }
 
   # a subset of the types in the standard
   # thinking Add and Remove for publish and unpublish?
   SUPPORTED_ACTIVITY_TYPES =
     [
-     ACTIVITY_TYPE_ADD = 'Add',
-     ACTIVITY_TYPE_CREATE = 'Create',
-     ACTIVITY_TYPE_DELETE = 'Delete',
-     ACTIVITY_TYPE_MOVE = 'Move',
-     ACTIVITY_TYPE_REMOVE = 'Remove',
-     ACTIVITY_TYPE_UPDATE = 'Update'
+     ACTIVITY_TYPE_ADD = 1,
+     ACTIVITY_TYPE_CREATE = 2,
+     ACTIVITY_TYPE_DELETE = 3,
+     ACTIVITY_TYPE_MOVE = 4,
+     ACTIVITY_TYPE_REMOVE = 5,
+     ACTIVITY_TYPE_UPDATE = 6
     ]
 
   EXTENSION_ACTIVITY_TYPES =
     [
-     ACTIVITY_TYPE_MERGE = 'Merge'
+     ACTIVITY_TYPE_MERGE = 51
     ]
 
-  ACTIVITY_TYPES = (SUPPORTED_ACTIVITY_TYPES + EXTENSION_ACTIVITY_TYPES).sort
+  ACTIVITY_TYPES = SUPPORTED_ACTIVITY_TYPES + EXTENSION_ACTIVITY_TYPES
+
+  ACTIVITY_TYPE_CODE_TABLE =
+    {
+     ACTIVITY_TYPE_ADD => 'Add',
+     ACTIVITY_TYPE_CREATE => 'Create',
+     ACTIVITY_TYPE_DELETE => 'Delete',
+     ACTIVITY_TYPE_MOVE => 'Move',
+     ACTIVITY_TYPE_REMOVE => 'Remove',
+     ACTIVITY_TYPE_UPDATE => 'Update',
+     ACTIVITY_TYPE_MERGE => 'Merge'
+    }
+
 
   # FIXME: these are the examples given in the scope statement - needs thought
   # this field is not in the standard
   CHANGE_METHODS =
     [
-     CHANGE_METHOD_API = 'API',
-     CHANGE_METHOD_BULK = 'Bulk Spreadsheet',
-     CHANGE_METHOD_RAPID = 'Rapid Data Entry'
+     CHANGE_METHOD_API = 1,
+     CHANGE_METHOD_BULK = 2,
+     CHANGE_METHOD_RAPID = 3
     ]
 
-  AGENT_TYPES =
+  CHANGE_METHOD_CODE_TABLE =
+    {
+     CHANGE_METHOD_API => 'API',
+     CHANGE_METHOD_BULK => 'Bulk Spreadsheet',
+     CHANGE_METHOD_RAPID => 'Rapid Data Entry'
+    }
+
+  ACTOR_TYPES =
     [
-     AGENT_TYPE_APPLICATION = 'Application',
-     AGENT_TYPE_PERSON = 'Person',
-     AGENT_TYPE_SERVICE = 'Service'
+     ACTOR_TYPE_APPLICATION = 1,
+     ACTOR_TYPE_PERSON = 2,
+     ACTOR_TYPE_SERVICE = 3
     ]
+
+  ACTOR_TYPE_CODE_TABLE =
+    {
+     ACTOR_TYPE_APPLICATION => 'Application',
+     ACTOR_TYPE_PERSON => 'Person',
+     ACTOR_TYPE_SERVICE => 'Service'
+    }
 
 
   def self.ds(db, since = 0, object_type = nil)
@@ -56,7 +89,7 @@ class AuditEvent
     end
 
     if object_type
-      ds = ds.filter(:object_type => object_type)
+      ds = ds.filter(:object_type => OBJECT_TYPE_CODE_TABLE.invert[object_type])
     end
 
     ds.select(:uuid,
@@ -78,15 +111,15 @@ class AuditEvent
       :id => "/activity-stream/event/#{event[:uuid]}",
       :endTime => event[:timestamp].rfc3339,
       :actor => {
-        :type => event[:actor_type] || 'Person',
+        :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
         :name => event[:actor_name]
       },
       :object => {
         :id => event[:object_uri],
-        :type => event[:object_type]
+        :type => OBJECT_TYPE_CODE_TABLE[event[:object_type]]
       },
-      :type => event[:activity_type],
-      :method_of_change => event[:change_method]
+      :type => ACTIVITY_TYPE_CODE_TABLE[event[:activity_type]],
+      :method_of_change => CHANGE_METHOD_CODE_TABLE[event[:change_method]]
     }
 
     if event.fetch(:origin_uri)
@@ -178,7 +211,7 @@ class AuditEvent
 
   def self.log_events(activity_type, change_method, object_uris, opts = {})
     unless ACTIVITY_TYPES.include?(activity_type)
-      Log.info("Failed to log Audit Event - unsupported Activity Type: #{activity_type}")
+      Log.info("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
       return
     end
 
@@ -200,7 +233,7 @@ class AuditEvent
           next
         end
 
-        unless AuditEvent::OBJECT_TYPES.include?(parsed[:type])
+        unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
           Log.info("Failed to log Audit Event - unsupported Object Type: #{parsed[:type]}")
           next
         end
@@ -208,9 +241,9 @@ class AuditEvent
         db[:audit_event].insert(:uuid => SecureRandom.uuid,
                                 :timestamp => Time.now,
                                 :actor_name => opts[:actor],
-                                :actor_type => opts[:actor_type],
+                                :actor_type => opts[:actor_type] || ACTOR_TYPE_PERSON,
                                 :object_uri => uri,
-                                :object_type => parsed[:type],
+                                :object_type => OBJECT_TYPE_CODE_TABLE.invert[parsed[:type]],
                                 :origin_uri => opts[:origin_uri],
                                 :target_uri => opts[:target_uri],
                                 :activity_type => activity_type,

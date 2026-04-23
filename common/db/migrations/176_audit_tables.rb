@@ -4,14 +4,14 @@ Sequel.migration do
       primary_key :id
       String :uuid, :null => false
       DateTime :timestamp, :null => false
+      Integer :activity_type, :null => false, :size => :tinyint
+      Integer :change_method, :null => false, :size => :tinyint
       String :actor_name, :null => false
-      String :actor_type
+      Integer :actor_type, :null => false, :size => :tinyint
       String :object_uri, :null => false
-      String :object_type, :null => false
+      Integer :object_type, :null => false, :size => :tinyint
       String :origin_uri
       String :target_uri
-      String :activity_type, :null => false
-      String :change_method, :null => false
     end
   end
 end
