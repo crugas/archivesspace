@@ -84,7 +84,7 @@ describe AccessionsController, type: :controller do
       expect(page).to have_css(".pui-thumbnail img[src='#{@fv_thumbnail_uri}']")
       expect(page).to have_css(".pui-thumbnail a[href='#{@fv_master_uri}']")
       page.find(:css, '.pui-thumbnail .pui-thumbnail-caption') do |fc|
-        expect(fc.text).to have_content(@fv_master_caption)
+        expect(fc.text).to have_content(@fv_thumbnail_caption)
       end
     end
   end

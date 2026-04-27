@@ -627,11 +627,22 @@ describe 'Thumbnails mixin' do
   end
 
   describe "calculate_caption" do
-    it 'picks the instance representative representative candidate over others' do
+    it 'picks the thumbnail caption over others' do
       result = Resource.calculate_caption(build(:resource), [
         thumbnail_candidate,
         master_candidate,
         instance_representative_thumbnail_candidate,
+        instance_representative_candidate,
+        instance_representative_master_candidate,
+      ])
+
+      expect(result).to eq(instance_representative_thumbnail_candidate.file_version_caption)
+    end
+
+    it 'picks the instance representative representative candidate over others' do
+      result = Resource.calculate_caption(build(:resource), [
+        thumbnail_candidate,
+        master_candidate,
         instance_representative_candidate,
         instance_representative_master_candidate,
       ])

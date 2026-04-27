@@ -195,17 +195,16 @@ module Thumbnails
     def calculate_caption(record_json, thumbnail_candidates)
       scored_captions = {}
 
+      # Prefer the thumbnail caption.
       preferred_thumbnail = find_preferred_thumbnail_candidate(thumbnail_candidates)
+      if preferred_thumbnail && preferred_thumbnail.file_version_caption
+        return preferred_thumbnail.file_version_caption
+      end
 
       thumbnail_candidates.each do |candidate|
-        # Prefer the representative’s caption.
+        # If absent, use representative’s caption.
         if candidate.file_version_is_representative && candidate.file_version_caption
           scored_captions[ScoredCaption.new(candidate, candidate.file_version_caption)] = 500
-        end
-
-        # If absent, use the thumbnail caption.
-        if candidate == preferred_thumbnail && candidate.file_version_caption
-          scored_captions[ScoredCaption.new(candidate, candidate.file_version_caption)] ||= 400
         end
 
         # If absent, use the representative’s Digital Object title
