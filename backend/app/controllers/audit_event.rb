@@ -17,7 +17,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params()
     .returns([200, "a list of supported object types"]) \
   do
-    json_response(AuditEvent::OBJECT_TYPE_CODE_TABLE.values)
+    json_response(AuditEvent.all_activity_streams)
   end
 
   Endpoint.get('/activity-stream')
