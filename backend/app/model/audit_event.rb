@@ -6,16 +6,36 @@ class AuditEvent
   PAGE_SIZE = 2
 
   # FIXME: which object types do we want?
+  # others include: assessment, classification, collection_management
+  #                 container_profile, default_values, digital_object_component
+  #                 enumeration, event, group, job, location, location_profile
+  #                 merge_request, ..., subject, user, vocabulary
   OBJECT_TYPES =
     [
-     OBJECT_TYPE_RESOURCE = 1,
-     OBJECT_TYPE_ARCHIVAL_OBJECT = 2
+     OBJECT_TYPE_REPOSITORY = 1,
+     OBJECT_TYPE_AGENT_PERSON = 2,
+     OBJECT_TYPE_AGENT_FAMILY = 3,
+     OBJECT_TYPE_AGENT_CORPORATE_ENTITY = 4,
+     OBJECT_TYPE_AGENT_SOFTWARE = 5,
+     OBJECT_TYPE_ACCESSION = 6,
+     OBJECT_TYPE_RESOURCE = 7,
+     OBJECT_TYPE_ARCHIVAL_OBJECT = 8,
+     OBJECT_TYPE_DIGITAL_OBJECT = 9,
+     OBJECT_TYPE_TOP_CONTAINER = 10,
     ]
 
   OBJECT_TYPE_CODE_TABLE =
     {
+     OBJECT_TYPE_REPOSITORY => 'repository',
+     OBJECT_TYPE_AGENT_PERSON => 'agent_person',
+     OBJECT_TYPE_AGENT_FAMILY => 'agent_family',
+     OBJECT_TYPE_AGENT_CORPORATE_ENTITY => 'agent_corporate_entity',
+     OBJECT_TYPE_AGENT_SOFTWARE => 'agent_software',
+     OBJECT_TYPE_ACCESSION => 'accession',
      OBJECT_TYPE_RESOURCE => 'resource',
-     OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object'
+     OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object',
+     OBJECT_TYPE_DIGITAL_OBJECT => 'digital_object',
+     OBJECT_TYPE_TOP_CONTAINER => 'top_container',
     }
 
   # a subset of the types in the standard
