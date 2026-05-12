@@ -2,6 +2,7 @@ require 'securerandom'
 
 class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
+  ACTIVITY_STREAM_URI = '/activity-stream'
 
   PAGE_SIZE = 2
 
@@ -128,7 +129,7 @@ class AuditEvent
   def self.render(event)
     out = {
       '@context' => W3C_URL,
-      :id => "/activity-stream/event/#{event[:uuid]}",
+      :id => "#{ACTIVITY_STREAM_URI}/event/#{event[:uuid]}",
       :endTime => event[:timestamp].rfc3339,
       :actor => {
         :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
@@ -175,11 +176,16 @@ class AuditEvent
     end
   end
 
+  def self.all_activity_streams
+    AuditEvent::OBJECT_TYPE_CODE_TABLE.values.map{|ot| "#{ACTIVITY_STREAM_URI}/#{ot}"}
+
+  end
+
   def self.activity_stream(object_type = nil)
     DB.open do |db|
       total = ds(db, 0, object_type).count
       last_page = (total.to_f / PAGE_SIZE).ceil
-      uri = '/activity-stream'
+      uri = ACTIVITY_STREAM_URI
       if object_type
         uri += "/#{object_type}"
       end
@@ -196,7 +202,7 @@ class AuditEvent
 
   def self.page(page, object_type = nil)
     DB.open do |db|
-      uri = '/activity-stream'
+      uri = ACTIVITY_STREAM_URI
       if object_type
         uri += "/#{object_type}"
       end
