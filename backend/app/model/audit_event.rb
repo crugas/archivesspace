@@ -101,10 +101,13 @@ class AuditEvent
     }
 
 
-  def self.ds(db, since = 0, object_type = nil)
-    ds = db[:audit_event].order(Sequel.desc(:audit_event__timestamp))
+  def self.ds(db, since = nil, object_type = nil)
+    ds = db[:audit_event]
 
-    if since > 0
+    if since.nil?
+      ds = ds.order(Sequel.asc(:audit_event__timestamp))
+    else
+      ds = ds.order(Sequel.desc(:audit_event__timestamp))
       since_time = Time.at(since)
       ds = ds.where { timestamp >= since_time }
     end
@@ -172,7 +175,7 @@ class AuditEvent
 
   def self.by_type(object_type)
     DB.open do |db|
-      ds(db, 0, object_type).map{|row| render(row)}
+      ds(db, nil, object_type).map{|row| render(row)}
     end
   end
 
@@ -183,7 +186,7 @@ class AuditEvent
 
   def self.activity_stream(object_type = nil)
     DB.open do |db|
-      total = ds(db, 0, object_type).count
+      total = ds(db, nil, object_type).count
       last_page = (total.to_f / PAGE_SIZE).ceil
       uri = ACTIVITY_STREAM_URI
       if object_type
@@ -224,7 +227,7 @@ class AuditEvent
         }
       end
 
-      out[:orderedItems] = ds(db, 0, object_type).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
+      out[:orderedItems] = ds(db, nil, object_type).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
 
       out
     end
