@@ -41,7 +41,8 @@ class AuditEvent
     }
 
   # a subset of the types in the standard
-  # thinking Add and Remove for publish and unpublish?
+  # FIXME: treat merge as move - so no extension types
+  # FIXME: no special handling for publish - just an update
   SUPPORTED_ACTIVITY_TYPES =
     [
      ACTIVITY_TYPE_ADD = 1,
@@ -71,8 +72,7 @@ class AuditEvent
     }
 
 
-  # FIXME: these are the examples given in the scope statement - needs thought
-  # this field is not in the standard
+  # FIXME: probably remove change method - awaiting confirmation
   CHANGE_METHODS =
     [
      CHANGE_METHOD_API = 1,
