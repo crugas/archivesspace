@@ -867,3 +867,8 @@ AppConfig[:bulk_archival_object_updater_max_rows] = 1000
 # Default search scope setting
 # Options: 'all_record_types', 'collections_only'
 AppConfig[:search_default_scope] = 'all_record_types'
+
+# Audit logging disabled by default
+AppConfig[:enable_audit_logging] = false
+# The number of events to include per activity-stream OrderedCollectionPage
+AppConfig[:activity_stream_page_size] = 20
