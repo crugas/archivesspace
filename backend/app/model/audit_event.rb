@@ -4,7 +4,8 @@ class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
   ACTIVITY_STREAM_URI = '/activity-stream'
 
-  PAGE_SIZE = 2
+  PAGE_SIZE = AppConfig[:activity_stream_page_size].to_i
+
 
   # FIXME: which object types do we want?
   # others include: assessment, classification, collection_management
@@ -239,6 +240,8 @@ class AuditEvent
   end
 
   def self.log_events(activity_type, change_method, object_uris, opts = {})
+    return unless AppConfig[:enable_audit_logging]
+
     unless ACTIVITY_TYPES.include?(activity_type)
       Log.info("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
       return
