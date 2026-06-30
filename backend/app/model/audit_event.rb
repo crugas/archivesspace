@@ -2,7 +2,8 @@ require 'securerandom'
 
 class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
-  ACTIVITY_STREAM_URI = '/activity-stream'
+  # FIXME: might need to support a proxy url
+  ACTIVITY_STREAM_URI = "#{AppConfig[:backend_url]}/activity-stream"
 
   PAGE_SIZE = AppConfig[:activity_stream_page_size].to_i
 
