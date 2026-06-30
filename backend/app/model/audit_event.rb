@@ -41,9 +41,8 @@ class AuditEvent
     }
 
   # a subset of the types in the standard
-  # FIXME: treat merge as move - so no extension types
   # FIXME: no special handling for publish - just an update
-  SUPPORTED_ACTIVITY_TYPES =
+  ACTIVITY_TYPES =
     [
      ACTIVITY_TYPE_ADD = 1,
      ACTIVITY_TYPE_CREATE = 2,
@@ -53,13 +52,6 @@ class AuditEvent
      ACTIVITY_TYPE_UPDATE = 6
     ]
 
-  EXTENSION_ACTIVITY_TYPES =
-    [
-     ACTIVITY_TYPE_MERGE = 51
-    ]
-
-  ACTIVITY_TYPES = SUPPORTED_ACTIVITY_TYPES + EXTENSION_ACTIVITY_TYPES
-
   ACTIVITY_TYPE_CODE_TABLE =
     {
      ACTIVITY_TYPE_ADD => 'Add',
@@ -68,7 +60,6 @@ class AuditEvent
      ACTIVITY_TYPE_MOVE => 'Move',
      ACTIVITY_TYPE_REMOVE => 'Remove',
      ACTIVITY_TYPE_UPDATE => 'Update',
-     ACTIVITY_TYPE_MERGE => 'Merge'
     }
 
 
