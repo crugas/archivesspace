@@ -14,6 +14,7 @@ Sequel.migration do
       primary_key :id
       Integer :audit_event_id, :null => false
       String :uri, :null => false
+      String :type, :null => false
       column :role, :tinyint, :unsigned => true, :null => false
     end
 
