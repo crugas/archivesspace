@@ -217,7 +217,7 @@ module ASModel
 
       AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
                            AuditEvent::CHANGE_METHOD_API,
-                           self.uri)
+                           AuditEvent::ROLE_OBJECT => self.uri)
 
       self
     end

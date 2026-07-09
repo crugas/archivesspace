@@ -3,7 +3,8 @@ require 'securerandom'
 class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
   # FIXME: might need to support a proxy url
-  ACTIVITY_STREAM_URI = "#{AppConfig[:backend_url]}/activity-stream"
+  ARCHIVESSPACE_URI = AppConfig[:backend_url]
+  ACTIVITY_STREAM_URI = "#{ARCHIVESSPACE_URI}/activity-stream"
 
   PAGE_SIZE = AppConfig[:activity_stream_page_size].to_i
 
@@ -79,6 +80,20 @@ class AuditEvent
      CHANGE_METHOD_RAPID => 'Rapid Data Entry'
     }
 
+  ROLES =
+    [
+     ROLE_OBJECT = 1,
+     ROLE_SOURCE = 2,
+     ROLE_TARGET = 3
+    ]
+
+  ROLE_CODE_TABLE =
+    {
+     ROLE_OBJECT => 'object',
+     ROLE_SOURCE => 'source',
+     ROLE_TARGET => 'target'
+    }
+
   ACTOR_TYPES =
     [
      ACTOR_TYPE_APPLICATION = 1,
@@ -95,12 +110,11 @@ class AuditEvent
 
 
   def self.ds(db, since = nil, object_type = nil)
-    ds = db[:audit_event]
+    ds = db[:audit_event].left_join(:audit_record, :audit_record__audit_event_id => :audit_event__id)
+                         .group(:audit_event__id)
+                         .order(Sequel.asc(:audit_event__timestamp))
 
-    if since.nil?
-      ds = ds.order(Sequel.asc(:audit_event__timestamp))
-    else
-      ds = ds.order(Sequel.desc(:audit_event__timestamp))
+    unless since.nil?
       since_time = Time.at(since)
       ds = ds.where { timestamp >= since_time }
     end
@@ -113,42 +127,54 @@ class AuditEvent
               :timestamp,
               :actor_name,
               :actor_type,
-              :object_uri,
-              :object_type,
-              :origin_uri,
-              :target_uri,
               :activity_type,
-              :change_method)
+              :change_method,
+              Sequel.function(:GROUP_CONCAT, Sequel.function(:CONCAT_WS, ":", :audit_record__role, :audit_record__uri)).as(:records))
   end
 
+  def self.archivesspace_uri(uri = '')
+    "#{ARCHIVESSPACE_URI}#{uri}"
+  end
+
+  def self.activity_stream_uri(uri = '')
+    "#{ACTIVITY_STREAM_URI}#{uri}"
+  end
 
   def self.render(event)
     out = {
       '@context' => W3C_URL,
-      :id => "#{ACTIVITY_STREAM_URI}/event/#{event[:uuid]}",
+      :id => activity_stream_uri("/event/#{event[:uuid]}"),
       :endTime => event[:timestamp].rfc3339,
       :actor => {
         :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
         :name => event[:actor_name]
       },
-      :object => {
-        :id => event[:object_uri],
-        :type => OBJECT_TYPE_CODE_TABLE[event[:object_type]]
-      },
       :type => ACTIVITY_TYPE_CODE_TABLE[event[:activity_type]],
       :method_of_change => CHANGE_METHOD_CODE_TABLE[event[:change_method]]
     }
 
-    if event.fetch(:origin_uri)
-      out[:origin] = {
-        :id => event[:origin_uri]
-      }
+    records = {}
+
+    event[:records].split(',').each do |record|
+      (role, uri) = record.split(':')
+      records[role] ||= []
+      records[role] << uri
     end
 
-    if event.fetch(:target_uri)
-      out[:target] = {
-        :id => event[:target_uri]
-      }
+    records.each do |role, uris|
+      if uris.length == 1
+        out[ROLE_CODE_TABLE[role.to_i]] = {
+          :id => archivesspace_uri(uris.first),
+          :type => JSONModel.parse_reference(uris.first)[:type]
+        }
+      else
+        out[ROLE_CODE_TABLE[role.to_i]] = uris.map{|uri|
+          {
+            :id => archivesspace_uri(uri),
+            :type => JSONModel.parse_reference(uri)[:type]
+          }
+        }
+      end
     end
 
     out
@@ -173,15 +199,14 @@ class AuditEvent
   end
 
   def self.all_activity_streams
-    AuditEvent::OBJECT_TYPE_CODE_TABLE.values.map{|ot| "#{ACTIVITY_STREAM_URI}/#{ot}"}
-
+    AuditEvent::OBJECT_TYPE_CODE_TABLE.values.map{|ot| activity_stream_uri("/#{ot}")}
   end
 
   def self.activity_stream(object_type = nil)
     DB.open do |db|
       total = ds(db, nil, object_type).count
       last_page = (total.to_f / PAGE_SIZE).ceil
-      uri = ACTIVITY_STREAM_URI
+      uri = activity_stream_uri
       if object_type
         uri += "/#{object_type}"
       end
@@ -190,15 +215,15 @@ class AuditEvent
         '@context' => W3C_URL,
         :type => 'OrderedCollection',
         :totalItems => total,
-        :first => "#{uri}/page/1",
-        :last => "#{uri}/page/#{last_page}",
+        :first => activity_stream_uri("/page/1"),
+        :last => activity_stream_uri("/page/#{last_page}"),
       }
     end
   end
 
   def self.page(page, object_type = nil)
     DB.open do |db|
-      uri = ACTIVITY_STREAM_URI
+      uri = activity_stream_uri
       if object_type
         uri += "/#{object_type}"
       end
@@ -206,7 +231,7 @@ class AuditEvent
       out = {
         '@context' => W3C_URL,
         :type => 'OrderedCollectionPage',
-        :id => "#{uri}/page/#{page}",
+        :id => "/#{uri}/page/#{page}",
         :partOf => {
           :id => uri,
           :type => 'OrderedCollection'
@@ -226,16 +251,11 @@ class AuditEvent
     end
   end
 
-
-  def self.log_event(activity_type, change_method, object_uri, opts = {})
-    log_events(activity_type, change_method, [object_uri], opts = opts)
-  end
-
-  def self.log_events(activity_type, change_method, object_uris, opts = {})
+  def self.log_event(activity_type, change_method, records, opts = {})
     return unless AppConfig[:enable_audit_logging]
 
     unless ACTIVITY_TYPES.include?(activity_type)
-      Log.info("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
+      Log.warn("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
       return
     end
 
@@ -243,35 +263,39 @@ class AuditEvent
       if username = RequestContext.get(:current_username)
         opts[:actor] = username
       else
-        Log.info("Failed to log Audit Event - no Actor provided and no current username")
+        Log.warn("Failed to log Audit Event - no Actor provided and no current username")
         return
       end
     end
 
     DB.open do |db|
-      object_uris.each do |uri|
-        parsed = JSONModel.parse_reference(uri)
+      event_id = db[:audit_event].insert(:uuid => SecureRandom.uuid,
+                                         :timestamp => Time.now,
+                                         :actor_name => opts[:actor],
+                                         :actor_type => opts[:actor_type] || ACTOR_TYPE_PERSON,
+                                         :activity_type => activity_type,
+                                         :change_method => change_method)
 
-        if parsed.nil?
-          Log.info("Failed to log Audit Event - failed to parse Object URI: #{uri}")
-          next
+
+      records.each do |role, uris|
+        ASUtils.wrap(uris).each do |uri|
+          parsed = JSONModel.parse_reference(uri)
+
+          if parsed.nil?
+            Log.warn("Failed to log Audit Event - failed to parse URI: #{uri}")
+            next
+          end
+
+          unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
+            Log.warn("Failed to log Audit Event - unsupported Object Type: #{parsed[:type]}")
+            next
+          end
+
+          db[:audit_record].insert(:audit_event_id => event_id,
+                                   :uri => uri,
+                                   :role => role)
+
         end
-
-        unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
-          Log.info("Failed to log Audit Event - unsupported Object Type: #{parsed[:type]}")
-          next
-        end
-
-        db[:audit_event].insert(:uuid => SecureRandom.uuid,
-                                :timestamp => Time.now,
-                                :actor_name => opts[:actor],
-                                :actor_type => opts[:actor_type] || ACTOR_TYPE_PERSON,
-                                :object_uri => uri,
-                                :object_type => OBJECT_TYPE_CODE_TABLE.invert[parsed[:type]],
-                                :origin_uri => opts[:origin_uri],
-                                :target_uri => opts[:target_uri],
-                                :activity_type => activity_type,
-                                :change_method => change_method)
       end
     end
   end

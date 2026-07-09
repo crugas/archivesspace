@@ -8,10 +8,18 @@ Sequel.migration do
       column :change_method, :tinyint, :unsigned => true, :null => false
       String :actor_name, :null => false
       column :actor_type, :tinyint, :unsigned => true, :null => false
-      String :object_uri, :null => false
-      column :object_type, :tinyint, :unsigned => true, :null => false
-      String :origin_uri
-      String :target_uri
     end
+
+    create_table(:audit_record) do
+      primary_key :id
+      Integer :audit_event_id, :null => false
+      String :uri, :null => false
+      column :role, :tinyint, :unsigned => true, :null => false
+    end
+
+    alter_table(:audit_record) do
+      add_foreign_key([:audit_event_id], :audit_event, :key => :id)
+    end
+
   end
 end
