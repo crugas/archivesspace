@@ -120,7 +120,7 @@ class AuditEvent
     end
 
     if object_type
-      ds = ds.filter(:object_type => OBJECT_TYPE_CODE_TABLE.invert[object_type])
+      ds = ds.filter(:audit_record__type => object_type)
     end
 
     ds.select(:uuid,
@@ -129,7 +129,7 @@ class AuditEvent
               :actor_type,
               :activity_type,
               :change_method,
-              Sequel.function(:GROUP_CONCAT, Sequel.function(:CONCAT_WS, ":", :audit_record__role, :audit_record__uri)).as(:records))
+              Sequel.function(:GROUP_CONCAT, Sequel.function(:CONCAT_WS, ":", :audit_record__role, :audit_record__type, :audit_record__uri)).as(:records))
   end
 
   def self.archivesspace_uri(uri = '')
@@ -156,24 +156,21 @@ class AuditEvent
     records = {}
 
     event[:records].split(',').each do |record|
-      (role, uri) = record.split(':')
+      (role, type, uri) = record.split(':')
       records[role] ||= []
-      records[role] << uri
+      records[role] << {:uri => uri, :type => type}
     end
 
     records.each do |role, uris|
+      out[ROLE_CODE_TABLE[role.to_i]] = ASUtils.wrap(uris).map{|uri|
+        {
+          :id => archivesspace_uri(uri[:uri]),
+          :type => uri[:type]
+        }
+      }
+
       if uris.length == 1
-        out[ROLE_CODE_TABLE[role.to_i]] = {
-          :id => archivesspace_uri(uris.first),
-          :type => JSONModel.parse_reference(uris.first)[:type]
-        }
-      else
-        out[ROLE_CODE_TABLE[role.to_i]] = uris.map{|uri|
-          {
-            :id => archivesspace_uri(uri),
-            :type => JSONModel.parse_reference(uri)[:type]
-          }
-        }
+        out[ROLE_CODE_TABLE[role.to_i]] = out[ROLE_CODE_TABLE[role.to_i]].first
       end
     end
 
@@ -293,6 +290,7 @@ class AuditEvent
 
           db[:audit_record].insert(:audit_event_id => event_id,
                                    :uri => uri,
+                                   :type => parsed[:type],
                                    :role => role)
 
         end
