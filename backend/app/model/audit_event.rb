@@ -261,7 +261,8 @@ class AuditEvent
         }
       end
 
-      out[:orderedItems] = ds(db, nil, object_type).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| render(row)}
+      ids = ds(db, nil, object_type).select(:audit_event__id).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| row[:id]}
+      out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map{|row| render(row)}
 
       out
     end
