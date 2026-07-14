@@ -25,6 +25,7 @@ class AuditEvent
      OBJECT_TYPE_ARCHIVAL_OBJECT = 8,
      OBJECT_TYPE_DIGITAL_OBJECT = 9,
      OBJECT_TYPE_TOP_CONTAINER = 10,
+     OBJECT_TYPE_SUBJECT = 11,
     ]
 
   OBJECT_TYPE_CODE_TABLE =
@@ -39,6 +40,7 @@ class AuditEvent
      OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object',
      OBJECT_TYPE_DIGITAL_OBJECT => 'digital_object',
      OBJECT_TYPE_TOP_CONTAINER => 'top_container',
+     OBJECT_TYPE_SUBJECT => 'subject',
     }
 
   # a subset of the types in the standard
