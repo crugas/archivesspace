@@ -180,6 +180,8 @@ class AuditEvent
     end
 
     # Special handling for merges
+    # A merge is a special case of move where the target is included in the list of objects
+    # This is marked with a summary of 'merge'
     if out[:type] == ACTIVITY_TYPE_CODE_TABLE[ACTIVITY_TYPE_MOVE] &&
         ASUtils.wrap(out[ROLE_CODE_TABLE[ROLE_OBJECT]]).map{|o| o[:id]}.include?(out[ROLE_CODE_TABLE[ROLE_TARGET]][:id])
       out[:summary] = 'merge'
