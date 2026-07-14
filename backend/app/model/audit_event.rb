@@ -261,6 +261,13 @@ class AuditEvent
         }
       end
 
+      if page < (ds(db, nil, object_type).count.to_f / PAGE_SIZE).ceil
+        out[:next] = {
+          :id => "#{uri}/page/#{page + 1}",
+          :type => 'OrderedCollectionPage',
+        }
+      end
+
       ids = ds(db, nil, object_type).select(:audit_event__id).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| row[:id]}
       out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map{|row| render(row)}
 
