@@ -227,13 +227,21 @@ class AuditEvent
         uri += "/#{object_type}"
       end
 
-      {
-        '@context' => W3C_URL,
-        :type => 'OrderedCollection',
-        :totalItems => total,
-        :first => activity_stream_uri("/page/1"),
-        :last => activity_stream_uri("/page/#{last_page}"),
-      }
+      if total == 0
+        {
+          '@context' => W3C_URL,
+          :type => 'OrderedCollection',
+          :totalItems => total,
+        }
+      else
+        {
+          '@context' => W3C_URL,
+          :type => 'OrderedCollection',
+          :totalItems => total,
+          :first => uri + "/page/1",
+          :last => uri + "/page/#{last_page}",
+        }
+      end
     end
   end
 
