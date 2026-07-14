@@ -276,6 +276,10 @@ module ASModel
         Tombstone.create(:uri => uri)
         DB.after_commit do
           RealtimeIndexing.record_delete(uri)
+
+          AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_DELETE,
+                               AuditEvent::CHANGE_METHOD_API,
+                               AuditEvent::ROLE_OBJECT => uri)
         end
       end
     end
@@ -347,6 +351,11 @@ module ASModel
         fire_update(json, obj)
 
         obj.refresh
+
+        AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
+                             AuditEvent::CHANGE_METHOD_API,
+                             AuditEvent::ROLE_OBJECT => json.class.uri_for(obj[:id]))
+
         obj
       end
 
