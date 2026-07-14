@@ -4,7 +4,6 @@ class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
   # FIXME: might need to support a proxy url
   ARCHIVESSPACE_URI = AppConfig[:backend_url]
-  ACTIVITY_STREAM_URI = "#{ARCHIVESSPACE_URI}/activity-stream"
 
   PAGE_SIZE = AppConfig[:activity_stream_page_size].to_i
 
@@ -133,11 +132,15 @@ class AuditEvent
   end
 
   def self.archivesspace_uri(uri = '')
-    "#{ARCHIVESSPACE_URI}#{uri}"
+    if (AppConfig[:activity_stream_use_relative_uris] rescue false)
+      uri
+    else
+      "#{ARCHIVESSPACE_URI}#{uri}"
+    end
   end
 
   def self.activity_stream_uri(uri = '')
-    "#{ACTIVITY_STREAM_URI}#{uri}"
+    archivesspace_uri("/activity-stream#{uri}")
   end
 
   def self.render(event)
