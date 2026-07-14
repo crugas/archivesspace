@@ -179,6 +179,12 @@ class AuditEvent
       end
     end
 
+    # Special handling for merges
+    if out[:type] == ACTIVITY_TYPE_CODE_TABLE[ACTIVITY_TYPE_MOVE] &&
+        out[ROLE_CODE_TABLE[ROLE_OBJECT]].map{|o| o[:id]}.include?(out[ROLE_CODE_TABLE[ROLE_TARGET]][:id])
+      out[:summary] = 'merge'
+    end
+
     out
   end
 

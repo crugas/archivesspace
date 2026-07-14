@@ -576,6 +576,11 @@ module Relationships
       raise MergeRequestFailed.new("Can't complete merge: record still in use")
     }
 
+    AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_MOVE,
+                         AuditEvent::CHANGE_METHOD_API,
+                         AuditEvent::ROLE_OBJECT => [self.uri] + merge_candidates.map{|c| c.uri},
+                         AuditEvent::ROLE_TARGET => self.uri)
+
     trigger_reindex_of_dependants
   end
 
