@@ -354,7 +354,7 @@ module ASModel
 
         AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
                              AuditEvent::CHANGE_METHOD_API,
-                             AuditEvent::ROLE_OBJECT => json.class.uri_for(obj[:id]))
+                             AuditEvent::ROLE_OBJECT => json.class.uri_for(obj[:id], :repo_id => values["repo_id"]))
 
         obj
       end
