@@ -65,20 +65,26 @@ class AuditEvent
      ACTIVITY_TYPE_UPDATE => 'Update',
     }
 
-
-  # FIXME: probably remove change method - awaiting confirmation
   CHANGE_METHODS =
     [
      CHANGE_METHOD_API = 1,
-     CHANGE_METHOD_BULK = 2,
-     CHANGE_METHOD_RAPID = 3
+     CHANGE_METHOD_FORM = 2,
+     CHANGE_METHOD_IMPORTER = 3,
+     CHANGE_METHOD_JOB = 4,
+     CHANGE_METHOD_BULK = 5,
+     CHANGE_METHOD_RAPID = 6,
+     CHANGE_METHOD_MIGRATION = 7,
     ]
 
   CHANGE_METHOD_CODE_TABLE =
     {
      CHANGE_METHOD_API => 'API',
+     CHANGE_METHOD_FORM => 'Staff UI Form',
+     CHANGE_METHOD_IMPORTER => 'Importer',
+     CHANGE_METHOD_JOB => 'Background Job',
      CHANGE_METHOD_BULK => 'Bulk Spreadsheet',
-     CHANGE_METHOD_RAPID => 'Rapid Data Entry'
+     CHANGE_METHOD_RAPID => 'Rapid Data Entry',
+     CHANGE_METHOD_MIGRATION => 'Database Migration',
     }
 
   ROLES =
