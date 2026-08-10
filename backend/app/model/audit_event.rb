@@ -286,6 +286,12 @@ class AuditEvent
   def self.log_event(activity_type, change_method, records, opts = {})
     return unless AppConfig[:enable_audit_logging]
 
+    if records.values.flatten.compact.empty?
+      # Don't log an event if there are no affected records
+      # This can happen when nested records are updated, via create_from_json
+      return
+    end
+
     unless ACTIVITY_TYPES.include?(activity_type)
       Log.warn("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
       return
