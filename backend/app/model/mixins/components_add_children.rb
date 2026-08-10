@@ -9,6 +9,8 @@ module ComponentsAddChildren
   end
 
   def add_children(children)
+    RequestContext.put(:change_method, 'RAPID');
+
     children.children.each do |child|
       obj = JSONModel(self.class.node_record_type.intern).from_hash(child)
 
