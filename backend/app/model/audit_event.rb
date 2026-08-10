@@ -283,7 +283,7 @@ class AuditEvent
     end
   end
 
-  def self.log_event(activity_type, change_method, records, opts = {})
+  def self.log_event(activity_type, records, opts = {})
     return unless AppConfig[:enable_audit_logging]
 
     if records.values.flatten.compact.empty?
@@ -297,10 +297,6 @@ class AuditEvent
       return
     end
 
-    if RequestContext.get(:change_method)
-      change_method = self.const_get("CHANGE_METHOD_#{RequestContext.get(:change_method).upcase}")
-    end
-
     unless opts[:actor]
       if username = RequestContext.get(:current_username)
         opts[:actor] = username
@@ -309,6 +305,17 @@ class AuditEvent
         return
       end
     end
+
+    change_method = if RequestContext.get(:change_method)
+                      begin
+                        self.const_get("CHANGE_METHOD_#{RequestContext.get(:change_method).upcase}")
+                      rescue
+                        Log.warn("Invalid change_method on RequestContext - #{RequestContext.get(:change_method)}. Defaulting to API")
+                        CHANGE_METHOD_API
+                      end
+                    else
+                      CHANGE_METHOD_API
+                    end
 
     DB.open do |db|
       event_id = db[:audit_event].insert(:uuid => SecureRandom.uuid,

@@ -216,7 +216,6 @@ module ASModel
       self.class.fire_update(json, self)
 
       AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
-                           AuditEvent::CHANGE_METHOD_API,
                            AuditEvent::ROLE_OBJECT => self.uri)
 
       self
@@ -278,7 +277,6 @@ module ASModel
           RealtimeIndexing.record_delete(uri)
 
           AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_DELETE,
-                               AuditEvent::CHANGE_METHOD_API,
                                AuditEvent::ROLE_OBJECT => uri)
         end
       end
@@ -353,7 +351,6 @@ module ASModel
         obj.refresh
 
         AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
-                             AuditEvent::CHANGE_METHOD_API,
                              AuditEvent::ROLE_OBJECT => json.class.uri_for(obj[:id], :repo_id => values["repo_id"]))
 
         obj
