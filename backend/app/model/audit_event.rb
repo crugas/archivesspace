@@ -297,6 +297,10 @@ class AuditEvent
       return
     end
 
+    if RequestContext.get(:change_method)
+      change_method = self.const_get("CHANGE_METHOD_#{RequestContext.get(:change_method).upcase}")
+    end
+
     unless opts[:actor]
       if username = RequestContext.get(:current_username)
         opts[:actor] = username
