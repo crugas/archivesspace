@@ -313,7 +313,7 @@ class AuditEvent
     end
 
     unless ACTIVITY_TYPES.include?(activity_type)
-      Log.warn("Failed to log Audit Event - unsupported Activity Type: #{ACTIVITY_TYPE_CODE_TABLE[activity_type]}")
+      Log.warn("Failed to log Audit Event - unsupported Activity Type: #{activity_type}")
       return
     end
 
@@ -326,6 +326,31 @@ class AuditEvent
       end
     end
 
+    records_to_be_logged = {}
+
+    records.each do |role, uris|
+      ASUtils.wrap(uris).each do |uri|
+        parsed = JSONModel.parse_reference(uri)
+
+        if parsed.nil?
+          Log.warn("Failed to log Audit Event Record - failed to parse URI: #{uri}")
+          next
+        end
+
+        unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
+          Log.debug("Skipping Audit Record - unsupported Object Type: #{parsed[:type]}")
+          next
+        end
+
+        records_to_be_logged[role] ||= []
+        records_to_be_logged[role] << {:uri => uri, :type => parsed[:type]}
+      end
+    end
+
+    if records_to_be_logged.empty?
+      return
+    end
+
     change_method = RequestContext.get(:change_method) || CHANGE_METHOD_API
 
     DB.open do |db|
@@ -336,26 +361,12 @@ class AuditEvent
                                          :activity_type => activity_type,
                                          :change_method => change_method)
 
-
-      records.each do |role, uris|
-        ASUtils.wrap(uris).each do |uri|
-          parsed = JSONModel.parse_reference(uri)
-
-          if parsed.nil?
-            Log.warn("Failed to log Audit Event - failed to parse URI: #{uri}")
-            next
-          end
-
-          unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
-            Log.warn("Failed to log Audit Event - unsupported Object Type: #{parsed[:type]}")
-            next
-          end
-
+      records_to_be_logged.each do |role, records|
+        records.each do |record|
           db[:audit_record].insert(:audit_event_id => event_id,
-                                   :uri => uri,
-                                   :type => parsed[:type],
+                                   :uri => record[:uri],
+                                   :type => record[:type],
                                    :role => role)
-
         end
       end
     end
