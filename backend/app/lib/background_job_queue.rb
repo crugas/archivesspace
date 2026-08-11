@@ -125,7 +125,9 @@ class BackgroundJobQueue
         job.finish!(:completed)
       end
 
-      runner.run
+      RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_JOB) do
+        runner.run
+      end
 
       finished.value = true
       watchdog_thread.join
