@@ -18,6 +18,7 @@ class BulkArchivalObjectUpdaterRunner < JobRunner
     begin
       RequestContext.open(:current_username => @job.owner.username,
                           :inside_bulk_update => true,
+                          :change_method => AuditEvent::CHANGE_METHOD_BULK,
                           :repo_id => @job.repo_id) do
 
         parameters = {}
