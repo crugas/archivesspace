@@ -36,6 +36,7 @@ class BulkImportRunner < JobRunner
           begin
             RequestContext.open(:create_enums => true,
                                 :current_username => @job.owner.username,
+                                :change_method => AuditEvent::CHANGE_METHOD_BULK,
                                 :repo_id => @job.repo_id) do
               importer = get_importer(@json.job["content_type"], params, ticker.method(:log))
               report = importer.run
