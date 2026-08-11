@@ -76,6 +76,17 @@ class AuditEvent
      CHANGE_METHOD_MIGRATION = 7,
     ]
 
+  CHANGE_METHOD_LOOKUP =
+    {
+     'API' => CHANGE_METHOD_API,
+     'FORM' => CHANGE_METHOD_FORM,
+     'IMPORTER' => CHANGE_METHOD_IMPORTER,
+     'JOB' => CHANGE_METHOD_JOB,
+     'BULK' => CHANGE_METHOD_BULK,
+     'RAPID' => CHANGE_METHOD_RAPID,
+     'MIGRATION' => CHANGE_METHOD_MIGRATION,
+    }
+
   CHANGE_METHOD_CODE_TABLE =
     {
      CHANGE_METHOD_API => 'API',
@@ -283,6 +294,15 @@ class AuditEvent
     end
   end
 
+  def self.lookup_change_method(key)
+    CHANGE_METHOD_LOOKUP.fetch(key) {
+      if key
+        Log.warn("Failed attempt to lookup AuditEvent::CHANGE_METHOD with key: #{key}. Defaulting to API")
+      end
+      CHANGE_METHOD_API
+    }
+  end
+
   def self.log_event(activity_type, records, opts = {})
     return unless AppConfig[:enable_audit_logging]
 
@@ -306,16 +326,7 @@ class AuditEvent
       end
     end
 
-    change_method = if RequestContext.get(:change_method)
-                      begin
-                        self.const_get("CHANGE_METHOD_#{RequestContext.get(:change_method).upcase}")
-                      rescue
-                        Log.warn("Invalid change_method on RequestContext - #{RequestContext.get(:change_method)}. Defaulting to API")
-                        CHANGE_METHOD_API
-                      end
-                    else
-                      CHANGE_METHOD_API
-                    end
+    change_method = RequestContext.get(:change_method) || CHANGE_METHOD_API
 
     DB.open do |db|
       event_id = db[:audit_event].insert(:uuid => SecureRandom.uuid,
