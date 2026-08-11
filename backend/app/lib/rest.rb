@@ -354,7 +354,7 @@ module RESTHelpers
 
             RequestContext.put(:repo_id, params[:repo_id])
             RequestContext.put(:is_high_priority, high_priority_request?)
-            RequestContext.put(:change_method, env['HTTP_X_ARCHIVESSPACE_CHANGE_METHOD']);
+            RequestContext.put(:change_method, AuditEvent.lookup_change_method(env['HTTP_X_ARCHIVESSPACE_CHANGE_METHOD']));
 
             if Endpoint.is_toplevel_request?(env) || Endpoint.is_potentially_destructive_request?(env)
               unless preconditions.all? { |precondition| self.instance_eval &precondition }

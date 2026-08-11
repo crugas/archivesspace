@@ -9,7 +9,7 @@ module ComponentsAddChildren
   end
 
   def add_children(children)
-    RequestContext.put(:change_method, 'RAPID');
+    RequestContext.put(:change_method, AuditEvent::CHANGE_METHOD_RAPID);
 
     children.children.each do |child|
       obj = JSONModel(self.class.node_record_type.intern).from_hash(child)
