@@ -231,8 +231,8 @@ module JSONModel
         req['X-ArchivesSpace-Priority'] = "high"
       end
 
-      if req.method == 'POST' || req.method == 'DELETE'
-        req['X-ArchivesSpace-Change-Method'] = "FORM"
+      if ['POST', 'DELETE'].include?(req.method)
+        req['X-ArchivesSpace-Change-Method'] = 'FORM'
       end
 
       response = http_conn.request(url, req, &block)
