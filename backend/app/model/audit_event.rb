@@ -7,8 +7,6 @@ class AuditEvent
   # FIXME: might need to support a proxy url
   ARCHIVESSPACE_URI = AppConfig[:backend_url]
 
-  PAGE_SIZE = AppConfig[:activity_stream_page_size].to_i
-
   def self.ds(db, since = nil, object_type = nil)
     ds = db[:audit_event].left_join(:audit_record, :audit_record__audit_event_id => :audit_event__id)
                          .group(:audit_event__id)
@@ -113,26 +111,26 @@ class AuditEvent
 
   def self.activity_stream(object_type = nil)
     DB.open do |db|
-      total = ds(db, nil, object_type).count
-      last_page = (total.to_f / PAGE_SIZE).ceil
+      page_info = AuditPaginator.page_statistics(db, object_type)
+
       uri = activity_stream_uri
       if object_type
         uri += "/#{object_type}"
       end
 
-      if total == 0
+      if page_info.total == 0
         {
           '@context' => W3C_URL,
           :type => 'OrderedCollection',
-          :totalItems => total,
+          :totalItems => page_info.total,
         }
       else
         {
           '@context' => W3C_URL,
           :type => 'OrderedCollection',
-          :totalItems => total,
+          :totalItems => page_info.total,
           :first => uri + "/page/1",
-          :last => uri + "/page/#{last_page}",
+          :last => uri + "/page/#{page_info.last_page}",
         }
       end
     end
@@ -144,6 +142,10 @@ class AuditEvent
       if object_type
         uri += "/#{object_type}"
       end
+
+      audit_page = AuditPaginator.get_page(db, page, object_type)
+
+      return nil unless audit_page
 
       out = {
         '@context' => W3C_URL,
@@ -162,17 +164,57 @@ class AuditEvent
         }
       end
 
-      if page < (ds(db, nil, object_type).count.to_f / PAGE_SIZE).ceil
+      if audit_page.has_next_page
         out[:next] = {
           :id => "#{uri}/page/#{page + 1}",
           :type => 'OrderedCollectionPage',
         }
       end
 
-      ids = ds(db, nil, object_type).select(:audit_event__id).limit(PAGE_SIZE, (page - 1) * PAGE_SIZE).map{|row| row[:id]}
-      out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map{|row| render(row)}
+      case audit_page.page_type
+      when 'audit'
+        ids = audit_page.event_ids
+        out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map{|row| render(row)}
+        out
+      when 'bulk'
+        record_type = AuditEvent::OBJECT_TYPE_CODE_TABLE.fetch(audit_page.page.fetch(:bulk_record_type))
+        record_ids = audit_page.event_ids
 
-      out
+        record_uris = DB.open do |db|
+          model = ASModel.all_models.find {|model|
+            jsonmodel = model.my_jsonmodel(true)
+            jsonmodel && jsonmodel.record_type == record_type
+          }
+
+          raise "Model not found for #{record_type}" unless model
+
+          model.any_repo.filter(id: record_ids).map {|record|
+            if record.respond_to?(:repo_id)
+              RequestContext.open(repo_id: record.repo_id) do
+                [record.id, record.uri]
+              end
+            else
+              [record.id, record.uri]
+            end
+          }.to_h
+        end
+
+        role = AuditEvent::ROLE_OBJECT
+
+        record_ids.map {|record_id|
+          {
+            uuid: 'FIXMEgarbagefornow',
+            timestamp: audit_page.page.fetch(:update_time),
+            activity_type: audit_page.page.fetch(:bulk_activity_type),
+            change_method: audit_page.page.fetch(:bulk_change_method),
+            actor_name: audit_page.page.fetch(:bulk_actor_name),
+            actor_type: audit_page.page.fetch(:bulk_actor_type),
+            records:[role, record_type, record_uris.fetch(record_id)].join(":")
+          }
+        }.map{|row| render(row)}
+      else
+        raise "Unknown page type: #{audit_page.page_type}"
+      end
     end
   end
 
