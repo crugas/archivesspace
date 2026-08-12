@@ -176,15 +176,6 @@ class AuditEvent
     end
   end
 
-  def self.lookup_change_method(key)
-    CHANGE_METHOD_LOOKUP.fetch(key) {
-      if key
-        Log.warn("Failed attempt to lookup AuditEvent::CHANGE_METHOD with key: #{key}. Defaulting to API")
-      end
-      CHANGE_METHOD_API
-    }
-  end
-
   def self.log_event(activity_type, records, opts = {})
     return unless AppConfig[:enable_audit_logging]
 

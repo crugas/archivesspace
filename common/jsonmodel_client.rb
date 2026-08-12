@@ -2,6 +2,7 @@ require 'ashttp'
 require 'net/http/persistent'
 require 'net/http/post/multipart'
 require 'json'
+require 'audit_event_constants'
 require_relative 'exceptions'
 
 
@@ -232,7 +233,7 @@ module JSONModel
       end
 
       if ['POST', 'DELETE'].include?(req.method)
-        req['X-ArchivesSpace-Change-Method'] = 'FORM'
+        req['X-ArchivesSpace-Change-Method'] = AuditEvent::CHANGE_METHOD_FORM
       end
 
       response = http_conn.request(url, req, &block)
