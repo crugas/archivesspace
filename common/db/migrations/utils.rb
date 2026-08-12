@@ -1,3 +1,6 @@
+require 'audit_event_constants'
+require 'securerandom'
+
 Sequel.extension :inflector
 Sequel.extension :pagination
 
@@ -228,4 +231,24 @@ def log_date_migration(r)
   $stderr.puts("era_id                   : " + r[:era_id].to_s)
   $stderr.puts("calendar_id              : " + r[:calendar_id].to_s)
   $stderr.puts("\n")
+end
+
+class AuditEventLogger
+  def initialize(db)
+    @db = db
+  end
+
+  def log_update_event(object_type, uri)
+    event_id = @db[:audit_event].insert(:uuid => SecureRandom.uuid,
+                                        :timestamp => Time.now,
+                                        :actor_name => 'admin',
+                                        :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
+                                        :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
+                                        :change_method => AuditEvent::CHANGE_METHOD_MIGRATION)
+
+    @db[:audit_record].insert(:audit_event_id => event_id,
+                              :uri => uri,
+                              :type => AuditEvent::OBJECT_TYPE_CODE_TABLE[object_type],
+                              :role => AuditEvent::ROLE_OBJECT)
+  end
 end
