@@ -35,7 +35,13 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["page", Integer, "The page to get"])
     .returns([200, "an OrderedCollectionPage"]) \
   do
-    json_response(AuditEvent.page(params[:page]))
+    result = AuditEvent.page(params[:page])
+
+    if result
+      json_response(result)
+    else
+      raise NotFoundException.new("page not available")
+    end
   end
 
   Endpoint.get('/activity-stream/event/:uuid')
@@ -63,6 +69,12 @@ class ArchivesSpaceService < Sinatra::Base
             ["page", Integer, "The page to get"])
     .returns([200, "an OrderedCollectionPage"]) \
   do
-    json_response(AuditEvent.page(params[:page], params[:object_type]))
+    result = AuditEvent.page(params[:page], params[:object_type])
+
+    if result
+      json_response(result)
+    else
+      raise NotFoundException.new("page not available")
+    end
   end
 end
