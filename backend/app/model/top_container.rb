@@ -1,3 +1,4 @@
+require 'audit_event_constants'
 require 'uri'
 require 'net/http'
 
@@ -301,6 +302,12 @@ class TopContainer < Sequel::Model(:top_container)
     end
   end
 
+  def self.log_audit_event_for_batch(ids)
+    RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_MANAGE_TOP_CONTAINERS) do
+      AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
+                           AuditEvent::ROLE_OBJECT => ids.map{|id| JSONModel(:top_container).uri_for(id, :repo_id => RequestContext.get(:repo_id))})
+    end
+  end
 
   def self.batch_update(ids, fields)
     fields.each_value(&:strip!)
@@ -308,6 +315,9 @@ class TopContainer < Sequel::Model(:top_container)
     begin
       n = self.filter(:id => ids).update(fields.merge({:system_mtime => Time.now, :user_mtime => Time.now}))
       out[:records_updated] = n
+
+      log_audit_event_for_batch(ids)
+
     rescue
       out[:error] = $!
     end
@@ -340,6 +350,9 @@ class TopContainer < Sequel::Model(:top_container)
                                 :user_mtime => now
                               })
         end
+
+        log_audit_event_for_batch(ids)
+
       end
 
       TopContainer.update_mtime_for_ids(ids)
@@ -382,6 +395,8 @@ class TopContainer < Sequel::Model(:top_container)
                                 :user_mtime => now
                               })
         end
+
+        log_audit_event_for_batch(ids)
       end
 
       TopContainer.update_mtime_for_ids(ids)
@@ -417,6 +432,8 @@ class TopContainer < Sequel::Model(:top_container)
       updated << id
     end
 
+    log_audit_event_for_batch(updated)
+
     TopContainer.update_mtime_for_ids(ids)
     updated
   end
@@ -439,6 +456,8 @@ class TopContainer < Sequel::Model(:top_container)
       top_container.save(:columns => [:indicator, :system_mtime])
       updated << id
     end
+
+    log_audit_event_for_batch(updated)
 
     TopContainer.update_mtime_for_ids(ids)
     updated
@@ -484,6 +503,8 @@ class TopContainer < Sequel::Model(:top_container)
       out[:error] = $!
     end
   end
+
+    log_audit_event_for_batch(out[:records_ids_updated])
 
     TopContainer.update_mtime_for_ids(ids)
 
