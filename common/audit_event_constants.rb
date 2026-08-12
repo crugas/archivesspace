@@ -1,4 +1,19 @@
 class AuditEvent
+
+# FIXME: think about enumerations
+# looks like this is the endpoint we care about:
+# /config/enumerations/migration
+# and it's not the enumeration itself, but the records that use it that we care about
+
+# FIXME: these object types are not included by default
+# but can be added in config:
+# Accession
+# Locations
+# Assessments
+# Permissions
+# Groups
+# User
+
   OBJECT_TYPES =
     [
      OBJECT_TYPE_REPOSITORY = 1,
@@ -10,8 +25,11 @@ class AuditEvent
      OBJECT_TYPE_RESOURCE = 7,
      OBJECT_TYPE_ARCHIVAL_OBJECT = 8,
      OBJECT_TYPE_DIGITAL_OBJECT = 9,
-     OBJECT_TYPE_TOP_CONTAINER = 10,
-     OBJECT_TYPE_SUBJECT = 11,
+     OBJECT_TYPE_DIGITAL_OBJECT_COMPONENT = 10,
+     OBJECT_TYPE_TOP_CONTAINER = 11,
+     OBJECT_TYPE_CONTAINER_PROFILE = 12,
+     OBJECT_TYPE_SUBJECT = 13,
+     OBJECT_TYPE_CLASSIFICATION = 14,
     ]
 
   OBJECT_TYPE_CODE_TABLE =
@@ -25,8 +43,11 @@ class AuditEvent
      OBJECT_TYPE_RESOURCE => 'resource',
      OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object',
      OBJECT_TYPE_DIGITAL_OBJECT => 'digital_object',
+     OBJECT_TYPE_DIGITAL_OBJECT_COMPONENT => 'digital_object_component',
      OBJECT_TYPE_TOP_CONTAINER => 'top_container',
+     OBJECT_TYPE_CONTAINER_PROFILE => 'container_profile',
      OBJECT_TYPE_SUBJECT => 'subject',
+     OBJECT_TYPE_CLASSIFICATION => 'classification',
     }
 
   # a subset of the types in the standard
