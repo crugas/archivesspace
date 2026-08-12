@@ -83,10 +83,11 @@ class AuditEvent
      CHANGE_METHOD_MIGRATION = 7,
     ]
 
-# add these
+# FIXME: add these?
 #- Duplicate record
 #- Manage top containers
 #- Reorder mode
+# and think about splitting out different importers
 
   CHANGE_METHOD_CODE_TABLE =
     {
