@@ -1,3 +1,5 @@
+require 'audit_event_constants'
+
 # Mixin methods for objects that belong in an ordered hierarchy (archival
 # objects, digital object components)
 
@@ -126,6 +128,17 @@ module TreeNodes
         .filter(:id => self.id)
         .update(:position => new_position,
                 :system_mtime => Time.now)
+
+      affected_siblings = self.class.dataset.db[self.class.table_name]
+               .filter(:root_record_id => self.root_record_id)
+               .filter(:parent_id => self.parent_id)
+               .filter { position >= new_position }.select_map(:id)
+
+      RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_REORDER) do
+        AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
+                             AuditEvent::ROLE_OBJECT => affected_siblings.map{|id| self.class.uri_for(self.class.my_jsonmodel.record_type, id)})
+      end
+
     end
   end
 

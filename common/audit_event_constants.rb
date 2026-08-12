@@ -81,12 +81,12 @@ class AuditEvent
      CHANGE_METHOD_BULK = 5,
      CHANGE_METHOD_RAPID = 6,
      CHANGE_METHOD_MANAGE_TOP_CONTAINERS = 7,
-     CHANGE_METHOD_MIGRATION = 8,
+     CHANGE_METHOD_REORDER = 8,
+     CHANGE_METHOD_MIGRATION = 9,
     ]
 
 # FIXME: add these?
 #- Duplicate record
-#- Manage top containers
 #- Reorder mode
 # and think about splitting out different importers
 
@@ -99,6 +99,7 @@ class AuditEvent
      CHANGE_METHOD_BULK => 'Bulk Spreadsheet',
      CHANGE_METHOD_RAPID => 'Rapid Data Entry',
      CHANGE_METHOD_MANAGE_TOP_CONTAINERS => 'Manage Top Containers',
+     CHANGE_METHOD_REORDER => 'Reorder',
      CHANGE_METHOD_MIGRATION => 'Database Migration',
     }
 
