@@ -87,7 +87,6 @@ class AuditEvent
 
 # FIXME: add these?
 #- Duplicate record
-#- Reorder mode
 # and think about splitting out different importers
 
   CHANGE_METHOD_CODE_TABLE =
