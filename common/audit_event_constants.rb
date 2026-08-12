@@ -83,17 +83,6 @@ class AuditEvent
      CHANGE_METHOD_MIGRATION = 7,
     ]
 
-  CHANGE_METHOD_LOOKUP =
-    {
-     'API' => CHANGE_METHOD_API,
-     'FORM' => CHANGE_METHOD_FORM,
-     'IMPORTER' => CHANGE_METHOD_IMPORTER,
-     'JOB' => CHANGE_METHOD_JOB,
-     'BULK' => CHANGE_METHOD_BULK,
-     'RAPID' => CHANGE_METHOD_RAPID,
-     'MIGRATION' => CHANGE_METHOD_MIGRATION,
-    }
-
 # add these
 #- Duplicate record
 #- Manage top containers
