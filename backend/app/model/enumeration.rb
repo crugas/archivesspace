@@ -54,6 +54,9 @@ class Enumeration < Sequel::Model(:enumeration)
       raise NotFoundException.new("Can't find a value '#{new_value}' in enumeration #{self.id}")
     end
 
+    # keep track of updated records for audit logging below
+    updated_records = []
+
     dependants = self.class.dependants_of(self.name) ? self.class.dependants_of(self.name) : []
     dependants.each do |definition, model|
       property_id = "#{definition[:property]}_id".intern
@@ -63,11 +66,27 @@ class Enumeration < Sequel::Model(:enumeration)
         records.each do |rec|
           rec.update(property_id => new_enum_value.id, :system_mtime => Time.now)
           rec.broadcast_reindex
+
+          update_rec = rec.active_association || rec
+          RequestContext.open(:repo_id => update_rec[:repo_id]) do
+            updated_records << update_rec.class.uri_for(update_rec.class.my_jsonmodel.record_type, rec[:id])
+          end
         end
       else
+        updated_records += records.map{|rec|
+          RequestContext.open(:repo_id => rec[:repo_id]) do
+            rec.class.uri_for(rec.class.my_jsonmodel.record_type, rec[:id])
+          end
+        }
+
         # update in one go
         records.update(property_id => new_enum_value.id, :system_mtime => Time.now)
       end
+    end
+
+    RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_MANAGE_ENUMERATIONS) do
+      AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_UPDATE,
+                           AuditEvent::ROLE_OBJECT => updated_records)
     end
 
     old_enum_value.delete

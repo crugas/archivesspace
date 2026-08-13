@@ -81,8 +81,9 @@ class AuditEvent
      CHANGE_METHOD_BULK = 5,
      CHANGE_METHOD_RAPID = 6,
      CHANGE_METHOD_MANAGE_TOP_CONTAINERS = 7,
-     CHANGE_METHOD_REORDER = 8,
-     CHANGE_METHOD_MIGRATION = 9,
+     CHANGE_METHOD_MANAGE_ENUMERATIONS = 8,
+     CHANGE_METHOD_REORDER = 9,
+     CHANGE_METHOD_MIGRATION = 10,
     ]
 
 # FIXME: add these?
@@ -98,6 +99,7 @@ class AuditEvent
      CHANGE_METHOD_BULK => 'Bulk Spreadsheet',
      CHANGE_METHOD_RAPID => 'Rapid Data Entry',
      CHANGE_METHOD_MANAGE_TOP_CONTAINERS => 'Manage Top Containers',
+     CHANGE_METHOD_MANAGE_ENUMERATIONS => 'Manage Enumerations',
      CHANGE_METHOD_REORDER => 'Reorder',
      CHANGE_METHOD_MIGRATION => 'Database Migration',
     }
