@@ -107,12 +107,15 @@ class AuditEvent
     end
   end
 
-  def self.object_types
+  def self.object_type_codes
     @included_object_types ||= AuditEvent::OPTIONAL_OBJECT_TYPES.select{|oot|
       AppConfig[:audit_logging_include_object_types].include?(AuditEvent::OBJECT_TYPE_CODE_TABLE[oot])
     }
 
-    object_type_codes = AuditEvent::OBJECT_TYPES - AuditEvent::OPTIONAL_OBJECT_TYPES + @included_object_types
+    AuditEvent::OBJECT_TYPES - AuditEvent::OPTIONAL_OBJECT_TYPES + @included_object_types
+  end
+
+  def self.object_types
     object_type_codes.map{|otc| AuditEvent::OBJECT_TYPE_CODE_TABLE[otc]}
   end
 
