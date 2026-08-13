@@ -1,19 +1,4 @@
 class AuditEvent
-
-# FIXME: think about enumerations
-# looks like this is the endpoint we care about:
-# /config/enumerations/migration
-# and it's not the enumeration itself, but the records that use it that we care about
-
-# FIXME: these object types are not included by default
-# but can be added in config:
-# Accession
-# Locations
-# Assessments
-# Permissions
-# Groups
-# User
-
   OBJECT_TYPES =
     [
      OBJECT_TYPE_REPOSITORY = 1,
@@ -21,15 +6,21 @@ class AuditEvent
      OBJECT_TYPE_AGENT_FAMILY = 3,
      OBJECT_TYPE_AGENT_CORPORATE_ENTITY = 4,
      OBJECT_TYPE_AGENT_SOFTWARE = 5,
-     OBJECT_TYPE_ACCESSION = 6,
-     OBJECT_TYPE_RESOURCE = 7,
-     OBJECT_TYPE_ARCHIVAL_OBJECT = 8,
-     OBJECT_TYPE_DIGITAL_OBJECT = 9,
-     OBJECT_TYPE_DIGITAL_OBJECT_COMPONENT = 10,
-     OBJECT_TYPE_TOP_CONTAINER = 11,
-     OBJECT_TYPE_CONTAINER_PROFILE = 12,
-     OBJECT_TYPE_SUBJECT = 13,
-     OBJECT_TYPE_CLASSIFICATION = 14,
+     OBJECT_TYPE_RESOURCE = 6,
+     OBJECT_TYPE_ARCHIVAL_OBJECT = 7,
+     OBJECT_TYPE_DIGITAL_OBJECT = 8,
+     OBJECT_TYPE_DIGITAL_OBJECT_COMPONENT = 9,
+     OBJECT_TYPE_TOP_CONTAINER = 10,
+     OBJECT_TYPE_CONTAINER_PROFILE = 11,
+     OBJECT_TYPE_SUBJECT = 12,
+     OBJECT_TYPE_CLASSIFICATION = 13,
+
+     OBJECT_TYPE_ACCESSION = 14,
+     OBJECT_TYPE_LOCATION = 15,
+     OBJECT_TYPE_ASSESSMENT = 16,
+     OBJECT_TYPE_PERMISSION = 17,
+     OBJECT_TYPE_GROUP = 18,
+     OBJECT_TYPE_USER = 19,
     ]
 
   OBJECT_TYPE_CODE_TABLE =
@@ -39,7 +30,6 @@ class AuditEvent
      OBJECT_TYPE_AGENT_FAMILY => 'agent_family',
      OBJECT_TYPE_AGENT_CORPORATE_ENTITY => 'agent_corporate_entity',
      OBJECT_TYPE_AGENT_SOFTWARE => 'agent_software',
-     OBJECT_TYPE_ACCESSION => 'accession',
      OBJECT_TYPE_RESOURCE => 'resource',
      OBJECT_TYPE_ARCHIVAL_OBJECT => 'archival_object',
      OBJECT_TYPE_DIGITAL_OBJECT => 'digital_object',
@@ -48,7 +38,24 @@ class AuditEvent
      OBJECT_TYPE_CONTAINER_PROFILE => 'container_profile',
      OBJECT_TYPE_SUBJECT => 'subject',
      OBJECT_TYPE_CLASSIFICATION => 'classification',
+
+     OBJECT_TYPE_ACCESSION => 'accession',
+     OBJECT_TYPE_LOCATION => 'location',
+     OBJECT_TYPE_ASSESSMENT => 'assessment',
+     OBJECT_TYPE_PERMISSION => 'permission',
+     OBJECT_TYPE_GROUP => 'group',
+     OBJECT_TYPE_USER => 'user',
     }
+
+  OPTIONAL_OBJECT_TYPES =
+    [
+     OBJECT_TYPE_ACCESSION,
+     OBJECT_TYPE_LOCATION,
+     OBJECT_TYPE_ASSESSMENT,
+     OBJECT_TYPE_PERMISSION,
+     OBJECT_TYPE_GROUP,
+     OBJECT_TYPE_USER,
+    ]
 
   # a subset of the types in the standard
   # FIXME: no special handling for publish - just an update

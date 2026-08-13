@@ -870,3 +870,6 @@ AppConfig[:activity_stream_page_size] = 20
 # When true, render uris as root-relative in the activity stream API
 # Default is to render full uris including scheme, host, etc
 AppConfig[:activity_stream_use_relative_uris] = false
+# Some object types are opt-in for audit logging
+# This array holds their jsonmodel names
+AppConfig[:audit_logging_include_object_types] = []

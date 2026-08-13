@@ -107,8 +107,17 @@ class AuditEvent
     end
   end
 
+  def self.object_types
+    @included_object_types ||= AuditEvent::OPTIONAL_OBJECT_TYPES.select{|oot|
+      AppConfig[:audit_logging_include_object_types].include?(AuditEvent::OBJECT_TYPE_CODE_TABLE[oot])
+    }
+
+    object_type_codes = AuditEvent::OBJECT_TYPES - AuditEvent::OPTIONAL_OBJECT_TYPES + @included_object_types
+    object_type_codes.map{|otc| AuditEvent::OBJECT_TYPE_CODE_TABLE[otc]}
+  end
+
   def self.all_activity_streams
-    AuditEvent::OBJECT_TYPE_CODE_TABLE.values.map{|ot| activity_stream_uri("/#{ot}")}
+    object_types.map{|ot| activity_stream_uri("/#{ot}")}
   end
 
   def self.activity_stream(object_type = nil)
@@ -210,7 +219,7 @@ class AuditEvent
           next
         end
 
-        unless OBJECT_TYPE_CODE_TABLE.values.include?(parsed[:type])
+        unless object_types.include?(parsed[:type])
           Log.debug("Skipping Audit Record - unsupported Object Type: #{parsed[:type]}")
           next
         end
