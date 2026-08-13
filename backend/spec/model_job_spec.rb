@@ -4,7 +4,7 @@ describe 'Background jobs' do
 
   before(:all) do
 
-    ["nugatory_job", "plugin_job"].each do |j|
+    ["nugatory_job", "plugin_job", "audit_logging_job"].each do |j|
       JSONModel.create_model_for(j,
                                  {
                                    "$schema" => "http://www.archivesspace.org/archivesspace.json",
@@ -60,6 +60,22 @@ describe 'Background jobs' do
       register_for_job_type("concurrent_job", :run_concurrently => true)
     end
 
+    class AuditLoggingJobRunner < JobRunner
+      register_for_job_type("audit_logging_job")
+
+      def run
+        json = JSONModel(:accession).from_hash({
+          'id_0' => "job-#{Time.now.to_i}",
+          'title' => 'Created from job queue',
+          'accession_date' => '2024-01-01'
+        })
+
+        Accession.create_from_json(json, :repo_id => @job.repo_id)
+
+        self.success!
+      end
+    end
+
     class PermissionJobRunner < JobRunner
       register_for_job_type("permissions_job",
                             :create_permissions => 'god_like',
@@ -70,6 +86,7 @@ describe 'Background jobs' do
 
   after(:all) do
     JSONModel.destroy_model(:nugatory_job)
+    JSONModel.destroy_model(:audit_logging_job)
   end
 
 
@@ -252,6 +269,40 @@ describe 'Background jobs' do
       sleep(0.5)
 
       expect(Job.any_repo[job_id].status).to eq('completed')
+    end
+
+    it "records background job change method for audit stream", :skip_db_open do
+      audit_calls = []
+      allow(AuditEvent).to receive(:log_event) do |activity_type, records, opts = {}|
+        audit_calls << {
+          :activity_type => activity_type,
+          :records => records,
+          :opts => opts,
+          :change_method => RequestContext.get(:change_method)
+        }
+      end
+
+      json = JSONModel(:job).from_hash({
+        :job => {'jsonmodel_type' => 'audit_logging_job'},
+      })
+
+      as_test_user("admin") do
+        RequestContext.open do
+          RequestContext.put(:repo_id, $repo_id)
+          RequestContext.put(:current_username, "admin")
+          user = create(:user, :username => 'jobber')
+          @job = Job.create_from_json(json,
+                                      :repo_id => $repo_id,
+                                      :user => user)
+        end
+      end
+
+      queue.run_pending_job
+
+      sleep(0.5)
+
+      expect(Job.any_repo[@job.id].status).to eq('completed')
+      expect(audit_calls.any? {|call| call[:change_method] == AuditEvent::CHANGE_METHOD_JOB }).to be_truthy
     end
 
     it "can stop a canceled job and finish it", :skip_db_open do

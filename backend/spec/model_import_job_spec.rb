@@ -66,4 +66,21 @@ describe 'Import job model' do
     expect(Accession[JSONModel(:accession).id_for(job.created_records.first[:record_uri])].title).to eq('foobar')
   end
 
+  it "records audit events with importer change method" do
+    allow(AppConfig).to receive(:[]).and_call_original
+    allow(AppConfig).to receive(:[]).with(:enable_audit_logging).and_return(true)
+    allow(AppConfig).to receive(:[]).with(:audit_logging_include_object_types).and_return(['accession'])
+
+
+    before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count
+
+    # mimic the background job runner, which sets the change method to IMPORTER
+    RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER) do
+      JobRunner.for(job).run
+    end
+
+    expect(job.created_records.count).to eq(1)
+    expect($testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count).to eq(before_count + 1)
+  end
+
 end

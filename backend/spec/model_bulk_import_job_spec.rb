@@ -3,6 +3,82 @@ require 'stringio'
 
 describe 'Bulk Import Jobs' do
 
+  describe "audit logging" do
+    let(:resource) do
+      create(:json_resource, ead_id: "bulk-audit")
+    end
+
+    let(:archival_object) do
+      create(:json_archival_object, :resource => {:ref => resource.uri}, :publish => true, :title => "Series bulk")
+    end
+
+    let(:job) do
+      json = build(:json_job,
+                   :job_type => 'bulk_import_job',
+                   :job_params => {rid: resource.id}.to_json,
+                   :job => JSONModel(:bulk_import_job).new({
+                     resource_id: resource.id.to_s,
+                     filename: 'bulk-audit.csv',
+                     load_type: 'digital',
+                     content_type: 'csv',
+                     format: "audit",
+                     only_validate: "false"
+                   }))
+
+      tmp = ASUtils.tempfile("bulk-import-audit-csv-#{Time.now.to_i}")
+      tmp.write("ArchivesSpace digital object import field codes,collection_id,ead,ref_id,res_uri,ao_ref_id,ao_uri,digital_object_id,digital_object_title,digital_object_publish,rep_file_uri,rep_use_statement,rep_xlink_actuate_attribute,rep_xlink_show_attribute,rep_file_format,rep_file_format_version,rep_file_size,rep_checksum,rep_checksum_method,rep_caption,nonrep_file_uri,nonrep_publish,nonrep_use_statement,nonrep_xlink_actuate_attribute,nonrep_xlink_show_attribute,nonrep_file_format,nonrep_file_format_version,nonrep_file_size,nonrep_checksum,nonrep_checksum_method,nonrep_caption\n")
+      tmp.write(",,#{resource.ead_id},,,#{archival_object.ref_id},,,bulk audit do,t,http://bulk.example/rep,,,,,,,,,,http://bulk.example/thumb,f,\n")
+      tmp.rewind
+
+      user = create_nobody_user
+      job = Job.create_from_json(json,
+                                 :repo_id => $repo_id,
+                                 :user => user)
+      job.add_file(tmp)
+      job
+    end
+
+    it "records bulk spreadsheet change method while running the job" do
+      audit_calls = []
+      allow(AuditEvent).to receive(:log_event) do |activity_type, records, opts = {}|
+        audit_calls << {
+          :activity_type => activity_type,
+          :records => records,
+          :opts => opts,
+          :change_method => RequestContext.get(:change_method)
+        }
+      end
+
+      fake_importer = Class.new do
+        attr_reader :info_messages, :record_uris
+
+        def initialize
+          @info_messages = []
+          @record_uris = []
+        end
+
+        def run
+          accession = Accession.create_from_json(JSONModel(:accession).from_hash(
+            'id_0' => "bulk-#{Time.now.to_i}",
+            'title' => 'Bulk import audit accession',
+            'accession_date' => '2024-01-01'
+          ), :repo_id => $repo_id)
+
+          @record_uris = [Accession.to_jsonmodel(accession.id).uri]
+
+          Struct.new(:terminal_error, :rows).new(nil, [])
+        end
+      end.new
+
+      runner = JobRunner.for(job)
+      allow(runner).to receive(:get_importer).and_return(fake_importer)
+
+      runner.run
+
+      expect(audit_calls.any? {|call| call[:change_method] == AuditEvent::CHANGE_METHOD_BULK }).to be_truthy
+    end
+  end
+
   describe "digital object spreadsheet imports" do
 
     let(:resource) do
