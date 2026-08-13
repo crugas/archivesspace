@@ -28,9 +28,26 @@ describe 'Enumerations model' do
       String :last_modified_by
     end
 
+    JSONModel.create_model_for("model_with_enums",
+                               {
+                                 "$schema" => "http://www.archivesspace.org/archivesspace.json",
+                                 "type" => "object",
+                                 "uri" => "/model_with_enums",
+                                 "properties" => {
+                                   "role" => {
+                                     "type" => "string",
+                                     "dynamic_enum" => "test_role_enum"
+                                   }
+                                 }
+                               })
+
     @model = Class.new(Sequel::Model(:model_with_enums)) do
       include ASModel
       include DynamicEnums
+
+      corresponds_to JSONModel(:model_with_enums)
+
+      set_model_scope :global
 
       uses_enums(:property => 'role', :uses_enum => ['test_role_enum'])
     end
@@ -39,6 +56,7 @@ describe 'Enumerations model' do
 
   after(:each) do
     $testdb.drop_table(:model_with_enums)
+    JSONModel.models.delete('model_with_enums')
   end
 
 

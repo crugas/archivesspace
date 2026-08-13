@@ -29,9 +29,24 @@ describe "Enumeration controller" do
       end
     end
 
+    JSONModel.create_model_for("controller_enum_model",
+                               {
+                                 "$schema" => "http://www.archivesspace.org/archivesspace.json",
+                                 "type" => "object",
+                                 "uri" => "/repositories/:repo_id/controller_enum_models",
+                                 "properties" => {
+                                   "my_enum" => {
+                                     "type" => "string",
+                                     "dynamic_enum" => "test_enum"
+                                   }
+                                 }
+                               })
+
     @model = Class.new(Sequel::Model(:controller_enum_model)) do
       include ASModel
       include DynamicEnums
+
+      corresponds_to JSONModel(:controller_enum_model)
 
       set_model_scope :global
 
@@ -39,6 +54,10 @@ describe "Enumeration controller" do
     end
   end
 
+  after(:each) do
+    $testdb.drop_table(:controller_enum_model)
+    JSONModel.models.delete('controller_enum_model')
+  end
 
 
   it "can return all defined enumerations" do
