@@ -350,8 +350,12 @@ module ASModel
 
         obj.refresh
 
-        AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
-                             AuditEvent::ROLE_OBJECT => json.class.uri_for(obj[:id], :repo_id => values["repo_id"]))
+        RequestContext.open(:repo_id => values['repo_id']) do
+          # Some models implement `uri` so we need to call that
+          # with the repo_id on the context
+          AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
+                               AuditEvent::ROLE_OBJECT => obj.uri)
+        end
 
         obj
       end
