@@ -120,6 +120,8 @@ def create_structured_date(r, rel)
 end
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Migrating agent dates from 'date' to 'structured_date' table")
 

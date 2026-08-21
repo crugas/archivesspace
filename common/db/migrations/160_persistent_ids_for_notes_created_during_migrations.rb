@@ -1,6 +1,8 @@
 require 'json'
 
 Sequel.migration do
+  no_audit_events_required!
+
   $stderr.puts "Assigning note persistent ids for agent contact notes"
   up do
     suspect_fks = [

@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     $stderr.puts("Reconstructing display strings for archival objects and digital object components with multiple dates.")

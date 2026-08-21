@@ -2,6 +2,7 @@
 # see https://archivesspace.atlassian.net/browse/AR-1320
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
 

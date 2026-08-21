@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     [:agent_person, :agent_software, :agent_corporate_entity,

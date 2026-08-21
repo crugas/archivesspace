@@ -1,4 +1,5 @@
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     drop_table(:housed_at_rlshp)

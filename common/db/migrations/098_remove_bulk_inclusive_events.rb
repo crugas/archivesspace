@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     range = self[:enumeration_value].filter(:value => 'range').get(:id)

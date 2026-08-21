@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     [:accession, :resource, :digital_object].each do |table|

@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Add is_primary flag to linked_agents_rlshp")
     alter_table(:linked_agents_rlshp) do

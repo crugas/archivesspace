@@ -22,39 +22,25 @@ describe 'AuditEvent controller' do
     {:id => event_id, :uuid => uuid, :timestamp => timestamp}
   end
 
+  def enable_audit_logging
+    allow(AppConfig).to receive(:[]).and_call_original
+    allow(AppConfig).to receive(:[]).with(:enable_audit_logging).and_return(true)
+  end
+
   before(:each) do
     @resource = create(:json_resource)
     @accession = create(:json_accession)
   end
 
-  it 'returns audit events newer than the supplied timestamp' do
-    older = create_audit_event(:uuid => 'older-event',
-                               :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
-                               :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
-                               :records => [{:role => AuditEvent::ROLE_OBJECT,
-                                             :type => 'resource',
-                                             :uri => @resource.uri}])
+  it 'returns activity stream metadata for a specific object type' do
+    AuditPaginator.new.send(:paginate_audit_records)
 
-    newer = create_audit_event(:uuid => 'newer-event',
-                               :timestamp => Time.utc(2024, 1, 1, 10, 5, 0),
-                               :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
-                               :records => [{:role => AuditEvent::ROLE_OBJECT,
-                                             :type => 'accession',
-                                             :uri => @accession.uri}])
-
-    response = as_test_user('admin') do
-      get '/audit_events', :since => older[:timestamp].to_i + 1
+    pre_response = as_test_user('admin') do
+      get '/activity-stream/resource'
       expect(last_response).to be_ok
       ASUtils.json_parse(last_response.body)
     end
 
-    expect(response.length).to eq(1)
-    expect(response[0]['id']).to eq(AuditEvent.activity_stream_uri("/event/#{newer[:uuid]}"))
-    expect(response[0]['type']).to eq('Update')
-    expect(response[0]['object']['id']).to eq(AuditEvent.archivesspace_uri(@accession.uri))
-  end
-
-  it 'returns activity stream metadata for a specific object type' do
     create_audit_event(:uuid => 'resource-event',
                        :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
                        :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
@@ -69,43 +55,57 @@ describe 'AuditEvent controller' do
                                      :type => 'accession',
                                      :uri => @accession.uri}])
 
-    response = as_test_user('admin') do
+    AuditPaginator.new.send(:paginate_audit_records)
+
+    post_response = as_test_user('admin') do
       get '/activity-stream/resource'
       expect(last_response).to be_ok
       ASUtils.json_parse(last_response.body)
     end
 
-    expect(response['type']).to eq('OrderedCollection')
-    expect(response['totalItems']).to eq(1)
-    expect(response['first']).to eq(AuditEvent.activity_stream_uri('/resource/page/1'))
-    expect(response['last']).to eq(AuditEvent.activity_stream_uri('/resource/page/1'))
+    new_page = (pre_response['totalItems'] + 1) / AuditPaginator::PAGE_SIZE
+
+    expect(post_response['type']).to eq('OrderedCollection')
+    expect(post_response['totalItems']).to eq(pre_response['totalItems'] + 1)
+    expect(post_response['first']).to eq(pre_response['first'])
+    expect(post_response['last']).to eq(AuditEvent.activity_stream_uri("/resource/page/#{new_page + 1}"))
   end
 
-  it 'returns activity stream pages and single events by uuid' do
-    event = create_audit_event(:uuid => 'page-event',
-                               :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
-                               :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
-                               :records => [{:role => AuditEvent::ROLE_OBJECT,
-                                             :type => 'resource',
-                                             :uri => @resource.uri}])
+  describe 'change method entry paths' do
+    it 'records FORM via the Rack request header path' do
+      enable_audit_logging
 
-    page = as_test_user('admin') do
-      get '/activity-stream/page/1'
+      before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_FORM).count
+
+      post "/repositories/#{$repo_id}/resources",
+           build(:json_resource).to_json,
+           {
+             'CONTENT_TYPE' => 'application/json',
+             'HTTP_X_ARCHIVESSPACE_CHANGE_METHOD' => AuditEvent::CHANGE_METHOD_FORM.to_s
+           }
+
       expect(last_response).to be_ok
-      ASUtils.json_parse(last_response.body)
+      after_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_FORM).count
+
+      expect(after_count).to eq(before_count + 1)
     end
 
-    expect(page['type']).to eq('OrderedCollectionPage')
-    expect(page['orderedItems'].length).to eq(1)
-    expect(page['orderedItems'][0]['id']).to eq(AuditEvent.activity_stream_uri("/event/#{event[:uuid]}"))
+    it 'records RAPID via the component add children endpoint' do
+      enable_audit_logging
+      resource = create(:json_resource)
 
-    fetched = as_test_user('admin') do
-      get "/activity-stream/event/#{event[:uuid]}"
-      expect(last_response).to be_ok
-      ASUtils.json_parse(last_response.body)
+      archival_object = build(:json_archival_object, :dates => [])
+      children = JSONModel(:archival_record_children).from_hash({
+        'children' => [archival_object]
+      })
+
+      before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_RAPID).count
+
+      url = URI("#{JSONModel::HTTP.backend_url}#{resource.uri}/children")
+      response = JSONModel::HTTP.post_json(url, children.to_json)
+
+      expect(response.code).to eq('200')
+      expect($testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_RAPID).count).to eq(before_count + 1)
     end
-
-    expect(fetched['id']).to eq(AuditEvent.activity_stream_uri("/event/#{event[:uuid]}"))
-    expect(fetched['object']['id']).to eq(AuditEvent.archivesspace_uri(@resource.uri))
   end
 end

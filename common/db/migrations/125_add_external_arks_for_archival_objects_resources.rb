@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Adding External ARK URLs for Archival Objects and Resources")
     alter_table(:archival_object) do

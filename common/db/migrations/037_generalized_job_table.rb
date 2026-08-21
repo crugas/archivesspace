@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     create_enum("job_type", ["import_job", "find_and_replace_job"])

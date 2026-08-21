@@ -37,6 +37,8 @@ def check_for_ambiguous_ark_links
 end
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     check_for_ambiguous_ark_links
 

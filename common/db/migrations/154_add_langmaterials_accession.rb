@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
 
     alter_table(:lang_material) do

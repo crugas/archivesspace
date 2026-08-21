@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Add slug fields to classification term")
     alter_table(:classification_term) do

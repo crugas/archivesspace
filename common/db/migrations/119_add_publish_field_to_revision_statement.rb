@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Add publish field to revision statement")
     alter_table(:revision_statement) do

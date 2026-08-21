@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
 
     TYPE_ID_SINGLE = get_enum_value_id("date_type_structured", "single")

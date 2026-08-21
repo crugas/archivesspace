@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     $stderr.puts("Updating Archival Object and Digital Object Component tables")

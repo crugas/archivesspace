@@ -3,6 +3,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     if $db_type == :mysql
 

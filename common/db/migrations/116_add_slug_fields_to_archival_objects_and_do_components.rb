@@ -1,6 +1,8 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     $stderr.puts("Add slug fields to archival object and digital object component")
     alter_table(:archival_object) do

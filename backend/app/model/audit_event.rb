@@ -87,12 +87,6 @@ class AuditEvent
     out
   end
 
-  def self.events_since(since, object_type = nil)
-    DB.open do |db|
-      ds(db, since, object_type).map{|row| render(row)}
-    end
-  end
-
   def self.by_id(uuid)
     DB.open do |db|
       render(ds(db).filter(:uuid => uuid).first)

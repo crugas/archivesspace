@@ -1,7 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
-
+  no_audit_events_required!
 
   # this migration was a mistake and born out of a misunderstood feature
   # request. Apologize if you already ran it, but it only removed the bulk_date

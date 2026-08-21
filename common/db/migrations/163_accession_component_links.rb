@@ -1,6 +1,7 @@
 require 'db/migrations/utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   up do
     # users of the as_accession_links plugin will already

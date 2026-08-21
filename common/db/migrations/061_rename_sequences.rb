@@ -1,6 +1,7 @@
 require_relative 'utils'
 
 Sequel.migration do
+  no_audit_events_required!
 
   # dedupe and rename existing sequences see:
   # https://archivesspace.atlassian.net/browse/AR-1326

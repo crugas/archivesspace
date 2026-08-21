@@ -1,4 +1,6 @@
 Sequel.migration do
+  no_audit_events_required!
+
   up do
     create_table(:audit_event) do
       primary_key :id

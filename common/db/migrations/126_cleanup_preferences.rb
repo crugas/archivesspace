@@ -2,6 +2,8 @@ require_relative 'utils'
 require 'json'
 
 Sequel.migration do
+  no_audit_events_required!
+
   up do
 
     self[:preference].each do |pref|
