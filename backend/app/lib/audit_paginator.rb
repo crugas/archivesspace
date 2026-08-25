@@ -113,6 +113,16 @@ class AuditPaginator
             # Time for a new page
             last_page = db[:audit_page].filter(filters).max(:page_number) || 0
 
+            cumulative_prior_event_count = if last_page > 0
+                                             db[:audit_page]
+                                               .filter(filters)
+                                               .filter(page_number: last_page)
+                                               .map {|p| p[:cumulative_prior_event_count] + p[:event_count] }
+                                               .first
+                                           else
+                                             0
+                                           end
+
             db[:audit_page]
               .insert(
                 filters.merge(
@@ -122,6 +132,7 @@ class AuditPaginator
                   last_id_written: -1,
                   is_page_complete: 1,
                   event_count: @id_set.cardinality,
+                  cumulative_prior_event_count: cumulative_prior_event_count,
                   id_set: AuditPaginator.id_set_to_bytes(@id_set),
                   bulk_record_type: self.record_type_code,
                   bulk_activity_type: self.activity_type,
@@ -259,6 +270,15 @@ class AuditPaginator
           # Time for a new page.
           last_page = db[:audit_page].filter(page_filter: record_type).max(:page_number) || 0
 
+          cumulative_prior_event_count = if last_page > 0
+                                           db[:audit_page]
+                                             .filter(page_filter: record_type, page_number: last_page)
+                                             .map {|p| p[:cumulative_prior_event_count] + p[:event_count] }
+                                             .first
+                                         else
+                                           0
+                                         end
+
           db[:audit_page]
             .insert(
               filters.merge(
@@ -266,6 +286,7 @@ class AuditPaginator
                 update_time: Time.now,
                 last_id_written: last_id_written,
                 is_page_complete: id_set.cardinality < PAGE_SIZE ? 0 : 1,
+                cumulative_prior_event_count: cumulative_prior_event_count,
                 event_count: id_set.cardinality,
                 id_set: AuditPaginator.id_set_to_bytes(id_set),
 
