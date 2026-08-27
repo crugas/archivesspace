@@ -42,18 +42,20 @@ class AuditEvent
     archivesspace_uri("/activity-stream#{uri}")
   end
 
-  def self.render(event)
-    out = {
-      '@context' => W3C_URL,
-      :id => activity_stream_uri("/event/#{event[:uuid]}"),
-      :endTime => event[:timestamp].rfc3339,
-      :actor => {
-        :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
-        :name => event[:actor_name]
-      },
-      :type => ACTIVITY_TYPE_CODE_TABLE[event[:activity_type]],
-      :method_of_change => CHANGE_METHOD_CODE_TABLE[event[:change_method]]
+  def self.render(event, include_context: true)
+    out = {}
+
+    out['@context'] = W3C_URL if include_context
+
+    out[:id] = activity_stream_uri("/event/#{event[:uuid]}")
+    out[:endTime] = event[:timestamp].rfc3339
+    out[:actor] = {
+      :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
+      :name => event[:actor_name]
     }
+    out[:type] = ACTIVITY_TYPE_CODE_TABLE[event[:activity_type]]
+    out[:method_of_change] = CHANGE_METHOD_CODE_TABLE[event[:change_method]]
+
 
     records = {}
 
@@ -180,7 +182,9 @@ class AuditEvent
       case audit_page.page_type
       when 'audit'
         ids = audit_page.event_ids
-        out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map{|row| render(row)}
+        out[:orderedItems] = ds(db, nil, object_type).filter(:audit_event__id => ids).map {|row|
+          render(row, include_context: false)
+        }
         out
       when 'bulk'
         record_type = AuditEvent::OBJECT_TYPE_CODE_TABLE.fetch(audit_page.page.fetch(:bulk_record_type))
@@ -217,7 +221,7 @@ class AuditEvent
             actor_type: audit_page.page.fetch(:bulk_actor_type),
             records:[role, record_type, record_uris.fetch(record_id)].join(":")
           }
-        }.map{|row| render(row)}
+        }.map {|row| render(row, include_context: false)}
 
         out
       else
