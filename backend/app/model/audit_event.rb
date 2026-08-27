@@ -156,7 +156,7 @@ class AuditEvent
       out = {
         '@context' => W3C_URL,
         :type => 'OrderedCollectionPage',
-        :id => "/#{uri}/page/#{page}",
+        :id => "#{uri}/page/#{page}",
         :partOf => {
           :id => uri,
           :type => 'OrderedCollection'
