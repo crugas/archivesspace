@@ -21,7 +21,8 @@ class AuditEvent
       ds = ds.filter(:audit_record__type => object_type)
     end
 
-    ds.select(:uuid,
+    ds.select(Sequel.as(Sequel.qualify(:audit_event, :id),
+                        :event_id),
               :timestamp,
               :actor_name,
               :actor_type,
@@ -49,9 +50,7 @@ class AuditEvent
 
     out['@context'] = W3C_URL if include_context
 
-    event_id = event[:uuid] || event[:event_id]
-
-    out[:id] = activity_stream_uri("/event/#{event_id}")
+    out[:id] = activity_stream_uri("/event/#{event[:event_id]}")
     out[:endTime] = event[:timestamp].rfc3339
     out[:actor] = {
       :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
@@ -107,9 +106,9 @@ class AuditEvent
         return nil
       end
     else
-      # Regular single event (uuid)
+      # Regular single event (by id)
       DB.open do |db|
-        render(ds(db).filter(:uuid => event_id).first)
+        render(ds(db).filter(Sequel.qualify(:audit_event, :id) => Integer(event_id)).first)
       end
     end
   end
