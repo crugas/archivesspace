@@ -101,7 +101,7 @@ class AuditEvent
 
         rendered_page = self.page(page_number)
 
-        rendered_page.fetch(:orderedItems).fetch(offset)
+        rendered_page.fetch(:orderedItems).fetch(offset).merge('@context' => W3C_URL)
       else
         return nil
       end
