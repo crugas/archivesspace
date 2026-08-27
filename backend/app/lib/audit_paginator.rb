@@ -64,7 +64,7 @@ class AuditPaginator
 
     return nil unless requested_page
 
-    has_next_page = requested_page.fetch(:is_page_complete) == 1 && page_ds.filter(:page_number => page + 1).exists
+    has_next_page = requested_page.fetch(:is_page_complete) == 1 && page_ds.filter(:page_number => page + 1).count > 0
 
     AuditPage.new(requested_page, has_next_page)
   end
