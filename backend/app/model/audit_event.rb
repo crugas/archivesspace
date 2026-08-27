@@ -51,7 +51,7 @@ class AuditEvent
 
     event_id = event[:uuid] || event[:event_id]
 
-    out[:id] = activity_stream_uri("/event/#{event[:uuid]}")
+    out[:id] = activity_stream_uri("/event/#{event_id}")
     out[:endTime] = event[:timestamp].rfc3339
     out[:actor] = {
       :type => ACTOR_TYPE_CODE_TABLE[event[:actor_type]],
