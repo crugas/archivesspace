@@ -207,7 +207,7 @@ class AuditEvent
 
         role = AuditEvent::ROLE_OBJECT
 
-        record_ids.map {|record_id|
+        out[:orderedItems] = record_ids.map {|record_id|
           {
             uuid: 'FIXMEgarbagefornow',
             timestamp: audit_page.page.fetch(:update_time),
@@ -218,6 +218,8 @@ class AuditEvent
             records:[role, record_type, record_uris.fetch(record_id)].join(":")
           }
         }.map{|row| render(row)}
+
+        out
       else
         raise "Unknown page type: #{audit_page.page_type}"
       end
