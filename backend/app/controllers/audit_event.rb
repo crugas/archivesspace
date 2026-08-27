@@ -15,7 +15,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params()
     .returns([200, "an OrderedCollection"]) \
   do
-    json_response(AuditEvent.activity_stream)
+    activity_json_response(AuditEvent.activity_stream)
   end
 
   Endpoint.get('/activity-stream/page/:page')
@@ -27,7 +27,7 @@ class ArchivesSpaceService < Sinatra::Base
     result = AuditEvent.page(params[:page])
 
     if result
-      json_response(result)
+      activity_json_response(result)
     else
       raise NotFoundException.new("page not available")
     end
@@ -39,7 +39,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["uuid", String, "The UUID of the event to get"])
     .returns([200, "an audit event"]) \
   do
-    json_response(AuditEvent.by_id(params[:uuid]))
+    activity_json_response(AuditEvent.by_id(params[:uuid]))
   end
 
   Endpoint.get('/activity-stream/:object_type')
@@ -48,7 +48,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["object_type", String, "The type of object to events for"])
     .returns([200, "an OrderedCollection"]) \
   do
-    json_response(AuditEvent.activity_stream(params[:object_type]))
+    activity_json_response(AuditEvent.activity_stream(params[:object_type]))
   end
 
   Endpoint.get('/activity-stream/:object_type/page/:page')
@@ -61,9 +61,13 @@ class ArchivesSpaceService < Sinatra::Base
     result = AuditEvent.page(params[:page], params[:object_type])
 
     if result
-      json_response(result)
+      activity_json_response(result)
     else
       raise NotFoundException.new("page not available")
     end
+  end
+
+  def activity_json_response(obj, status = 200)
+    [status, {"Content-Type" => "application/activity+json"}, [obj.to_json(:mode => :trusted, :max_nesting => false) + "\n"]]
   end
 end
