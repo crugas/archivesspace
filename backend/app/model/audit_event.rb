@@ -43,9 +43,13 @@ class AuditEvent
   end
 
   def self.render(event, include_context: true)
+    return nil if event.nil?
+
     out = {}
 
     out['@context'] = W3C_URL if include_context
+
+    event_id = event[:uuid] || event[:event_id]
 
     out[:id] = activity_stream_uri("/event/#{event[:uuid]}")
     out[:endTime] = event[:timestamp].rfc3339
@@ -89,9 +93,24 @@ class AuditEvent
     out
   end
 
-  def self.by_id(uuid)
-    DB.open do |db|
-      render(ds(db).filter(:uuid => uuid).first)
+  def self.by_id(event_id)
+    if event_id.start_with?("_blk")
+      # Batch event
+      if event_id =~ /\A_blk_p([0-9]+)o([0-9]+)\z/
+        page_number = Integer($1)
+        offset = Integer($2)
+
+        rendered_page = self.page(page_number)
+
+        rendered_page.fetch(:orderedItems).fetch(offset)
+      else
+        return nil
+      end
+    else
+      # Regular single event (uuid)
+      DB.open do |db|
+        render(ds(db).filter(:uuid => event_id).first)
+      end
     end
   end
 
@@ -211,9 +230,9 @@ class AuditEvent
 
         role = AuditEvent::ROLE_OBJECT
 
-        out[:orderedItems] = record_ids.map {|record_id|
+        out[:orderedItems] = record_ids.each_with_index.map {|record_id, offset|
           {
-            uuid: 'FIXMEgarbagefornow',
+            event_id: "_blk_p#{audit_page.page.fetch(:bulk_all_stream_page_number)}o#{offset}",
             timestamp: audit_page.page.fetch(:update_time),
             activity_type: audit_page.page.fetch(:bulk_activity_type),
             change_method: audit_page.page.fetch(:bulk_change_method),

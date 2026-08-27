@@ -39,7 +39,13 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["uuid", String, "The UUID of the event to get"])
     .returns([200, "an audit event"]) \
   do
-    activity_json_response(AuditEvent.by_id(params[:uuid]))
+    result = AuditEvent.by_id(params[:uuid])
+
+    if result
+      activity_json_response(result)
+    else
+      raise NotFoundException.new("event not available")
+    end
   end
 
   Endpoint.get('/activity-stream/:object_type')

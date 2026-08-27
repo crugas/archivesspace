@@ -99,7 +99,9 @@ class AuditPaginator
       if @id_set.cardinality == AuditPaginator::PAGE_SIZE || (@id_set.cardinality > 0 && force)
         @id_set.run_optimize
 
-        [record_type, ANY_TYPE].each do |type_limit|
+        new_pages = {}
+
+        [ANY_TYPE, record_type].each do |type_limit|
           filters = { page_filter: type_limit }
 
           # DB.open just to get the handle: we're already in an outer transaction
@@ -123,6 +125,8 @@ class AuditPaginator
                                              0
                                            end
 
+            new_pages[type_limit] = last_page + 1
+
             db[:audit_page]
               .insert(
                 filters.merge(
@@ -138,7 +142,11 @@ class AuditPaginator
                   bulk_activity_type: self.activity_type,
                   bulk_change_method: self.change_method,
                   bulk_actor_type: self.actor_type,
-                  bulk_actor_name: self.actor_name
+                  bulk_actor_name: self.actor_name,
+
+                  # Note: requirement that we process ANY_TYPE first because we
+                  # depend on its page for subsequent inserts.
+                  bulk_all_stream_page_number: new_pages.fetch(ANY_TYPE)
                 )
               )
 
