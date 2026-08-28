@@ -46,6 +46,26 @@ describe 'AuditEvent model' do
     allow(AppConfig).to receive(:[]).with(:audit_logging_include_object_types).and_return(['accession', 'resource'])
   end
 
+  def reset_audit_tables
+    # Start fresh to make it easier to test (rolls back after each test)
+    $testdb[:audit_page].delete
+    $testdb[:audit_record].delete
+    $testdb[:audit_event].delete
+  end
+
+  def create_bulk_top_container_page(timestamp:, top_container_ids:, actor_name: 'bulk_user')
+    AuditPaginator.add_bulk_events(:timestamp => timestamp,
+                                   :record_type => AuditEvent::OBJECT_TYPE_TOP_CONTAINER,
+                                   :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
+                                   :change_method => AuditEvent::CHANGE_METHOD_BULK,
+                                   :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
+                                   :actor_name => actor_name) do |consumer|
+      top_container_ids.each do |id|
+        consumer << id
+      end
+    end
+  end
+
   before(:each) do
     enable_audit_logging
     @resource = create(:json_resource)
@@ -98,6 +118,104 @@ describe 'AuditEvent model' do
     expect(response[:orderedItems].length).to be > 0
     expect(response[:orderedItems][0][:id]).to match %r{activity-stream/event/}
     expect(response[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_container.uri))
+  end
+
+  describe 'bulk page rendering' do
+    it 'splits a bulk batch larger than page size across pages in order' do
+      reset_audit_tables
+
+      top_containers = (AuditPaginator::PAGE_SIZE + 1).times.map { create(:json_top_container) }
+      create_bulk_top_container_page(:timestamp => Time.utc(2024, 1, 1, 12, 0, 0),
+                                     :top_container_ids => top_containers.map(&:id))
+
+      page_1 = AuditEvent.page(1, 'top_container')
+      page_2 = AuditEvent.page(2, 'top_container')
+
+      expect(page_1[:next][:id]).to eq(AuditEvent.activity_stream_uri('/top_container/page/2'))
+      expect(page_2[:prev][:id]).to eq(AuditEvent.activity_stream_uri('/top_container/page/1'))
+      expect(page_2).not_to have_key(:next)
+
+      expect(page_1[:orderedItems].length).to eq(AuditPaginator::PAGE_SIZE)
+      expect(page_2[:orderedItems].length).to eq(1)
+
+      expect(page_1[:orderedItems].first[:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p1o0'))
+      expect(page_1[:orderedItems].last[:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p1o499'))
+      expect(page_2[:orderedItems].first[:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p2o0'))
+
+      expect(page_1[:orderedItems].first['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_containers.first.uri))
+      expect(page_1[:orderedItems].last['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_containers[AuditPaginator::PAGE_SIZE - 1].uri))
+      expect(page_2[:orderedItems].first['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_containers.last.uri))
+    end
+
+    it 'retains page ordering for sequential bulk pages' do
+      top_container_1 = create(:json_top_container)
+      top_container_2 = create(:json_top_container)
+      reset_audit_tables
+
+      first_timestamp = Time.utc(2024, 1, 1, 10, 0, 0)
+      second_timestamp = Time.utc(2024, 1, 1, 11, 0, 0)
+
+      create_bulk_top_container_page(:timestamp => first_timestamp, :top_container_ids => [top_container_1.id])
+      create_bulk_top_container_page(:timestamp => second_timestamp, :top_container_ids => [top_container_2.id])
+
+      first_page = AuditEvent.page(1, 'top_container')
+      second_page = AuditEvent.page(2, 'top_container')
+
+      expect(first_page[:next][:id]).to eq(AuditEvent.activity_stream_uri('/top_container/page/2'))
+      expect(second_page[:prev][:id]).to eq(AuditEvent.activity_stream_uri('/top_container/page/1'))
+      expect(second_page).not_to have_key(:next)
+
+      expect(first_page[:orderedItems][0][:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p1o0'))
+      expect(second_page[:orderedItems][0][:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p2o0'))
+      expect(first_page[:orderedItems][0][:endTime]).to eq(first_timestamp.rfc3339)
+      expect(second_page[:orderedItems][0][:endTime]).to eq(second_timestamp.rfc3339)
+      expect(first_page[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_container_1.uri))
+      expect(second_page[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_container_2.uri))
+    end
+
+    it 'intermingles bulk pages with regular audit pages in the overall stream' do
+      top_container = create(:json_top_container)
+      reset_audit_tables
+
+      create_audit_event(:uuid => 'regular-event-1',
+                         :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
+                         :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
+                         :records => [{:role => AuditEvent::ROLE_OBJECT,
+                                       :type => 'resource',
+                                       :uri => @resource.uri}])
+
+      AuditPaginator.new.send(:paginate_audit_records)
+
+      create_bulk_top_container_page(:timestamp => Time.utc(2024, 1, 1, 10, 30, 0),
+                                     :top_container_ids => [top_container.id])
+
+      create_audit_event(:uuid => 'regular-event-2',
+                         :timestamp => Time.utc(2024, 1, 1, 11, 0, 0),
+                         :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
+                         :records => [{:role => AuditEvent::ROLE_OBJECT,
+                                       :type => 'accession',
+                                       :uri => @accession.uri}])
+
+      AuditPaginator.new.send(:paginate_audit_records)
+
+      first_page = AuditEvent.page(1)
+      second_page = AuditEvent.page(2)
+      third_page = AuditEvent.page(3)
+
+      expect(first_page[:next][:id]).to eq(AuditEvent.activity_stream_uri('/page/2'))
+      expect(second_page[:prev][:id]).to eq(AuditEvent.activity_stream_uri('/page/1'))
+      expect(second_page[:next][:id]).to eq(AuditEvent.activity_stream_uri('/page/3'))
+      expect(third_page[:prev][:id]).to eq(AuditEvent.activity_stream_uri('/page/2'))
+      expect(third_page).not_to have_key(:next)
+
+      expect(first_page[:orderedItems][0][:id]).to match(%r{/activity-stream/event/\d+$})
+      expect(second_page[:orderedItems][0][:id]).to eq(AuditEvent.activity_stream_uri('/event/_blk_p2o0'))
+      expect(third_page[:orderedItems][0][:id]).to match(%r{/activity-stream/event/\d+$})
+
+      expect(first_page[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(@resource.uri))
+      expect(second_page[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(top_container.uri))
+      expect(third_page[:orderedItems][0]['object'][:id]).to eq(AuditEvent.archivesspace_uri(@accession.uri))
+    end
   end
 
   it 'logs audit events using the request context actor and change method' do
