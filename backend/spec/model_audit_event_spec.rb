@@ -47,19 +47,22 @@ describe 'AuditEvent model' do
   end
 
   before(:each) do
+    enable_audit_logging
     @resource = create(:json_resource)
     @accession = create(:json_accession)
   end
 
   it 'marks merge events when the target is included in the moved objects' do
-    rendered = AuditEvent.render(:uuid => 'merge-event',
-                                 :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
-                                 :actor_name => 'admin',
-                                 :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
-                                 :activity_type => AuditEvent::ACTIVITY_TYPE_MOVE,
-                                 :change_method => AuditEvent::CHANGE_METHOD_API,
-                                 :records => "#{AuditEvent::ROLE_OBJECT}:resource:#{@resource.uri}," \
-                                             "#{AuditEvent::ROLE_TARGET}:resource:#{@resource.uri}")
+    rendered = AuditEvent.render({
+                                   :uuid => 'merge-event',
+                                   :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
+                                   :actor_name => 'admin',
+                                   :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
+                                   :activity_type => AuditEvent::ACTIVITY_TYPE_MOVE,
+                                   :change_method => AuditEvent::CHANGE_METHOD_API,
+                                   :records => "#{AuditEvent::ROLE_OBJECT}:resource:#{@resource.uri}," \
+                                               "#{AuditEvent::ROLE_TARGET}:resource:#{@resource.uri}"
+                                 })
 
     expect(rendered[:type]).to eq('Move')
     expect(rendered[:summary]).to eq('merge')
@@ -98,8 +101,6 @@ describe 'AuditEvent model' do
   end
 
   it 'logs audit events using the request context actor and change method' do
-    enable_audit_logging
-
     RequestContext.put(:current_username, 'audit_user')
     RequestContext.put(:change_method, AuditEvent::CHANGE_METHOD_FORM)
 
@@ -132,8 +133,6 @@ describe 'AuditEvent model' do
     end
 
     it 'does not log when there are no affected records' do
-      enable_audit_logging
-
       expect {
         AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_CREATE,
                              {AuditEvent::ROLE_OBJECT => []},
@@ -142,7 +141,6 @@ describe 'AuditEvent model' do
     end
 
     it 'warns and returns for unsupported activity types' do
-      enable_audit_logging
       allow(Log).to receive(:warn)
 
       expect {
@@ -155,7 +153,6 @@ describe 'AuditEvent model' do
     end
 
     it 'warns and returns when no actor is available' do
-      enable_audit_logging
       RequestContext.put(:current_username, nil)
       allow(Log).to receive(:warn)
 
@@ -168,7 +165,6 @@ describe 'AuditEvent model' do
     end
 
     it 'skips invalid records while still logging supported ones' do
-      enable_audit_logging
       allow(Log).to receive(:warn)
       allow(Log).to receive(:debug)
 
@@ -190,7 +186,6 @@ describe 'AuditEvent model' do
     end
 
     it 'does not log when every parsed record is discarded' do
-      enable_audit_logging
       allow(Log).to receive(:warn)
       allow(Log).to receive(:debug)
 
@@ -207,7 +202,6 @@ describe 'AuditEvent model' do
 
   describe 'change method entry paths' do
     it 'defaults to API when no explicit change method is present' do
-      enable_audit_logging
       RequestContext.put(:change_method, nil)
 
       before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_API).count

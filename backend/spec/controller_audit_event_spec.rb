@@ -28,6 +28,7 @@ describe 'AuditEvent controller' do
   end
 
   before(:each) do
+    enable_audit_logging
     @resource = create(:json_resource)
     @accession = create(:json_accession)
   end
@@ -73,8 +74,6 @@ describe 'AuditEvent controller' do
 
   describe 'change method entry paths' do
     it 'records FORM via the Rack request header path' do
-      enable_audit_logging
-
       before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_FORM).count
 
       post "/repositories/#{$repo_id}/resources",
@@ -91,7 +90,6 @@ describe 'AuditEvent controller' do
     end
 
     it 'records RAPID via the component add children endpoint' do
-      enable_audit_logging
       resource = create(:json_resource)
 
       archival_object = build(:json_archival_object, :dates => [])
