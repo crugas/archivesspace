@@ -66,21 +66,59 @@ describe 'Import job model' do
     expect(Accession[JSONModel(:accession).id_for(job.created_records.first[:record_uri])].title).to eq('foobar')
   end
 
-  it "records audit events with importer change method" do
-    allow(AppConfig).to receive(:[]).and_call_original
-    allow(AppConfig).to receive(:[]).with(:enable_audit_logging).and_return(true)
-    allow(AppConfig).to receive(:[]).with(:audit_logging_include_object_types).and_return(['accession'])
+  describe "audit events" do
 
+    before(:all) {
+      resource_converter = Class.new(Converter) do
+        def self.instance_for(type, input_file)
+          self.new(input_file) if type == 'nonce_resource'
+        end
 
-    before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count
+        def run
+          obj = ASpaceImport::JSONModel(:resource).from_hash(
+            FactoryBot.build(:json_resource_nohtml, :title => IO.read(@input_file)).to_hash
+          )
+          @batch << obj
+          @batch.flush
+        end
+      end
 
-    # mimic the background job runner, which sets the change method to IMPORTER
-    RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER) do
-      JobRunner.for(job).run
+      Converter.register_converter(resource_converter)
+    }
+
+    it "have importer change method" do
+      tmp = ASUtils.tempfile("resource-doc-#{Time.now.to_i}")
+      tmp.write("resource-from-import-job")
+      tmp.rewind
+
+      json = build(:json_job,
+                   :job_type => 'import_job',
+                   :job => build(:json_import_job,
+                                 :filenames => [tmp.path],
+                                 :import_type => 'nonce_resource'))
+
+      user = create_nobody_user
+      resource_job = Job.create_from_json(json,
+                                          :repo_id => $repo_id,
+                                          :user => user)
+      resource_job.add_file(tmp)
+
+      allow(AppConfig).to receive(:[]).and_call_original
+      allow(AppConfig).to receive(:[]).with(:enable_audit_logging).and_return(true)
+      allow(AppConfig).to receive(:[]).with(:audit_logging_include_object_types).and_return(['resource'])
+
+      before_count = $testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count
+
+      # mimic the background job runner, which sets the change method to IMPORTER
+      RequestContext.open(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER) do
+        JobRunner.for(resource_job).run
+      end
+
+      expect(resource_job.created_records.count).to eq(1)
+      expect(resource_job.created_records.first[:record_uri]).to match(/resources\/\d+$/)
+      expect(Resource[JSONModel(:resource).id_for(resource_job.created_records.first[:record_uri])].title).to eq('resource-from-import-job')
+      expect($testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count).to eq(before_count + 1)
     end
-
-    expect(job.created_records.count).to eq(1)
-    expect($testdb[:audit_event].where(:change_method => AuditEvent::CHANGE_METHOD_IMPORTER).count).to eq(before_count + 1)
   end
 
 end
