@@ -15,6 +15,17 @@ decisions. It also provides some guidance on configuration and testing.
 
 ## Database migrations
 
+There are database migrations required for this functionality. The migrations
+add four new tables. No existing table definitions or data are changed by the
+migrations. The new tables are:
+```
+audit_event
+audit_record
+audit_page
+audit_page_lock
+```
+
+
 ## Configuration
 
 Some configuration is required. The following snippet shows the new lines added
