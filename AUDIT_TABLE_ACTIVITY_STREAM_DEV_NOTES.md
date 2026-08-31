@@ -1,0 +1,48 @@
+
+# Audit Table Activity Stream Development Notes
+
+This branch (`audit-table-activity-stream`) contains the implementation of the
+requirements specified in the following documents:
+
+- Request for Comment - ASpace Activity Stream + Audit Table - Public (9/17/2025)
+- Activity Stream Scope Statement (2/2/2026)
+
+The branch is currently based on ArchivesSpace v4.2.1.
+
+This document summarizes the technical design and motivations for key design
+decisions. It also provides some guidance on configuration and testing.
+
+
+## Database migrations
+
+## Configuration
+
+Some configuration is required. The following snippet shows the new lines added
+to `common/config/config-defaults.rb`:
+
+```
+# Audit logging disabled by default
+AppConfig[:enable_audit_logging] = false
+# When true, render uris as root-relative in the activity stream API
+# Default is to render full uris including scheme, host, etc
+AppConfig[:activity_stream_use_relative_uris] = false
+# Some object types are opt-in for audit logging
+# This array holds their jsonmodel names
+AppConfig[:audit_logging_include_object_types] = []
+```
+
+A minimal configuration that enables audit logging:
+```
+AppConfig[:enable_audit_logging] = true
+```
+
+## Storage Considerations
+
+## Bulk Events
+
+## Pagination
+
+## Enforcing audit logging in Migrations
+
+## Tests
+
