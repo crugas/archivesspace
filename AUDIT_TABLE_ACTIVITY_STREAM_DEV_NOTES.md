@@ -250,6 +250,30 @@ Some consequences of this design:
     page.
 
 
+  * Bulk activity identifiers use a different ID scheme
+
+    Since ordinary activities have a row in the database, they can be
+    referenced using their identifier, like:
+
+         https://example.com/activity-stream/event/18852
+
+    But bulk activity entries have no such ID (and storing one ID per
+    activity would be prohibitively expensive anyway).  So, they
+    instead use a different identifier scheme:
+
+         https://example.com/activity-stream/event/_blk_p40o498
+
+    Fetching a single activity works the same in either case, and since
+    API consumers are expected to treat identifiers as opaque anyway,
+    the difference shouldn't matter.
+
+    But for the curious: the bulk identifier scheme just identifies
+    the activity by the page it appears on and its position on the
+    page.  These activity IDs are also normalized, so if the same
+    activity appears in different activity streams, it will report the
+    same canonical ID.
+
+
 ### Managing database storage
 
 
