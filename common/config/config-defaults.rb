@@ -865,8 +865,6 @@ AppConfig[:search_default_scope] = 'all_record_types'
 
 # Audit logging disabled by default
 AppConfig[:enable_audit_logging] = false
-# The number of events to include per activity-stream OrderedCollectionPage
-AppConfig[:activity_stream_page_size] = 20
 # When true, render uris as root-relative in the activity stream API
 # Default is to render full uris including scheme, host, etc
 AppConfig[:activity_stream_use_relative_uris] = false
