@@ -36,6 +36,17 @@ A minimal configuration that enables audit logging:
 AppConfig[:enable_audit_logging] = true
 ```
 
+## Endpoints
+
+```
+/activity-stream
+/activity-stream/:object_type
+/activity-stream/:object_type/page/:page
+/activity-stream/event/:uuid
+/activity-stream/object_types
+/activity-stream/page/:page
+```
+
 ## Storage Considerations
 
 ## Bulk Events
