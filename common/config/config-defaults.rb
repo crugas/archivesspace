@@ -869,5 +869,7 @@ AppConfig[:enable_audit_logging] = false
 # Default is to render full uris including scheme, host, etc
 AppConfig[:activity_stream_use_relative_uris] = false
 # Some object types are opt-in for audit logging
-# This array holds their jsonmodel names
+# This array holds their jsonmodel names as strings
+# Supported optional types:
+#   accession, location, assessment, permission, group, user
 AppConfig[:audit_logging_include_object_types] = []
