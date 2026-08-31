@@ -60,6 +60,27 @@ AppConfig[:enable_audit_logging] = true
 /activity-stream/page/:page
 ```
 
+## Event Logging
+
+Individual audit events are created by calls to `AuditEvent#log_event`. These
+calls are currently made in the following files:
+```
+backend/app/model/ASModel_crud.rb
+backend/app/model/enumeration.rb
+backend/app/model/mixins/relationships.rb
+backend/app/model/mixins/tree_nodes.rb
+backend/app/model/top_container.rb
+```
+Each call to `AuditEvent#log_event` will result in zero or one rows being
+inserted into `audit_event` and, if an event is inserted, then one or more
+rows will be inserted into `audit_record` - one row for each affected record.
+
+When an event is logged, its `change_method` is passed via the `RequestContext`.
+When the request originates from the staff ui, the change method is passed to
+the backend via a header called `HTTP_X_ARCHIVESSPACE_CHANGE_METHOD` and then
+placed in the `RequestContext`.
+
+
 ## Pagination and activity storage
 
 When a client is consuming an activity stream, most requests involve
