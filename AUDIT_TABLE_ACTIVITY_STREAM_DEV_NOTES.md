@@ -53,13 +53,15 @@ AppConfig[:enable_audit_logging] = true
 
 ## Endpoints
 
+All endpoints for the Activity Stream API are GETs. There are currently no
+permissions required to hit these endpoints.
 ```
 /activity-stream
+/activity-stream/page/:page
 /activity-stream/:object_type
 /activity-stream/:object_type/page/:page
-/activity-stream/event/:uuid
 /activity-stream/object_types
-/activity-stream/page/:page
+/activity-stream/event/:uuid
 ```
 
 ## Event Logging
