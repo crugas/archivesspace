@@ -179,31 +179,6 @@ class ArchivesSpaceService < Sinatra::Base
       # Start the notifications background delivery thread
       Notifications.init if ASpaceEnvironment.environment != :unit_test
 
-      begin
-        AuditPaginator.add_bulk_events(
-          timestamp: Time.now,
-          record_type: AuditEvent::OBJECT_TYPE_ARCHIVAL_OBJECT,
-          activity_type: AuditEvent::ACTIVITY_TYPE_UPDATE,
-          change_method: AuditEvent::CHANGE_METHOD_MIGRATION,
-          actor_type: AuditEvent::ACTOR_TYPE_APPLICATION,
-          actor_name: 'admin'
-        ) do |events|
-          DB.open do |db|
-            begin
-              db[:archival_object].select(:id).each do |row|
-                events << row.fetch(:id)
-              end
-            rescue
-              Log.exception($!)
-              raise
-            end
-          end
-        end
-      rescue Exception => e
-        Log.error("Whoops: #{e}")
-        Log.exception(e)
-      end
-
 
       # Start the audit event paginator
       AuditPaginator.start
