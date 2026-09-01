@@ -84,6 +84,19 @@ When the request originates from the staff ui, the change method is passed to
 the backend via a header called `HTTP_X_ARCHIVESSPACE_CHANGE_METHOD` and then
 placed in the `RequestContext`.
 
+NOTE: There is a known gap in audit logging. There are various transfer
+endpoints on the ArchivesSpace API:
+```
+/repositories/:repo_id/accessions/:id/transfer
+/repositories/:repo_id/component_transfers
+/repositories/:repo_id/digital_objects/:id/transfer
+/repositories/:repo_id/resources/:id/transfer
+/repositories/:repo_id/transfer
+```
+These endpoints cause records to be transfered (`move` in Activity Stream
+speak) between Repository of Resource records. Currently these events will be
+logged as regular `update`s. We will implement this soon.
+
 
 ## Pagination and activity storage
 
