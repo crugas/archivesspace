@@ -146,7 +146,7 @@ activities available through the API for a given activity stream.  An
 
   * whether the page has been fully written
 
-  * a packed set of IDs of the events contained in the page
+  * a packed set of IDs sufficient to render the page
 
 There are two main benefits to this approach:
 
@@ -163,7 +163,8 @@ There are also some consequences of this design:
 
   * Pages have a fixed maximum size, and so we try to strike a balance
     between a size that is small enough for an API consumer to consume
-    but large enough to reduce database storage overhead.
+    but large enough to reduce database storage overhead.  Currently
+    this number is 500 activities, but this can be tuned if required.
 
   * The last page in any activity stream will be continuously
     rewritten until it reaches the maximum number of entries, and then
@@ -292,6 +293,49 @@ Some consequences of this design:
 
 
 ### Managing database storage
+
+[This section somewhat speculative because we haven't started
+ implementing it yet]
+
+Another concern for an ever-growing set of activities is the space
+required for MySQL to store them all.  Although bulk activities don't
+take much space, a steady trickle of regular activities will use
+increasing amounts of space over time.
+
+The current plan is to implement archiving of these events, and we
+think the pagination system described above should set us up to do
+this.  The current plan is:
+
+  * A background archiver process identifies the oldest N pages that
+    haven't yet been archived, based on some selection criteria
+    (target row count? age-based?)
+
+  * It combines the activities of those pages into segments, where
+    each segment contains some workable number of pages.  Small enough
+    to fit comfortably in memory; large enough to reduce storage
+    overhead.
+
+  * Each segment is compressed and inserted as a blob into a separate
+    table (`audit_archive`?), along with additional metadata
+    indicating the range of pages, the range of event IDs and the
+    activity stream the entry belongs to.
+
+  * The corresponding `audit_page` entries are rewritten to indicate
+    that the page has been archived, and to point to the corresponding
+    `audit_archive` entry.
+
+  * API requests for an archived page will fetch and decompress the
+    corresponding `audit_archive` entry to extract the relevant page.
+
+  * API requests for an archived event will scan the `audit_archive`
+    table's event ranges (DB index scan) to find the entry holding the
+    given event, then extract and scan to find the requested event
+    entry.
+
+Read performance of these API requests will need to be considered.  It
+might be desirable to consider some form of caching/readahead to
+accelerate clients who are making a sequential scan through a series
+of archived activity pages.
 
 
 ## Enforcing audit logging in Migrations
