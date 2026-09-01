@@ -7,6 +7,8 @@ requirements specified in the following documents:
 - Request for Comment - ASpace Activity Stream + Audit Table - Public (9/17/2025)
 - Activity Stream Scope Statement (2/2/2026)
 
+The implementation was also informed by a number of calls.
+
 The branch is currently based on ArchivesSpace v4.2.1.
 
 This document summarizes the technical design and motivations for key design
