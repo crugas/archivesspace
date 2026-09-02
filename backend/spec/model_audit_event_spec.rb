@@ -3,11 +3,10 @@ require_relative '../../common/db/migrations/utils'
 
 describe 'AuditEvent model' do
 
-  def create_audit_event(uuid:, timestamp:, activity_type:, records:, actor_name: 'admin',
+  def create_audit_event(timestamp:, activity_type:, records:, actor_name: 'admin',
                          actor_type: AuditEvent::ACTOR_TYPE_PERSON,
                          change_method: AuditEvent::CHANGE_METHOD_API)
-    event_id = $testdb[:audit_event].insert(:uuid => uuid,
-                                            :timestamp => timestamp,
+    event_id = $testdb[:audit_event].insert(:timestamp => timestamp,
                                             :actor_name => actor_name,
                                             :actor_type => actor_type,
                                             :activity_type => activity_type,
@@ -20,7 +19,7 @@ describe 'AuditEvent model' do
                                     :role => record[:role])
     end
 
-    {:id => event_id, :uuid => uuid, :timestamp => timestamp}
+    {:id => event_id, :timestamp => timestamp}
   end
 
   def capture_log_event_calls
@@ -74,7 +73,6 @@ describe 'AuditEvent model' do
 
   it 'marks merge events when the target is included in the moved objects' do
     rendered = AuditEvent.render({
-                                   :uuid => 'merge-event',
                                    :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
                                    :actor_name => 'admin',
                                    :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
@@ -177,8 +175,7 @@ describe 'AuditEvent model' do
       top_container = create(:json_top_container)
       reset_audit_tables
 
-      create_audit_event(:uuid => 'regular-event-1',
-                         :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
+      create_audit_event(:timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
                          :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
                          :records => [{:role => AuditEvent::ROLE_OBJECT,
                                        :type => 'resource',
@@ -189,8 +186,7 @@ describe 'AuditEvent model' do
       create_bulk_top_container_page(:timestamp => Time.utc(2024, 1, 1, 10, 30, 0),
                                      :top_container_ids => [top_container.id])
 
-      create_audit_event(:uuid => 'regular-event-2',
-                         :timestamp => Time.utc(2024, 1, 1, 11, 0, 0),
+      create_audit_event(:timestamp => Time.utc(2024, 1, 1, 11, 0, 0),
                          :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
                          :records => [{:role => AuditEvent::ROLE_OBJECT,
                                        :type => 'accession',

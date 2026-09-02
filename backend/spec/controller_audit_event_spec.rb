@@ -2,11 +2,10 @@ require 'spec_helper'
 
 describe 'AuditEvent controller' do
 
-  def create_audit_event(uuid:, timestamp:, activity_type:, records:, actor_name: 'admin',
+  def create_audit_event(timestamp:, activity_type:, records:, actor_name: 'admin',
                          actor_type: AuditEvent::ACTOR_TYPE_PERSON,
                          change_method: AuditEvent::CHANGE_METHOD_API)
-    event_id = $testdb[:audit_event].insert(:uuid => uuid,
-                                            :timestamp => timestamp,
+    event_id = $testdb[:audit_event].insert(:timestamp => timestamp,
                                             :actor_name => actor_name,
                                             :actor_type => actor_type,
                                             :activity_type => activity_type,
@@ -19,7 +18,7 @@ describe 'AuditEvent controller' do
                                     :role => record[:role])
     end
 
-    {:id => event_id, :uuid => uuid, :timestamp => timestamp}
+    {:id => event_id, :timestamp => timestamp}
   end
 
   def enable_audit_logging
@@ -42,15 +41,13 @@ describe 'AuditEvent controller' do
       ASUtils.json_parse(last_response.body)
     end
 
-    create_audit_event(:uuid => 'resource-event',
-                       :timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
+    create_audit_event(:timestamp => Time.utc(2024, 1, 1, 10, 0, 0),
                        :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
                        :records => [{:role => AuditEvent::ROLE_OBJECT,
                                      :type => 'resource',
                                      :uri => @resource.uri}])
 
-    create_audit_event(:uuid => 'accession-event',
-                       :timestamp => Time.utc(2024, 1, 1, 10, 5, 0),
+    create_audit_event(:timestamp => Time.utc(2024, 1, 1, 10, 5, 0),
                        :activity_type => AuditEvent::ACTIVITY_TYPE_CREATE,
                        :records => [{:role => AuditEvent::ROLE_OBJECT,
                                      :type => 'accession',
