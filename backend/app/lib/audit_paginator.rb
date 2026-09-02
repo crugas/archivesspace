@@ -190,6 +190,39 @@ class AuditPaginator
     end
   end
 
+  def self.mark_everything_updated!
+    now = Time.now
+
+    audited_code_by_record_name = AuditEvent.object_type_codes.map {|code|
+      [AuditEvent::OBJECT_TYPE_CODE_TABLE.fetch(code), code]
+    }.to_h
+
+    ASModel.all_models.each do |model|
+      jsonmodel_cls = model.my_jsonmodel(true)
+      if jsonmodel_cls && audited_code_by_record_name.has_key?(jsonmodel_cls.record_type)
+        Log.info("Generating update events for all records of type #{jsonmodel_cls.record_type}")
+
+        AuditPaginator.add_bulk_events(
+          timestamp: now,
+          record_type: audited_code_by_record_name.fetch(jsonmodel_cls.record_type),
+          activity_type: AuditEvent::ACTIVITY_TYPE_UPDATE,
+          change_method: AuditEvent::CHANGE_METHOD_MIGRATION,
+          actor_type: AuditEvent::ACTOR_TYPE_APPLICATION,
+          actor_name: 'admin'
+        ) do |events|
+          begin
+            model.map(:id).each do |record_id|
+              events << record_id
+            end
+          rescue
+            Log.error("Failure generating update events for type #{jsonmodel_cls.record_type}: #{$!}")
+            Log.exception($!)
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def paginate_audit_records
