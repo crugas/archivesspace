@@ -1,7 +1,5 @@
 require 'audit_event_constants'
 
-require 'securerandom'
-
 class AuditEvent
   W3C_URL = 'https://www.w3.org/ns/activitystreams'
   # FIXME: might need to support a proxy url
@@ -299,8 +297,7 @@ class AuditEvent
     change_method = RequestContext.get(:change_method) || CHANGE_METHOD_API
 
     DB.open do |db|
-      event_id = db[:audit_event].insert(:uuid => SecureRandom.uuid,
-                                         :timestamp => Time.now,
+      event_id = db[:audit_event].insert(:timestamp => Time.now,
                                          :actor_name => opts[:actor],
                                          :actor_type => opts[:actor_type] || ACTOR_TYPE_PERSON,
                                          :activity_type => activity_type,

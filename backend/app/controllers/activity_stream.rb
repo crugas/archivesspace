@@ -33,13 +33,13 @@ class ArchivesSpaceService < Sinatra::Base
     end
   end
 
-  Endpoint.get('/activity-stream/event/:uuid')
+  Endpoint.get('/activity-stream/event/:id')
     .description("Get an audit event by id")
     .permissions([])
-    .params(["uuid", String, "The UUID of the event to get"])
+    .params(["id", String, "The ID of the event to get"])
     .returns([200, "an audit event"]) \
   do
-    result = AuditEvent.by_id(params[:uuid])
+    result = AuditEvent.by_id(params[:id])
 
     if result
       activity_json_response(result)

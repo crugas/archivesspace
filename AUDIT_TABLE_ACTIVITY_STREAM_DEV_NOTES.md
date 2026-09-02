@@ -61,7 +61,7 @@ permissions required to hit these endpoints.
 /activity-stream/:object_type
 /activity-stream/:object_type/page/:page
 /activity-stream/object_types
-/activity-stream/event/:uuid
+/activity-stream/event/:id
 ```
 
 ## Event Logging

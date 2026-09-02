@@ -1,5 +1,4 @@
 require 'audit_event_constants'
-require 'securerandom'
 
 Sequel.extension :inflector
 Sequel.extension :pagination
@@ -239,8 +238,7 @@ class AuditEventLogger
   end
 
   def log_update_event(object_type, uri)
-    event_id = @db[:audit_event].insert(:uuid => SecureRandom.uuid,
-                                        :timestamp => Time.now,
+    event_id = @db[:audit_event].insert(:timestamp => Time.now,
                                         :actor_name => 'admin',
                                         :actor_type => AuditEvent::ACTOR_TYPE_PERSON,
                                         :activity_type => AuditEvent::ACTIVITY_TYPE_UPDATE,
