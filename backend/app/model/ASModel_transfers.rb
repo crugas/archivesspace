@@ -16,6 +16,13 @@ module ASModel
         self.class.filter(id: self.id).update(repo_id: target_repository.id,
                                                  system_mtime: Time.now)
 
+        pre_transfer_uri = self.uri
+        RequestContext.open(repo_id: target_repository.id, change_method: AuditEvent::CHANGE_METHOD_TRANSFER) do
+          AuditEvent.log_event(AuditEvent::ACTIVITY_TYPE_MOVE,
+                               AuditEvent::ROLE_OBJECT => pre_transfer_uri,
+                               AuditEvent::ROLE_TARGET => self.uri)
+        end
+
         # Mark the old URI as deleted (if we can locate the source repo)
         if source_repository
           RequestContext.open(repo_id: source_repository.id) do

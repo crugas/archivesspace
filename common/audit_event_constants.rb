@@ -91,11 +91,11 @@ class AuditEvent
      CHANGE_METHOD_MANAGE_ENUMERATIONS = 8,
      CHANGE_METHOD_REORDER = 9,
      CHANGE_METHOD_MIGRATION = 10,
+     CHANGE_METHOD_TRANSFER = 11,
     ]
 
 # FIXME: add these?
 #- Duplicate record
-# and think about splitting out different importers
 
   CHANGE_METHOD_CODE_TABLE =
     {
@@ -109,6 +109,7 @@ class AuditEvent
      CHANGE_METHOD_MANAGE_ENUMERATIONS => 'Manage Enumerations',
      CHANGE_METHOD_REORDER => 'Reorder',
      CHANGE_METHOD_MIGRATION => 'Database Migration',
+     CHANGE_METHOD_TRANSFER => 'Transfer',
     }
 
   ROLES =
